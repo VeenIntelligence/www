@@ -1,0 +1,276 @@
+/* ============================================================
+   Navbar — Liquid Glass via @liquidglass/react
+   ============================================================ */
+
+.navbar {
+  --navbar-height: 60px;
+  --navbar-padding-inline: 48px;
+  --navbar-padding-inline-mobile: 20px;
+  --navbar-border-idle: rgba(255, 255, 255, 0.08);
+  --navbar-border-scrolled: rgba(255, 255, 255, 0.12);
+  --navbar-logo-color: rgba(224, 224, 224, 0.85);
+  --navbar-logo-mark-color: #ffffff;
+  --navbar-link-gap: 8px;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--navbar-height);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Fully transparent — let LiquidGlass white refraction show */
+  background: transparent;
+
+  /* Subtle bottom edge */
+  border-bottom: 1px solid var(--navbar-border-idle);
+}
+
+.navbar--scrolled {
+  background: transparent;
+  border-bottom: 1px solid var(--navbar-border-scrolled);
+}
+
+/* LiquidGlass applies its own container — override its internal layout */
+.navbar__glass {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.navbar__inner {
+  width: 100%;
+  height: var(--navbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--navbar-padding-inline);
+}
+
+/* ---- Logo ---- */
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--navbar-logo-color);
+  z-index: 101;
+  transition: color 0.3s;
+}
+
+.navbar__logo:hover {
+  color: #e0e0e0;
+}
+
+.navbar__logo .brand-wordmark {
+  --brand-wordmark-color: var(--navbar-logo-color);
+  --brand-wordmark-mark-color: var(--navbar-logo-mark-color);
+}
+
+/* ---- Nav Links ---- */
+.navbar__links {
+  display: flex;
+  gap: var(--navbar-link-gap);
+}
+
+.navbar__link {
+  position: relative;
+  padding: 8px 18px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: 0.3px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+  border-radius: 0;
+}
+
+/* Inactive links dim when there's an active one */
+.navbar__links:has(.navbar__link--active) .navbar__link:not(.navbar__link--active) {
+  filter: blur(0.3px);
+  opacity: 0.45;
+}
+
+.navbar__link:hover {
+  color: rgba(255, 255, 255, 0.85);
+  filter: blur(0px) !important;
+  opacity: 1 !important;
+}
+
+/* Active link: white, semibold, no glow */
+.navbar__link--active {
+  color: #ffffff;
+  font-weight: 600;
+  filter: blur(0px);
+  opacity: 1;
+}
+
+
+
+/* ---- Right Section ---- */
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 101;
+}
+
+/* Hide mobile links on desktop */
+@media (min-width: 769px) {
+  .mobile-links {
+    display: none !important;
+  }
+}
+
+/* ---- Liquid Language Toggle ---- */
+.lang-switch {
+  --lang-switch-width: 76px;
+  --lang-switch-height: 30px;
+  --lang-switch-pad: 2px;
+  --lang-switch-travel: 36px;
+
+  position: relative;
+  display: flex;
+  width: var(--lang-switch-width);
+  height: var(--lang-switch-height);
+  padding: var(--lang-switch-pad);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 6px 18px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.lang-switch__thumb {
+  position: absolute;
+  top: var(--lang-switch-pad);
+  left: var(--lang-switch-pad);
+  width: calc(50% - var(--lang-switch-pad));
+  height: calc(100% - (var(--lang-switch-pad) * 2));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 10px rgba(0, 0, 0, 0.12);
+  transform: translateX(0);
+  transition: transform 220ms cubic-bezier(0.24, 0.9, 0.32, 1);
+}
+
+.lang-switch--zh .lang-switch__thumb {
+  transform: translateX(var(--lang-switch-travel));
+}
+
+.lang-switch__option {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.52);
+  transition: color 180ms ease;
+}
+
+.lang-switch__option--active {
+  color: rgba(10, 12, 18, 0.88);
+}
+
+.lang-switch__option-label {
+  position: relative;
+  transform: translateY(-0.5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-switch__thumb,
+  .lang-switch__option {
+    transition-duration: 0ms !important;
+  }
+}
+
+/* ---- Hamburger (mobile) ---- */
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.navbar__hamburger span {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: rgba(224, 224, 224, 0.7);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.navbar__hamburger--open span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+.navbar__hamburger--open span:nth-child(2) {
+  opacity: 0;
+}
+.navbar__hamburger--open span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ============================================================
+   Mobile Responsive
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .navbar__inner {
+    padding: 0 var(--navbar-padding-inline-mobile);
+  }
+
+  .navbar__links {
+    position: fixed;
+    inset: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(10, 10, 15, 0.94);
+    backdrop-filter: blur(30px) saturate(1.8);
+    -webkit-backdrop-filter: blur(30px) saturate(1.8);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.96);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999; /* Increased to avoid being obscured by content */
+  }
+
+  .desktop-links {
+    display: none !important;
+  }
+
+  .navbar__links--open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  .navbar__link {
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    padding: 14px 28px;
+  }
+
+  .navbar__hamburger {
+    display: flex;
+  }
+}

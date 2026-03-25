@@ -1,0 +1,27 @@
+.brand-wordmark {
+  --brand-wordmark-size: 19px;
+  --brand-wordmark-color: rgba(224, 224, 224, 0.85);
+  --brand-wordmark-mark-color: #ffffff;
+  --brand-wordmark-gap: calc(var(--brand-wordmark-size) * 0.1);
+  --brand-wordmark-mark-scale: 1.21;
+
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--brand-wordmark-gap);
+  color: var(--brand-wordmark-color);
+  font-family: var(--font-sans);
+  font-size: var(--brand-wordmark-size);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.brand-wordmark__mark {
+  color: var(--brand-wordmark-mark-color);
+  font-size: calc(var(--brand-wordmark-size) * var(--brand-wordmark-mark-scale));
+  font-weight: 700;
+}
+
+.brand-wordmark__text {
+  color: currentColor;
+}

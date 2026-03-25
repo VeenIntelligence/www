@@ -1,0 +1,147 @@
+import { useState, useEffect } from 'react';
+import { LiquidGlass } from '@liquidglass/react';
+import BrandWordmark from './common/BrandWordmark';
+import LanguageToggle from './LanguageToggle';
+import { COPY } from '../config/i18n';
+import { useLanguage } from '../context/useLanguage';
+import '../styles/components/navbar.css';
+
+// 导航栏区块配置，已从硬编码文本变为仅用ID查找，配合多语言字典进行翻译使用
+const NAV_LINKS = [
+  { id: 'hero' },
+  { id: 'about' },
+  { id: 'product' },
+  { id: 'services' },
+];
+
+// 触发导航栏滚动状态（如模糊增强等视觉变化）的滚动像素阈值
+const NAVBAR_SCROLL_THRESHOLD = 30;
+
+// 用于监听当前访问的页面区块，从而高亮对应导航菜单项
+const NAVBAR_SECTION_OBSERVER = {
+  threshold: 0.3, // 区块在屏幕出现30%时即视作当前区块并触发高亮
+  rootMargin: '-60px 0px 0px 0px', // 顶部偏移量，用于平衡导航的高度带来的遮挡偏差
+};
+
+// 导航栏液态毛玻璃组件的基础物理渲染常量
+const NAVBAR_GLASS_BASE = {
+  borderRadius: 0, // 圆角度数，默认无圆角（占满边缘）
+  contrast: 1.2, // 玻璃表面材质对比度系数
+  shadowIntensity: 0.1, // 模型背部投射到物理环境的发光/阴影强度
+  elasticity: 0.5, // （如果存在物理悬浮或形变互动）弹性和恢复原始状态的速度
+  zIndex: 100, // Z轴层级，确保菜单悬浮于各类动效最上层
+  className: 'navbar__glass',
+};
+
+// 【未滚动时】页面静止在最顶部时的毛玻璃外观参数（偏透明隐形、平稳）
+const NAVBAR_GLASS_IDLE = {
+  blur: 0.1, // 背景模糊程度
+  brightness: 1.5, // 毛玻璃材质整体的透光率、亮度增益
+  saturation: 1.3, // 色彩饱和度增益比例，让透过的底层颜色更润泽
+  displacementScale: 2.9, // 表面涟漪波浪/曲面扭曲扰动系数（数值越大曲率越弯折）
+};
+
+// 【滚动发生后】吸附在顶部滑动后的毛玻璃动态外观呈现（加强阻挡、凸出存在感）
+const NAVBAR_GLASS_SCROLLED = {
+  blur: 1.2, // 更高的糊化效果，隔绝底下滚过的图文带来的视觉干扰
+  brightness: 1.25, // 材质进一步提亮，形成视觉焦点和玻璃质感
+  saturation: 1.6, // 底色反射的色彩进一步浓郁，提升整体环境光影响
+  displacementScale: 1.3, // 使表面发生更剧烈的扭曲，增加液体流动或厚玻璃折射的质感
+};
+
+export default function Navbar() {
+  const [activeSection, setActiveSection] = useState('hero');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { lang, setLang } = useLanguage();
+  const glassProps = {
+    ...NAVBAR_GLASS_BASE,
+    ...(scrolled ? NAVBAR_GLASS_SCROLLED : NAVBAR_GLASS_IDLE),
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      NAVBAR_SECTION_OBSERVER
+    );
+
+    NAV_LINKS.forEach(link => {
+      const el = document.getElementById(link.id);
+      if (el) observer.observe(el);
+    });
+
+    const onScroll = () => setScrolled(window.scrollY > NAVBAR_SCROLL_THRESHOLD);
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth > 768) setMenuOpen(false); };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  return (
+    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-nav">
+      <LiquidGlass {...glassProps}>
+        <div className="navbar__inner">
+          {/* Logo */}
+          <a href="#hero" className="navbar__logo" onClick={() => setMenuOpen(false)}>
+            <BrandWordmark variant="full" size={19} />
+          </a>
+
+          {/* Desktop Nav links */}
+          <div className="navbar__links desktop-links">
+            {NAV_LINKS.map(link => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {COPY.nav[lang][link.id]}
+              </a>
+            ))}
+          </div>
+
+          {/* Right side */}
+          <div className="navbar__right">
+            <LanguageToggle lang={lang} onChange={setLang} />
+
+            <button
+              className={`navbar__hamburger ${menuOpen ? 'navbar__hamburger--open' : ''}`}
+              onClick={() => setMenuOpen(v => !v)}
+              aria-label="Toggle menu"
+            >
+              <span /><span /><span />
+            </button>
+          </div>
+        </div>
+      </LiquidGlass>
+
+      {/* Mobile Nav links (Outside LiquidGlass to break free from scale/filter stacking context) */}
+      <div className={`navbar__links mobile-links ${menuOpen ? 'navbar__links--open' : ''}`}>
+        {NAV_LINKS.map(link => (
+          <a
+            key={link.id}
+            href={`#${link.id}`}
+            className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            {COPY.nav[lang][link.id]}
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}

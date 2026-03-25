@@ -1,0 +1,416 @@
+/* ============================================================
+   Hero Section — Deep-space glass droplet stage
+   ============================================================ */
+
+.hero-section {
+  /* 内容区位置参数 */
+  --hero-content-pad-top: clamp(160px, 30vh, 280px);
+  --hero-content-pad-inline: 56px;
+  --hero-content-pad-bottom: 56px;
+  --hero-title-slot-height: clamp(150px, 16vw, 230px);
+
+  /* slogan 面板位置与内边距 */
+  --hero-subtitle-top: clamp(75vh, 75%, 80vh);
+  --hero-subtitle-pad-top: clamp(28px, 3.8vh, 40px);
+  --hero-subtitle-pad-inline: 56px;
+  --hero-subtitle-pad-bottom: 28px;
+
+  /* slogan 面板玻璃透明度参数 */
+  --hero-subtitle-glass-top-white-alpha: 0.00; /* 顶部白雾透明度；默认标准值：0.05。越大越白，越小越通透。 */
+  --hero-subtitle-glass-mid-white-alpha: 0.005; /* 中段白雾透明度；默认标准值：0.015。用于控制玻璃中层泛白感。 */
+  --hero-subtitle-glass-bottom-dark-alpha: 0.01; /* 底部暗色透明度；默认标准值：0.05。越大越厚重。 */
+  --hero-subtitle-glass-left-accent-alpha: 0.08; /* 左侧蓝色玻璃染色透明度；默认标准值：0.08。 */
+  --hero-subtitle-glass-mid-accent-alpha: 0.004; /* 中部蓝色玻璃染色透明度；默认标准值：0.04。 */
+  --hero-subtitle-glass-right-accent-alpha: 0.001; /* 右侧白蓝染色透明度；默认标准值：0.03。 */
+
+  /* slogan 面板磨砂强度参数 */
+  --hero-subtitle-blur: 10px; /* 背景模糊强度；默认标准值：8px。越大越糊。 */
+  --hero-subtitle-saturate: 1.0; /* 背景饱和度增强；默认标准值：1.06。1 为不增强。 */
+
+  /* slogan 面板白边参数 */
+  --hero-subtitle-top-border-color: rgba(255, 255, 255, 0); /* 顶部白边颜色；默认标准值：rgba(255, 255, 255, 0)。当前关闭顶部白边/倒角。 */
+  --hero-subtitle-bottom-border-color: rgba(255, 255, 255, 0.04); /* 底部细边颜色；默认标准值：rgba(255, 255, 255, 0.04)。 */
+
+  /* slogan 面板阴影参数 */
+  --hero-subtitle-inner-shadow: inset 0 0 0 rgba(255, 255, 255, 0); /* 内阴影；默认标准值：inset 0 0 0 rgba(255, 255, 255, 0)。当前关闭内阴影。 */
+  --hero-subtitle-outer-shadow: 0 0 0 rgba(3, 8, 20, 0); /* 外阴影；默认标准值：0 0 0 rgba(3, 8, 20, 0)。当前关闭外阴影。 */
+
+  /* slogan 面板顶部发光边参数 */
+  --hero-subtitle-edge-glow-white-alpha: 0.0; /* 顶部发光白色强度；默认标准值：0.2。 */
+  --hero-subtitle-edge-glow-blue-alpha: 0.08; /* 顶部发光蓝色强度；默认标准值：0.08。 */
+  --hero-subtitle-edge-glow-opacity: 0; /* 顶部发光整体可见度；默认标准值：0。0 为完全关闭，1 为完全显示。 */
+  --hero-subtitle-edge-glow-blur: 6px; /* 顶部发光模糊半径；默认标准值：6px。 */
+
+  /* slogan 文字参数 */
+  --hero-subtitle-text-color: rgba(231, 242, 252, 0.76); /* 文字颜色；默认标准值：rgba(214, 231, 247, 0.76)。 */
+  --hero-subtitle-text-glow-near: rgba(102, 181, 255, 0.08); /* 文字近距离发光；默认标准值：rgba(102, 181, 255, 0.08)。 */
+  --hero-subtitle-text-glow-far: rgba(41, 93, 179, 0.04); /* 文字远距离发光；默认标准值：rgba(41, 93, 179, 0.04)。 */
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  background:
+    radial-gradient(circle at 74% 34%, rgba(102, 173, 255, 0.18), transparent 26%),
+    radial-gradient(circle at 78% 58%, rgba(41, 105, 201, 0.14), transparent 32%),
+    linear-gradient(180deg, #040816 0%, #060c18 42%, #070911 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero__stage--interactive {
+  pointer-events: auto;
+  cursor: default;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 82% 42%, rgba(164, 213, 255, 0.12), transparent 18%),
+    radial-gradient(circle at 65% 68%, rgba(73, 128, 214, 0.09), transparent 24%),
+    linear-gradient(90deg, rgba(3, 8, 20, 0.82) 0%, rgba(3, 8, 20, 0.38) 32%, rgba(3, 8, 20, 0.08) 56%, transparent 72%);
+  pointer-events: none;
+}
+
+.hero-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(2, 6, 16, 0.30) 0%, transparent 24%, transparent 72%, rgba(2, 6, 16, 0.55) 100%),
+    radial-gradient(circle at 26% 54%, rgba(4, 10, 22, 0.54), transparent 34%);
+  pointer-events: none;
+}
+
+.hero__content {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--hero-content-pad-top) var(--hero-content-pad-inline) var(--hero-content-pad-bottom);
+  pointer-events: none;
+}
+
+.hero__title-area {
+  max-width: min(40rem, 44vw);
+  min-height: var(--hero-title-slot-height);
+  display: flex;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.hero__title-backdrop {
+  position: relative;
+  display: inline-block;
+  padding: 22px 34px 24px 0;
+}
+
+.hero__title-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: -40px -26px -34px -48px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 48%, rgba(10, 18, 36, 0.82), rgba(10, 18, 36, 0.50) 42%, transparent 74%);
+  filter: blur(22px);
+  z-index: -1;
+}
+
+.hero__title {
+  font-family: 'Avenir Next', 'Helvetica Neue', Inter, system-ui, -apple-system, sans-serif;
+  font-size: clamp(3.35rem, 6.95vw, 7.1rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.88;
+  color: rgba(245, 250, 255, 0.97);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.hero__title--compact {
+  font-size: clamp(2.7rem, 5.1vw, 5rem);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.hero__title--compact .hero__title-line {
+  white-space: nowrap;
+}
+
+.hero__title-line {
+  display: block;
+  position: relative;
+  text-shadow:
+    0 18px 36px rgba(4, 9, 20, 0.82),
+    0 6px 20px rgba(21, 51, 96, 0.26),
+    0 0 22px rgba(121, 190, 255, 0.08);
+}
+
+.hero__title-line--secondary {
+  margin-top: -0.12em;
+}
+
+.hero__divider {
+  position: relative;
+  width: clamp(180px, 24vw, 320px);
+  max-width: 100%;
+  height: clamp(2px, 0.22vw, 3px);
+  margin: 24px 0 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(239, 248, 255, 0.92) 0%,
+    rgba(174, 218, 255, 0.42) 18%,
+    rgba(96, 160, 238, 0.12) 52%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 10px rgba(105, 181, 255, 0.14),
+    0 0 22px rgba(105, 181, 255, 0.07);
+}
+
+.hero__divider::before,
+.hero__divider::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.hero__divider::before {
+  inset: -9px -14px;
+  background:
+    radial-gradient(circle at 6% 50%, rgba(255, 255, 255, 0.42), transparent 18%),
+    linear-gradient(90deg, rgba(143, 207, 255, 0.18) 0%, rgba(143, 207, 255, 0.05) 32%, transparent 72%);
+  filter: blur(9px);
+  z-index: -1;
+}
+
+.hero__divider::after {
+  inset: -6px -10px;
+  background:
+    radial-gradient(circle at 82% 50%, rgba(226, 242, 255, 0.18) 0%, rgba(167, 214, 255, 0.14) 12%, rgba(138, 201, 255, 0.08) 20%, transparent 34%),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(150, 210, 255, 0.01) 34%,
+      rgba(150, 210, 255, 0.04) 58%,
+      rgba(188, 231, 255, 0.18) 82%,
+      rgba(230, 244, 255, 0.38) 100%
+    );
+  box-shadow:
+    0 0 10px rgba(189, 233, 255, 0.1),
+    0 0 20px rgba(126, 197, 255, 0.07);
+  filter: blur(1px);
+  transform-origin: 100% 50%;
+  animation: hero-divider-breathe 6.8s cubic-bezier(0.28, 0, 0.18, 1) infinite;
+}
+
+.hero__subtitle-area {
+  position: absolute;
+  top: var(--hero-subtitle-top);
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: auto;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, var(--hero-subtitle-glass-top-white-alpha)),
+      rgba(255, 255, 255, var(--hero-subtitle-glass-mid-white-alpha)) 28%,
+      rgba(8, 15, 30, var(--hero-subtitle-glass-bottom-dark-alpha)) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(108, 156, 219, var(--hero-subtitle-glass-left-accent-alpha)) 0%,
+      rgba(177, 214, 255, var(--hero-subtitle-glass-mid-accent-alpha)) 52%,
+      rgba(235, 246, 255, var(--hero-subtitle-glass-right-accent-alpha)) 100%
+    );
+  backdrop-filter: blur(var(--hero-subtitle-blur)) saturate(var(--hero-subtitle-saturate));
+  -webkit-backdrop-filter: blur(var(--hero-subtitle-blur)) saturate(var(--hero-subtitle-saturate));
+  border-top: 1px solid var(--hero-subtitle-top-border-color);
+  border-bottom: 1px solid var(--hero-subtitle-bottom-border-color);
+  box-shadow: var(--hero-subtitle-inner-shadow), var(--hero-subtitle-outer-shadow);
+}
+
+.hero__subtitle-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: var(--hero-subtitle-pad-top) var(--hero-subtitle-pad-inline) var(--hero-subtitle-pad-bottom);
+  display: flex;
+  align-items: flex-start;
+}
+
+.hero__subtitle-shell::before {
+  content: '';
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: -18px;
+  height: 32px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      70% 130% at 50% 100%,
+      rgba(245, 249, 255, var(--hero-subtitle-edge-glow-white-alpha)) 0%,
+      rgba(148, 205, 255, var(--hero-subtitle-edge-glow-blue-alpha)) 42%,
+      transparent 72%
+    );
+  filter: blur(var(--hero-subtitle-edge-glow-blur));
+  opacity: var(--hero-subtitle-edge-glow-opacity);
+  pointer-events: none;
+  animation: hero-subtitle-edge-bounce 8.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.hero__subtitle {
+  position: relative;
+  z-index: 1;
+  font-family: 'Avenir Next', 'Helvetica Neue', sans-serif;
+  font-size: clamp(0.86rem, 1.2vw, 1.02rem);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.55;
+  text-transform: uppercase;
+  color: var(--hero-subtitle-text-color);
+  user-select: text;
+  -webkit-user-select: text;
+  text-shadow:
+    0 0 10px var(--hero-subtitle-text-glow-near),
+    0 0 22px var(--hero-subtitle-text-glow-far);
+}
+
+@media (max-width: 980px) {
+  .hero__title-area {
+    max-width: min(34rem, 60vw);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    --hero-content-pad-inline: 24px;
+    --hero-content-pad-bottom: 56px;
+    --hero-title-slot-height: clamp(122px, 32vw, 168px);
+    --hero-subtitle-pad-top: 18px;
+    --hero-subtitle-pad-inline: 24px;
+    --hero-subtitle-pad-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+
+    background:
+      radial-gradient(circle at 72% 24%, rgba(102, 173, 255, 0.16), transparent 22%),
+      radial-gradient(circle at 82% 48%, rgba(41, 105, 201, 0.14), transparent 28%),
+      linear-gradient(180deg, #040816 0%, #060c18 48%, #070911 100%);
+  }
+
+  .hero-section::before {
+    background:
+      radial-gradient(circle at 82% 34%, rgba(164, 213, 255, 0.10), transparent 16%),
+      linear-gradient(180deg, rgba(3, 8, 20, 0.24) 0%, rgba(3, 8, 20, 0.10) 26%, rgba(3, 8, 20, 0.42) 100%);
+  }
+
+  .hero__title-area {
+    max-width: 100%;
+  }
+
+  .hero__title-backdrop {
+    padding: 10px 16px 12px 0;
+  }
+
+  .hero__title-backdrop::before {
+    inset: -24px -14px -18px -26px;
+    filter: blur(16px);
+  }
+
+  .hero__title {
+    font-size: clamp(2.95rem, 15.6vw, 4.7rem);
+    line-height: 0.9;
+  }
+
+  .hero__title--compact {
+    font-size: clamp(2.2rem, 10vw, 3.2rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+  }
+
+  .hero__title-line--secondary {
+    margin-top: -0.1em;
+  }
+
+  .hero__divider {
+    margin: 18px 0 14px;
+  }
+
+  .hero__subtitle {
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+@keyframes hero-divider-breathe {
+  0% {
+    opacity: 0.2;
+    transform: scaleX(1);
+  }
+
+  18% {
+    opacity: 0.24;
+    transform: scaleX(1);
+  }
+
+  30% {
+    opacity: 0.42;
+    transform: scaleX(1.01);
+  }
+
+  42% {
+    opacity: 0.76;
+    transform: scaleX(1.03);
+  }
+
+  54% {
+    opacity: 0.34;
+    transform: scaleX(1.008);
+  }
+
+  100% {
+    opacity: 0.2;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-subtitle-edge-bounce {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0.78;
+  }
+
+  20% {
+    transform: translateY(-2px) scaleX(1.015);
+    opacity: 0.96;
+  }
+
+  42% {
+    transform: translateY(0) scaleX(0.996);
+    opacity: 0.82;
+  }
+
+  100% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0.78;
+  }
+}

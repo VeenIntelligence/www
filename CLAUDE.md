@@ -1,0 +1,172 @@
+# Veenai Project — Gemini Instructions
+
+请使用英文做内部思考，任何做输出的地方都使用中文。
+
+> **⚠️ This file is kept in sync with `AGENT.md` and `CLAUDE.md`.**
+> If you modify ANY of these three files, you MUST update the other two to match.
+
+---
+
+## 1. Meta Rules
+
+1. **Triple-file sync**: `AGENT.md`, `GEMINI.md`, `CLAUDE.md` contain identical principles. Any edit to one MUST be propagated to the other two in the same operation.
+2. **No browser verification**: After making changes, run `npx vite build` to confirm compilation. Do NOT launch browsers, screenshot, or visually verify. The user will verify visually.
+3. **Compile-only validation**: If the build passes, stop. If it fails, fix the error. That's it.
+
+---
+
+## 2. Code Philosophy — Write Less, Mean More
+
+### 2.1 Craftsmanship Over Volume
+
+- Code should become **shorter and more elegant** over time, never longer and messier.
+- Every new feature is an opportunity to **extract, refactor, and simplify** existing code.
+- Before writing new code, ask: _"Does a pattern already exist here that I can reuse or generalize?"_
+- Prefer **one well-designed abstraction** over three copy-pasted variants.
+
+### 2.2 Pattern Extraction
+
+- When you see **two or more similar blocks**, extract a shared utility, hook, or component.
+- Common patterns to watch for:
+  - Repeated Tailwind class groups → extract with `@apply` or shared component
+  - Similar event handler logic → extract custom hook
+  - Duplicated section layout → extract layout component
+  - Repeated config objects → centralize in `src/config/`
+
+### 2.3 No Dead Code
+
+- Never leave unused imports, commented-out code blocks, or orphaned files.
+- If you replace a file, delete the old one. If you extract a function, remove the inline version.
+
+### 2.4 Localization (i18n)
+
+- **Never hardcode UI text** in components or pages.
+- Provide both English and Chinese translations out of the box.
+- All display texts must be extracted to `src/config/i18n.js`. Use the `t()` function to map texts dynamically.
+
+---
+
+## 3. Data Flow & Lifecycle Discipline
+
+### 3.1 Track Every Resource's Birth and Death
+
+Every resource you create must have a clear cleanup path:
+
+| Resource                     | Creation                                   | Cleanup                           |
+| ---------------------------- | ------------------------------------------ | --------------------------------- |
+| `requestAnimationFrame`      | `animId = requestAnimationFrame(fn)`       | `cancelAnimationFrame(animId)`    |
+| `addEventListener`           | `el.addEventListener(evt, fn)`             | `el.removeEventListener(evt, fn)` |
+| `setInterval` / `setTimeout` | `id = setInterval(fn, ms)`                 | `clearInterval(id)`               |
+| `IntersectionObserver`       | `observer = new IntersectionObserver(...)` | `observer.disconnect()`           |
+| `ResizeObserver`             | `observer = new ResizeObserver(...)`       | `observer.disconnect()`           |
+| WebSocket                    | `ws = new WebSocket(url)`                  | `ws.close()`                      |
+| Canvas context state         | `ctx.save()`                               | `ctx.restore()`                   |
+
+### 3.2 React useEffect Cleanup
+
+- **Every `useEffect` that creates a side effect MUST return a cleanup function.**
+- Group related setup/teardown together; don't scatter listeners across multiple effects.
+- Use `AbortController` for fetch requests that may outlive the component.
+
+### 3.3 Prevent Memory Leaks
+
+- Never capture component references in closures that outlive the component (e.g., global event handlers without cleanup).
+- Avoid appending to arrays indefinitely (e.g., particle systems) — always cap size and prune old entries.
+- `Float32Array` / `TypedArray` buffers should be reused, not reallocated per frame.
+
+---
+
+## 4. Performance & Rendering
+
+### 4.1 Animation & Canvas Rules
+
+- **One `requestAnimationFrame` loop** per canvas. Never stack multiple loops.
+- Avoid allocating objects inside the animation loop. Pre-allocate buffers in `resize()` or initialization.
+- Use `Float32Array` for numerical buffers — it's faster and communicates intent.
+- Batch canvas operations: set `ctx.font` once, not per character.
+- Consider frame-skipping for complex simulations on low-power devices.
+
+### 4.2 React Rendering
+
+- Avoid inline object/array literals in JSX props — they cause unnecessary re-renders.
+- Use `React.memo` for pure presentational components that receive stable props.
+- Never put heavy computation in render. Use `useMemo` / `useCallback` where appropriate, but don't over-optimize — measure first.
+- Tailwind utility classes over inline `style={{}}` objects. Inline styles only for truly dynamic values (e.g., `transform`, `perspective`).
+
+### 4.3 CSS Performance
+
+- Prefer `transform` and `opacity` for animations (GPU-composited, no layout thrashing).
+- Avoid animating `width`, `height`, `top`, `left` (trigger layout recalculation).
+- Use `will-change` sparingly and only on elements that actually animate.
+- Use CSS custom properties (variables) for theming — change one variable, update everywhere.
+
+---
+
+## 5. Architecture & File Organization
+
+### 5.1 Current Project Structure
+
+```
+src/
+├── components/          # Global shared components (Navbar, Footer, WaveCanvas)
+├── pages/
+│   ├── HomePage.jsx     # Landing page assembler
+│   ├── NotFound.jsx     # 404
+│   ├── home/            # Landing page sections (HeroSection, AboutSection, etc.)
+│   └── product/         # Product sub-routes
+│       └── components/  # Product-page-specific components
+├── styles/
+│   ├── index.css        # Global reset & design tokens
+│   ├── components/      # Styles for global components
+│   ├── sections/        # Styles for landing page sections
+│   └── product/         # Styles for product pages
+├── utils/               # Pure utility functions (noise.js, rippleSimulation.js)
+├── config/              # Configuration objects (heroConfig.js)
+├── App.jsx              # Pure router — NO page content here
+├── main.jsx             # Entry point
+└── index.css            # Global styles & CSS custom properties
+```
+
+### 5.2 Placement Rules
+
+| What                       | Where                        | Why                              |
+| -------------------------- | ---------------------------- | -------------------------------- |
+| Used by ≥2 pages           | `components/`                | Shared globally                  |
+| Used only within one page  | `pages/<page>/components/`   | Co-located, not polluting global |
+| Pure computation, no React | `utils/`                     | Reusable, testable               |
+| Tunable parameters         | `config/`                    | Centralized, easy to adjust      |
+| Page-level assembler       | `pages/<Name>.jsx`           | Composes sections + layout       |
+| Section of a page          | `pages/<page>/<Section>.jsx` | Focused, single-responsibility   |
+
+### 5.3 Naming Conventions
+
+- Components: `PascalCase.jsx` (e.g., `HeroSection.jsx`)
+- Utilities: `camelCase.js` (e.g., `rippleSimulation.js`)
+- CSS: `kebab-case.css` only for `@keyframes`, pseudo-elements, and things Tailwind can't inline
+- Config files: `camelCase.js` (e.g., `heroConfig.js`)
+
+---
+
+## 6. CSS & Styling Rules
+
+- **Tailwind CSS v4** is the primary styling system. Use utility classes inline in JSX.
+- Inline `style={{}}` only for truly dynamic values (e.g., `perspective`, `transform`, `transformOrigin`).
+- `@keyframes`, `::before/::after` pseudo-elements, and complex animations go in companion `.css` files under `styles/`.
+- Use CSS custom properties defined in `index.css` for design tokens (colors, fonts).
+- Design tokens (`:root` variables) are the **single source of truth** for theming.
+- 任何“抽离出来给人调”的参数，无论写成 CSS 自定义属性还是 config 对象，都必须加中文注释，并且必须在注释里写清楚“默认标准值”。注释必须明确说明：这个参数控制什么、当前默认是多少、往大或往小调会发生什么。不要只给变量名，不要只写英文，不要省略默认值。
+- Responsive: use Tailwind breakpoint prefixes (`max-md:`, `max-lg:`, `sm:`, `md:`, `lg:`).
+
+---
+
+## 7. Code Review Checklist (Before Every Commit)
+
+- [ ] Every `useEffect` has proper cleanup
+- [ ] No unused imports or dead code
+- [ ] No inline style objects (use Tailwind classes; `style={}` only for dynamic values)
+- [ ] TypedArrays reused, not reallocated in loops
+- [ ] Event listeners paired with removal
+- [ ] Animation frames cancelled on unmount
+- [ ] Common patterns extracted, not duplicated
+- [ ] UI text is NOT hardcoded (added to `i18n.js` instead)
+- [ ] Build passes: `npx vite build`

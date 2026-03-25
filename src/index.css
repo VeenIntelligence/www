@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Global Styles — Veenai
+   ============================================================ */
+
+@layer base {
+  :root {
+    --color-bg: #0a0a0f;
+    --color-text: #e0e0e0;
+    --color-text-dim: rgba(224, 224, 224, 0.5);
+    --color-accent: #4fc3f7;
+    --color-accent-dim: rgba(79, 195, 247, 0.3);
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text);
+    background: var(--color-bg);
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(79, 195, 247, 0.2);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(79, 195, 247, 0.4);
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(79, 195, 247, 0.25);
+    color: #fff;
+  }
+}
+
