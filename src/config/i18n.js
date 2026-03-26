@@ -16,11 +16,15 @@ export const COPY = {
   hero: {
     en: {
       titleLines: ['Veen Intelligence', 'Foundation'],
-      subtitle: 'Decentralized Privacy × LLM Infrastructure × Intelligent Trading',
+      subtitleLines: [
+        'Decentralized Privacy',
+        'LLM Infrastructure',
+        'Intelligent Trading',
+      ],
     },
     zh: {
       titleLines: ['文氏智能基金会'],
-      subtitle: '去中心化隐私 × LLM 基础设施 × 智能交易',
+      subtitleLines: ['去中心化隐私 × LLM 基础设施 × 智能交易'],
     },
   },
   about: {

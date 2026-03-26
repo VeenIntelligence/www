@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { LanguageContext } from './language-context';
+import { createContext, useEffect, useState } from 'react';
+
+export const LanguageContext = createContext(null);
 
 const LANGUAGE_STORAGE_KEY = 'veenai-lang';
 
@@ -16,17 +17,21 @@ function getInitialLanguage() {
   return window.navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
 }
 
+function applyDocumentLanguage(lang) {
+  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.dataset.language = lang;
+}
+
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState(getInitialLanguage);
 
   useEffect(() => {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-    document.documentElement.dataset.language = lang;
+    applyDocumentLanguage(lang);
   }, [lang]);
 
   const setLang = (nextLanguage) => {
-    if (nextLanguage !== 'en' && nextLanguage !== 'zh') {
+    if ((nextLanguage !== 'en' && nextLanguage !== 'zh') || nextLanguage === lang) {
       return;
     }
 

@@ -12,6 +12,15 @@
     --color-accent: #4fc3f7;
     --color-accent-dim: rgba(79, 195, 247, 0.3);
 
+    /* 控制局部文案换字动画时长，默认标准值 260ms。调大后更柔和，调小后更利落。 */
+    --i18n-swap-duration: 260ms;
+    /* 控制局部文案换字时的纵向位移，默认标准值 0.32em。调大后层次更明显，调小后更克制。 */
+    --i18n-swap-shift-y: 0.32em;
+    /* 控制局部文案换字时的模糊强度，默认标准值 8px。调大后更软，调小后更清晰。 */
+    --i18n-swap-blur: 8px;
+    /* 控制局部文案换字时旧文案保留的透明度，默认标准值 0.18。调大后拖影更明显，调小后更干净。 */
+    --i18n-swap-outgoing-opacity: 0.18;
+
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
@@ -29,6 +38,12 @@
     scroll-behavior: smooth;
   }
 
+  html.home-page-scroll-snap,
+  body.home-page-scroll-snap {
+    scroll-snap-type: y mandatory;
+    overscroll-behavior-y: none;
+  }
+
   body {
     margin: 0;
     padding: 0;
@@ -42,6 +57,20 @@
   #root {
     width: 100%;
     min-height: 100vh;
+  }
+
+  .home-page {
+    width: 100%;
+  }
+
+  .home-page > section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .home-page > footer {
+    scroll-snap-align: end;
+    scroll-snap-stop: always;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -86,5 +115,66 @@
     background: rgba(79, 195, 247, 0.25);
     color: #fff;
   }
-}
 
+  .i18n-swap {
+    position: relative;
+    display: inline-grid;
+    vertical-align: top;
+  }
+
+  .i18n-swap--block {
+    display: grid;
+    width: 100%;
+  }
+
+  .i18n-swap__layer {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+
+  .i18n-swap__layer--outgoing {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation: i18n-swap-out var(--i18n-swap-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .i18n-swap__layer--current-enter {
+    animation: i18n-swap-in var(--i18n-swap-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes i18n-swap-out {
+    from {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    to {
+      opacity: var(--i18n-swap-outgoing-opacity);
+      filter: blur(var(--i18n-swap-blur));
+      transform: translateY(var(--i18n-swap-shift-y));
+    }
+  }
+
+  @keyframes i18n-swap-in {
+    from {
+      opacity: 0;
+      filter: blur(var(--i18n-swap-blur));
+      transform: translateY(calc(var(--i18n-swap-shift-y) * -0.8));
+    }
+
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .i18n-swap__layer--outgoing,
+    .i18n-swap__layer--current-enter {
+      animation-duration: 0ms;
+    }
+  }
+}

@@ -23,6 +23,12 @@
   isolation: isolate;
   contain: layout paint;
   font-family: var(--font-sans);
+  cursor: grab;
+}
+
+.about-section.is-rotating {
+  cursor: grabbing;
+  user-select: none;
 }
 
 .about-section::before {

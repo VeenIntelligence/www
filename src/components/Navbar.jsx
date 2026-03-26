@@ -91,6 +91,30 @@ export default function Navbar() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen || window.innerWidth > 768) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [menuOpen]);
+
   return (
     <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-nav">
       <LiquidGlass {...glassProps}>
@@ -119,9 +143,12 @@ export default function Navbar() {
             <LanguageToggle lang={lang} onChange={setLang} />
 
             <button
+              type="button"
               className={`navbar__hamburger ${menuOpen ? 'navbar__hamburger--open' : ''}`}
               onClick={() => setMenuOpen(v => !v)}
               aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav-menu"
             >
               <span /><span /><span />
             </button>
@@ -129,18 +156,31 @@ export default function Navbar() {
         </div>
       </LiquidGlass>
 
-      {/* Mobile Nav links (Outside LiquidGlass to break free from scale/filter stacking context) */}
-      <div className={`navbar__links mobile-links ${menuOpen ? 'navbar__links--open' : ''}`}>
-        {NAV_LINKS.map(link => (
-          <a
-            key={link.id}
-            href={`#${link.id}`}
-            className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
-            onClick={() => setMenuOpen(false)}
-          >
-            {COPY.nav[lang][link.id]}
-          </a>
-        ))}
+      {/* Mobile Nav links: top dropdown panel with click-away close area */}
+      <div
+        className={`navbar__mobile-menu ${menuOpen ? 'navbar__mobile-menu--open' : ''}`}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden={!menuOpen}
+      >
+        <div className="navbar__mobile-backdrop" />
+        <div
+          className="navbar__mobile-panel"
+          id="mobile-nav-menu"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="navbar__links mobile-links">
+            {NAV_LINKS.map(link => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {COPY.nav[lang][link.id]}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </nav>
   );

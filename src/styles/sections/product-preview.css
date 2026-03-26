@@ -90,6 +90,21 @@
   max-width: var(--product-copy-max-width);
 }
 
+.product-title,
+.product-subtitle,
+.product-media,
+.product-card {
+  will-change: transform, opacity;
+}
+
+.product-media,
+.product-card,
+.product-card img {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 .product-glow {
   opacity: 0.82;
   background:

@@ -5,6 +5,25 @@ import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import '../../styles/sections/product-preview.css';
 
+const PRODUCT_SCREENSHOT_SIZES = '(max-width: 768px) 92vw, (max-width: 1024px) 78vw, 42vw';
+
+function ProductScreenshot({ src, mobileSrc, alt, className = '' }) {
+  return (
+    <img
+      src={src}
+      srcSet={`${mobileSrc} 1280w, ${src} 2744w`}
+      sizes={PRODUCT_SCREENSHOT_SIZES}
+      alt={alt}
+      className={className}
+      width="1372"
+      height="1340"
+      loading="eager"
+      decoding="async"
+      fetchPriority="high"
+    />
+  );
+}
+
 /** Update CSS custom properties so the cursor-reflection spot follows the mouse */
 function trackGlassCursor(e) {
   const rect = e.currentTarget.getBoundingClientRect();
@@ -49,7 +68,8 @@ export default function ProductSection() {
   const scaleActions  = useTransform(scrollYProgress, [0, 0.5], [1.1, 1]);
 
   // 图片翻折: 从 0° 到最终角度
-  const foldAngle = useTransform(scrollYProgress, [0.05, 0.5], [0, 33]);
+  const foldAngleLeft = useTransform(scrollYProgress, [0.05, 0.5], [0, 33]);
+  const foldAngleRight = useTransform(scrollYProgress, [0.05, 0.5], [0, -33]);
 
   // 图片缩放: 从放大(1.25) → 正常(1.0)
   const scaleImages = useTransform(scrollYProgress, [0.05, 0.55], [1.25, 1]);
@@ -57,16 +77,6 @@ export default function ProductSection() {
   // 图片水平展开: 从两端扩散 → 回归原位
   const spreadLeft  = useTransform(scrollYProgress, [0.05, 0.5], [-120, 0]);
   const spreadRight = useTransform(scrollYProgress, [0.05, 0.5], [120, 0]);
-
-  // 组合 transform 字符串
-  const leftCardTransform = useTransform(
-    [yImages, foldAngle, scaleImages, spreadLeft],
-    ([y, angle, s, sx]) => `translateY(${y}px) translateX(${sx}px) rotateY(${angle}deg) scale(${s})`
-  );
-  const rightCardTransform = useTransform(
-    [yImages, foldAngle, scaleImages, spreadRight],
-    ([y, angle, s, sx]) => `translateY(${y}px) translateX(${sx}px) rotateY(-${angle}deg) scale(${s})`
-  );
 
   return (
     <section
@@ -115,7 +125,7 @@ export default function ProductSection() {
 
         {/* 右侧 3D V 字形展示 */}
         <Motion.div
-          className="flex-1 flex justify-end items-center -ml-[150px] mr-5 z-5 max-lg:justify-center max-lg:w-full max-lg:ml-0 max-lg:mr-0"
+          className="product-media flex-1 flex justify-end items-center -ml-[150px] mr-5 z-5 max-lg:justify-center max-lg:w-full max-lg:ml-0 max-lg:mr-0"
           style={{ perspective: '1000px', opacity: opImages }}
         >
           <div
@@ -124,15 +134,37 @@ export default function ProductSection() {
           >
             <Motion.div
               className="product-card flex-1 relative rounded-xl overflow-hidden border border-white/10 bg-black"
-              style={{ transformOrigin: 'center left', transform: leftCardTransform }}
+              style={{
+                transformOrigin: 'center left',
+                x: spreadLeft,
+                y: yImages,
+                rotateY: foldAngleLeft,
+                scale: scaleImages,
+              }}
             >
-              <img src="/screenshot1.jpg" alt={copy.episodesAlt} className="w-full h-auto block opacity-85 transition-opacity duration-500 hover:opacity-100" />
+              <ProductScreenshot
+                src="/screenshot1.jpg"
+                mobileSrc="/screenshot1-mobile.jpg"
+                alt={copy.episodesAlt}
+                className="w-full h-auto block opacity-85 transition-opacity duration-500 hover:opacity-100"
+              />
             </Motion.div>
             <Motion.div
               className="product-card flex-1 relative -ml-[80px] max-md:ml-0 rounded-xl overflow-hidden border border-white/10 bg-black"
-              style={{ transformOrigin: 'center right', transform: rightCardTransform }}
+              style={{
+                transformOrigin: 'center right',
+                x: spreadRight,
+                y: yImages,
+                rotateY: foldAngleRight,
+                scale: scaleImages,
+              }}
             >
-              <img src="/screenshot2.jpg" alt={copy.dashboardAlt} className="w-full h-auto block opacity-85 transition-opacity duration-500 hover:opacity-100" />
+              <ProductScreenshot
+                src="/screenshot2.jpg"
+                mobileSrc="/screenshot2-mobile.jpg"
+                alt={copy.dashboardAlt}
+                className="w-full h-auto block opacity-85 transition-opacity duration-500 hover:opacity-100"
+              />
             </Motion.div>
           </div>
         </Motion.div>
