@@ -1,6 +1,6 @@
 /* ============================================================
    Footer — Global page footer
-   Extracted from Hero's info strip
+   统一字号层级 & 亮度层级，以五个链接为"基准亮度"
    ============================================================ */
 
 .footer {
@@ -11,51 +11,130 @@
 
 .footer__inner {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: space-between;
+  gap: 40px;
 }
 
 .footer__left {
   flex: 1;
-  max-width: 400px;
+  max-width: 500px;
 }
 
+/* 公司名称 — 主标题级，字号 14px，亮度最高一档（默认 0.78） */
 .footer__company {
   font-family: 'Inter', sans-serif;
-  font-size: 10.5px;
+  font-size: 14px;
   font-weight: 600;
-  color: rgba(224, 224, 224, 0.55);
+  color: rgba(236, 240, 246, 0.78);
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  margin: 0 0 6px;
+  line-height: 1.4;
+  margin: 0 0 10px;
 }
 
+/* 公司 meta 信息 (EST / 地区) — 稍暗一级（默认 0.52） */
 .footer__meta {
   font-weight: 400;
-  color: rgba(224, 224, 224, 0.3);
+  color: rgba(226, 233, 243, 0.52);
 }
 
+/* 描述文案 — 字号 15px，次亮档（默认 0.62） */
 .footer__desc {
   font-family: 'Inter', sans-serif;
-  font-size: 12.5px;
-  color: rgba(224, 224, 224, 0.38);
-  line-height: 1.6;
+  font-size: 15px;
+  color: rgba(230, 236, 245, 0.62);
+  line-height: 1.68;
   margin: 0;
+}
+
+.footer__desc-line {
+  display: block;
 }
 
 .footer__links {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding-left: 48px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 12px;
+  min-width: 270px;
+  padding-left: 0;
 }
 
+/* 链接基础样式 — 14px，锚定亮度（默认 0.76） */
 .footer__link {
   font-family: 'Inter', sans-serif;
-  font-size: 12.5px;
-  color: rgba(224, 224, 224, 0.42);
+  font-size: 14px;
+  color: rgba(234, 240, 248, 0.76);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+.footer__social-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.footer__link--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(242, 247, 253, 0.80);
+  text-shadow:
+    0 0 6px rgba(210, 220, 232, 0.16),
+    0 0 14px rgba(121, 171, 225, 0.08);
+}
+
+.footer__nav-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.footer__link--featured {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  color: rgba(250, 252, 255, 0.82);
+  text-shadow:
+    0 0 6px rgba(220, 229, 241, 0.18),
+    0 0 16px rgba(108, 160, 216, 0.09);
+}
+
+.footer__link--featured::after {
+  content: '';
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: -8px;
+  bottom: -8px;
+  border-radius: 999px;
+  background:
+    radial-gradient(55% 80% at 50% 50%, rgba(228, 236, 248, 0.20) 0%, rgba(150, 194, 238, 0.10) 52%, transparent 100%);
+  filter: blur(10px);
+  opacity: 0.46;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 图标 — SVG 尺寸固定 16px，与 14px 文字形成明确的视觉分量（默认 16px） */
+/* 数字越大图标越大，默认标准值：16px；调整范围建议 14px ~ 20px */
+.footer__link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: rgba(238, 243, 250, 0.80);
 }
 
 .footer__link:hover {
@@ -66,12 +145,14 @@
 .footer__right {
   display: flex;
   align-items: flex-start;
+  align-self: flex-start;
 }
 
+/* 版权信息 — 最低优先级，字号 13px（默认 0.52） */
 .footer__copy {
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  color: rgba(224, 224, 224, 0.25);
+  font-size: 13px;
+  color: rgba(226, 233, 244, 0.52);
 }
 
 /* ============================================================
@@ -85,6 +166,7 @@
 
   .footer__inner {
     flex-direction: column;
+    align-items: flex-start;
     gap: 20px;
   }
 
@@ -93,5 +175,17 @@
     flex-wrap: wrap;
     gap: 12px;
     padding-left: 0;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .footer__social-links,
+  .footer__nav-links {
+    display: contents;
+  }
+
+  .footer__right {
+    align-self: flex-start;
   }
 }
