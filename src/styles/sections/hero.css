@@ -4,16 +4,19 @@
 
 .hero-section {
   /* 内容区位置参数 */
-  --hero-content-pad-top: clamp(160px, 30vh, 280px);
-  --hero-content-pad-inline: 56px;
-  --hero-content-pad-bottom: 56px;
-  --hero-title-slot-height: clamp(150px, 16vw, 230px);
+  --hero-content-pad-inline: 56px; /* 标题/分隔线的左侧内边距；默认标准值：56px。 */
 
-  /* slogan 面板位置与内边距 */
-  --hero-subtitle-top: clamp(75vh, 75%, 80vh);
-  --hero-subtitle-pad-top: clamp(28px, 3.8vh, 40px);
+  /* 玻璃面板高度参数 */
+  --hero-panel-height: calc(100svh / 5); /* 面板占视口高度的比例；默认标准值：1/5 视口高度。往大调面板越高。 */
+  --hero-panel-min-height: 140px; /* 面板最小高度，防止过小；默认标准值：140px。 */
+
+  /* 分隔线间距参数 — 上下等距 */
+  --hero-divider-gap: clamp(14px, 2vh, 26px); /* 标题↔分隔线↔面板的间距（上下相同）；默认标准值：clamp(14px, 2vh, 26px)。 */
+
+  /* slogan 面板内边距 */
+  --hero-subtitle-pad-top: clamp(22px, 2.8vh, 32px);
   --hero-subtitle-pad-inline: 56px;
-  --hero-subtitle-pad-bottom: 28px;
+  --hero-subtitle-pad-bottom: 22px;
 
   /* slogan 面板玻璃透明度参数 */
   --hero-subtitle-glass-top-white-alpha: 0.00; /* 顶部白雾透明度；默认标准值：0.05。越大越白，越小越通透。 */
@@ -94,23 +97,47 @@
   pointer-events: none;
 }
 
+/*
+ * Hero → About 跨页过渡层
+ * 在 Hero 底部最后 18% 区域逐渐从全透明过渡到 About 的背景基色(#03060d)，
+ * 消除两个 section 之间的硬切换。
+ * z-index 高于 ::after 层，渲染在最上面。
+ */
+.hero-section .hero__transition-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22%;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(3, 6, 13, 0.08) 20%,
+    rgba(3, 6, 13, 0.28) 45%,
+    rgba(3, 6, 13, 0.62) 70%,
+    rgba(3, 6, 13, 0.88) 88%,
+    #03060d 100%
+  );
+}
+
 .hero__content {
   position: absolute;
   inset: 0;
   z-index: 3;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end; /* 从底部向上堆叠 */
   align-items: flex-start;
-  padding: var(--hero-content-pad-top) var(--hero-content-pad-inline) var(--hero-content-pad-bottom);
   pointer-events: none;
 }
 
 .hero__title-area {
   max-width: min(40rem, 44vw);
-  min-height: var(--hero-title-slot-height);
   display: flex;
   align-items: flex-end;
+  padding-left: var(--hero-content-pad-inline);
   pointer-events: auto;
 }
 
@@ -138,8 +165,10 @@
   letter-spacing: -0.05em;
   line-height: 0.88;
   color: rgba(245, 250, 255, 0.97);
-  user-select: text;
-  -webkit-user-select: text;
+  user-select: none;
+  -webkit-user-select: none;
+  /* 模糊→清晰出场动画；默认标准值：持续 1.2s。 */
+  animation: hero-blur-reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hero__title--compact {
@@ -167,12 +196,14 @@
 
 .hero__divider {
   position: relative;
+  margin: var(--hero-divider-gap) 0;
+  margin-left: var(--hero-content-pad-inline);
   width: clamp(180px, 24vw, 320px);
   max-width: 100%;
   height: clamp(2px, 0.22vw, 3px);
-  margin: 24px 0 18px;
   border-radius: 999px;
   overflow: hidden;
+  flex-shrink: 0;
   background: linear-gradient(
     90deg,
     rgba(239, 248, 255, 0.92) 0%,
@@ -222,13 +253,12 @@
 }
 
 .hero__subtitle-area {
-  position: absolute;
-  top: var(--hero-subtitle-top);
-  bottom: 0;
-  left: 0;
+  position: relative;
   width: 100%;
+  height: var(--hero-panel-height);
+  min-height: var(--hero-panel-min-height);
+  flex-shrink: 0;
   pointer-events: auto;
-  overflow: hidden;
   transform-origin: 50% 100%;
   will-change: transform;
   background:
@@ -257,7 +287,10 @@
   height: 100%;
   padding: var(--hero-subtitle-pad-top) var(--hero-subtitle-pad-inline) var(--hero-subtitle-pad-bottom);
   display: flex;
-  align-items: flex-start;
+  flex-direction: row; /* Desktop: 副标题左侧，社交链接紧随其后 */
+  align-items: flex-start; /* 顶部对齐 */
+  justify-content: flex-start;
+  gap: clamp(24px, 3vw, 48px);
   transform-style: preserve-3d;
 }
 
@@ -289,29 +322,156 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.18em;
-  font-family: 'Avenir Next', 'Helvetica Neue', sans-serif;
-  font-size: clamp(0.86rem, 1.2vw, 1.02rem);
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  line-height: 1.55;
-  text-transform: uppercase;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-size: clamp(0.92rem, 1.3vw, 1.12rem); /* 稍微放大；默认标准值：clamp(0.92rem, 1.3vw, 1.12rem)。 */
+  font-weight: 450;
+  letter-spacing: normal; /* 正常字间距，不刻意拉大 */
+  line-height: 1.6;
   color: var(--hero-subtitle-text-color);
-  user-select: text;
-  -webkit-user-select: text;
+  /* 副标题允许选中 */
   text-shadow:
     0 0 10px var(--hero-subtitle-text-glow-near),
     0 0 22px var(--hero-subtitle-text-glow-far);
+  /* 模糊→清晰出场动画，比标题延迟 0.3s；默认标准值：持续 1.4s，延迟 0.3s。 */
+  animation: hero-blur-reveal 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 }
 
 .hero__subtitle--compact {
   gap: 0;
-  letter-spacing: 0.12em;
+  letter-spacing: normal;
 }
 
 .hero__subtitle-line {
   display: block;
   width: fit-content;
   will-change: transform, opacity;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 从左到右的朦胧扫光效果 — 用 filter:blur 实现柔和渐变 */
+.hero__subtitle-line::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  width: 64px; /* 光斑宽度 */
+  border-radius: 50%;
+  background: rgba(160, 215, 255, 0.32);
+  filter: blur(18px); /* 大模糊 = 完全朦胧，无硬边 */
+  transform: translateX(-120%);
+  animation: hero-subtitle-sweep 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* 每行错开扫光时间，产生波浪序列感 */
+.hero__subtitle-line:nth-child(2)::after {
+  animation-delay: 0.5s;
+}
+
+.hero__subtitle-line:nth-child(3)::after {
+  animation-delay: 1.0s;
+}
+
+/* ---------- 社交链接条 ---------- */
+.hero__social-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+  padding-left: 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero__social-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(200, 220, 245, 0.5);
+  text-decoration: none;
+  font-family: 'Avenir Next', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 0.45s ease, text-shadow 0.45s ease;
+}
+
+/* 图标外围的朦胧月晕光环 — 完全模糊、无硬边 */
+.hero__social-link::before {
+  content: '';
+  position: absolute;
+  left: 7px; /* 居中于图标 */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(140, 200, 255, 0);
+  filter: blur(14px); /* 始终保持大模糊半径，确保没有硬边 */
+  transition: background 0.45s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero__social-link:hover {
+  color: rgba(220, 240, 255, 0.95);
+  text-shadow:
+    0 0 10px rgba(140, 210, 255, 0.30),
+    0 0 24px rgba(100, 175, 255, 0.12);
+}
+
+/* hover 时月晕扩散 — 纯色 + 大模糊 = 完全朦胧的光晕 */
+.hero__social-link:hover::before {
+  background: rgba(150, 210, 255, 0.38);
+}
+
+.hero__social-icon {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  transition: filter 0.45s ease;
+}
+
+.hero__social-link:hover .hero__social-icon {
+  filter:
+    drop-shadow(0 0 6px rgba(160, 215, 255, 0.45))
+    drop-shadow(0 0 14px rgba(120, 190, 255, 0.20));
+}
+
+@media (max-width: 768px) {
+  .hero__subtitle-shell {
+    flex-direction: column; /* 移动端：上下堆叠 */
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .hero__social-bar {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    justify-content: flex-end; /* 移动端：社交链接右对齐 */
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 20px;
+  }
+
+  .hero__social-link span {
+    display: none;
+  }
+
+  .hero__social-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .hero__social-link::before {
+    width: 56px;
+    height: 56px;
+    left: 9px;
+    filter: blur(16px);
+  }
 }
 
 @media (max-width: 980px) {
@@ -323,11 +483,11 @@
 @media (max-width: 768px) {
   .hero-section {
     --hero-content-pad-inline: 24px;
-    --hero-content-pad-bottom: 56px;
-    --hero-title-slot-height: clamp(122px, 32vw, 168px);
-    --hero-subtitle-pad-top: 18px;
+    --hero-panel-height: calc(100svh / 4); /* 移动端面板更高；默认标准值：1/4 视口高度。 */
+    --hero-panel-min-height: 130px;
+    --hero-subtitle-pad-top: 16px;
     --hero-subtitle-pad-inline: 24px;
-    --hero-subtitle-pad-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    --hero-subtitle-pad-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 
     background:
       radial-gradient(circle at 72% 24%, rgba(102, 173, 255, 0.16), transparent 22%),
@@ -369,13 +529,9 @@
     margin-top: -0.1em;
   }
 
-  .hero__divider {
-    margin: 18px 0 14px;
-  }
-
   .hero__subtitle {
     font-size: 0.82rem;
-    letter-spacing: 0.12em;
+    letter-spacing: normal;
     gap: 0.14em;
   }
 }
@@ -431,5 +587,44 @@
   100% {
     transform: translateY(0) scaleX(1);
     opacity: 0.78;
+  }
+}
+
+/* 从左到右朦胧扫光动画 — 慢速柔和 */
+@keyframes hero-subtitle-sweep {
+  0% {
+    left: -80px;
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  15% {
+    left: 110%;
+    opacity: 0;
+  }
+
+  /* 扫完后长时间停留再循环 */
+  100% {
+    left: 110%;
+    opacity: 0;
+  }
+}
+
+/*
+ * 模糊→清晰出场动画
+ * 元素从完全模糊 + 半透明逐渐变为清晰 + 不透明。
+ * 配合 animation-fill-mode: both 使用，确保动画未开始时保持初始状态。
+ */
+@keyframes hero-blur-reveal {
+  0% {
+    filter: blur(12px);
+    opacity: 0;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
   }
 }

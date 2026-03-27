@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { LiquidGlass } from '@liquidglass/react';
 import BrandWordmark from './common/BrandWordmark';
 import LanguageToggle from './LanguageToggle';
@@ -11,7 +12,8 @@ const NAV_LINKS = [
   { id: 'hero' },
   { id: 'about' },
   { id: 'product' },
-  { id: 'services' },
+  { id: 'consultants' },
+  { id: 'blog', route: '/blog' },
 ];
 
 // 触发导航栏滚动状态（如模糊增强等视觉变化）的滚动像素阈值
@@ -54,6 +56,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { lang, setLang } = useLanguage();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
   const glassProps = {
     ...NAVBAR_GLASS_BASE,
     ...(scrolled ? NAVBAR_GLASS_SCROLLED : NAVBAR_GLASS_IDLE),
@@ -126,16 +130,33 @@ export default function Navbar() {
 
           {/* Desktop Nav links */}
           <div className="navbar__links desktop-links">
-            {NAV_LINKS.map(link => (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {COPY.nav[lang][link.id]}
-              </a>
-            ))}
+            {NAV_LINKS.map(link => {
+              // Blog 使用路由链接
+              if (link.route) {
+                return (
+                  <Link
+                    key={link.id}
+                    to={link.route}
+                    className={`navbar__link ${!isHome && location.pathname === link.route ? 'navbar__link--active' : ''}`}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {COPY.nav[lang][link.id]}
+                  </Link>
+                );
+              }
+              // 首页锚点链接
+              const href = isHome ? `#${link.id}` : `/#${link.id}`;
+              return (
+                <a
+                  key={link.id}
+                  href={href}
+                  className={`navbar__link ${isHome && activeSection === link.id ? 'navbar__link--active' : ''}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {COPY.nav[lang][link.id]}
+                </a>
+              );
+            })}
           </div>
 
           {/* Right side */}
@@ -169,16 +190,31 @@ export default function Navbar() {
           onClick={(event) => event.stopPropagation()}
         >
           <div className="navbar__links mobile-links">
-            {NAV_LINKS.map(link => (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {COPY.nav[lang][link.id]}
-              </a>
-            ))}
+            {NAV_LINKS.map(link => {
+              if (link.route) {
+                return (
+                  <Link
+                    key={link.id}
+                    to={link.route}
+                    className={`navbar__link ${!isHome && location.pathname === link.route ? 'navbar__link--active' : ''}`}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {COPY.nav[lang][link.id]}
+                  </Link>
+                );
+              }
+              const href = isHome ? `#${link.id}` : `/#${link.id}`;
+              return (
+                <a
+                  key={link.id}
+                  href={href}
+                  className={`navbar__link ${isHome && activeSection === link.id ? 'navbar__link--active' : ''}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {COPY.nav[lang][link.id]}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

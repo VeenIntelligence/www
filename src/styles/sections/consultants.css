@@ -1,0 +1,25 @@
+/* ============================================================
+   Consultants Section — Coming Soon placeholder
+   ============================================================ */
+
+.consultants-section {
+  min-height: 100vh;
+  background: #0a0a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid rgba(79, 195, 247, 0.1);
+}
+
+.consultants__inner {
+  max-width: 1200px;
+  width: 100%;
+  padding: 80px 48px;
+}
+
+.consultants__placeholder {
+  color: rgba(224, 224, 224, 0.3);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  text-align: center;
+}

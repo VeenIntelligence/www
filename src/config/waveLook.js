@@ -42,8 +42,9 @@ export const DROP_DRAG_CATCH_MULT = 2.2;
 export const DROP_DRAG_STIFFNESS = 8.5;
 // 液滴被松手抛出时的速度增益。默认 0.35。越大松手后飞得越远。
 export const DROP_DRAG_RELEASE_BOOST = 0.35;
-// 页面滚动时液滴受到的下坠力。默认 20.5。越大滚动时液滴往下偏移越明显。
-export const DROP_SCROLL_GRAVITY = 20.5;
+// 页面滚动时液滴受到的下坠力。默认 6.0（原 20.5）。越大滚动时液滴往下偏移越明显。
+// 调低此值避免滚动时液滴被齐刷刷地拉到下方。
+export const DROP_SCROLL_GRAVITY = 6.0;
 // 立方体经过时对液滴的推力增益。默认 5.8。越大立方体经过时液滴被推得越远。
 export const DROP_CUBE_SWAT_GAIN = 5.8;
 // 液滴偏离轨道基准位的最大允许距离。默认 2.8。拖拽或被推离时不会超过此距离。
@@ -300,5 +301,17 @@ export const WAVE_LOOK = {
     glassEdgeGlow: [0.7, 0.85, 1.0],
     // 边缘 Fresnel 光辉强度。
     glassEdgeGlowBoost: 0.12,
+    // === 摄像头环境映射参数 (About 页玻璃方块专用) ===
+    // 折射偏移缩放。调大透镜畸变更夸张，调小更微弱。
+    // 参考: 0.15（微弱） ~ 0.6（强烈），默认 0.35
+    cameraRefractScale: 0.2,
+    // 反射中摄像头画面的混合比例。
+    // 0.0 = 反射完全用程序化环境光，1.0 = 完全用摄像头。
+    // 参考: 0.05 ~ 0.25，默认 0.10
+    cameraReflectMix: 0.90,
+    // 穿过方块的摄像头画面亮度衰减。
+    // 1.0 = 原始亮度（太亮），0.3 = 很暗。
+    // 参考: 0.35 ~ 0.7，默认 0.55
+    cameraTransmitDim: 0.25,
   },
 };

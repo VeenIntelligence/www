@@ -1,17 +1,17 @@
 /* ============================================================
-   About Section — EVR-inspired full-screen design
-   Glass cube background · Display typography · Progress ring · Marquee
+   About Section — Project Σ 介绍
+   Glass cube background · 四大支柱卡片 · CTA
+   Desktop: 单屏底部对齐 / Mobile: 分两屏（标题屏 + 支柱屏）
    ============================================================ */
 
-/* ---------- container ---------- */
+/* ---------- 容器 ---------- */
 .about-section {
   --about-bg: 0 0% 0%;
   --about-fg: 0 0% 100%;
 
   position: relative;
   z-index: 0;
-  height: 100vh;
-  height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background:
@@ -42,7 +42,7 @@
     radial-gradient(circle at 50% 50%, rgba(5, 11, 28, 0), rgba(3, 5, 10, 0.5) 78%);
 }
 
-/* ---------- Three.js glass cube background ---------- */
+/* ---------- Three.js 玻璃方块背景 ---------- */
 .about-glass-cube {
   position: absolute;
   inset: 0;
@@ -59,7 +59,20 @@
   height: 100% !important;
 }
 
-/* ---------- main content ---------- */
+/*
+ * 移动端：限制玻璃方块画布到 section 顶部 100vh
+ * 原因：section 在移动端高度 ≥200vh（两屏），inset:0 会让画布拉伸到整个高度，
+ * 导致 SDF 空间中方块出现在第一屏底部。限定 height:100vh 后方块回到上半区域。
+ */
+@media (max-width: 767px) {
+  .about-glass-cube {
+    bottom: auto;
+    height: 100vh;
+    height: 100svh;
+  }
+}
+
+/* ---------- 主内容 ---------- */
 .about-content {
   position: relative;
   z-index: 10;
@@ -67,59 +80,182 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 40px 164px;
+  padding: 0 40px 60px;
 }
 
-/* mobile override */
 @media (max-width: 767px) {
   .about-content {
     justify-content: flex-start;
-    padding: 24px 24px 120px;
+    padding: 0 24px 0;
   }
 }
 
-/* ---------- subheading ---------- */
+/* ---------- 两屏布局（移动端） ---------- */
+/* Desktop: screen-1 和 screen-2 正常流式堆叠 */
+.about-screen-1 {
+  /* Desktop 无特殊处理 */
+}
+
+.about-screen-2 {
+  /* Desktop 无特殊处理 */
+}
+
+@media (max-width: 767px) {
+  /* 移动端第一屏：上半留空给方块，内容底部对齐 */
+  .about-screen-1 {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* 底部内边距 — 确保 manifesto 文字不被截断；
+       默认标准值：calc(24px + env(safe-area-inset-bottom, 0px))。 */
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 移动端第二屏：支柱卡片独立一屏 */
+  .about-screen-2 {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+}
+
+/* ---------- Project Σ 标签（大字 + 白框 Σ 柔光晕） ---------- */
 .about-subheading {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.25em;
+  gap: 16px;
+  /* 字号与标题同级；默认标准值：clamp(1.6rem, 4vw, 3.2rem)。调大则更醒目。 */
+  font-size: clamp(1.6rem, 4vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-bottom: 16px;
   color: hsl(var(--about-fg));
 }
 
+/* 箭头图标也跟着放大 */
 .about-subheading__icon {
-  width: 16px;
-  height: 16px;
+  width: 1.2em;
+  height: 1.2em;
 }
 
-/* ---------- two-column layout ---------- */
+/* Σ 标志白框容器 */
+.about-sigma-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  font-size: inherit;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/*
+ * 旋转光晕 — 柔和模糊渐变版本
+ * 使用 conic-gradient 旋转 + 大幅模糊(blur)，消除金属感
+ * 内外都有 blur 衰减，产生柔和的脉冲激光循环效果
+ */
+.about-sigma-badge::before {
+  content: '';
+  position: absolute;
+  /* 光晕扩散范围；默认标准值：-10px。调大(更负)则光晕更大。 */
+  inset: -10px;
+  border-radius: 14px;
+  background: conic-gradient(
+    from var(--sigma-halo-angle, 0deg),
+    rgba(120, 180, 255, 0.0) 0%,
+    rgba(120, 180, 255, 0.18) 8%,
+    rgba(160, 210, 255, 0.35) 15%,
+    rgba(200, 235, 255, 0.45) 20%,
+    rgba(160, 210, 255, 0.35) 25%,
+    rgba(120, 180, 255, 0.18) 32%,
+    rgba(120, 180, 255, 0.0) 42%,
+    transparent 100%
+  );
+  /* 关键：大幅模糊让旋转光形成柔和渐变，不再有锐利金属边 */
+  filter: blur(8px);
+  animation: sigma-halo-spin 3.5s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 外层呼吸柔光 — 更大范围的散射 */
+.about-sigma-badge::after {
+  content: '';
+  position: absolute;
+  /* 外层柔光范围；默认标准值：-18px。调大则柔光扩散更远。 */
+  inset: -18px;
+  border-radius: 22px;
+  background: radial-gradient(
+    circle,
+    rgba(120, 190, 255, 0.12) 0%,
+    rgba(100, 170, 255, 0.06) 40%,
+    rgba(80, 150, 255, 0.02) 65%,
+    transparent 80%
+  );
+  filter: blur(6px);
+  animation: sigma-glow-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -2;
+}
+
+/* 使用 @property 让 CSS 自定义属性可动画化 */
+@property --sigma-halo-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes sigma-halo-spin {
+  to {
+    --sigma-halo-angle: 360deg;
+  }
+}
+
+@keyframes sigma-glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+/* ---------- 两栏布局 ---------- */
 .about-columns {
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 60px;
 }
 
 @media (max-width: 1023px) {
   .about-columns {
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
     align-items: flex-start;
   }
 }
 
-/* ---------- heading ---------- */
+/* ---------- 标题 ---------- */
 .about-heading {
   flex: 1;
 }
 
 .about-heading__h2 {
-  font-size: clamp(2rem, 6vw, 5rem);
-  line-height: 0.9;
+  font-size: clamp(1.8rem, 4.5vw, 3.8rem);
+  line-height: 1.0;
   letter-spacing: -0.02em;
   color: hsl(var(--about-fg));
 }
@@ -129,131 +265,188 @@
 }
 
 .about-heading__display {
-  font-family: 'Gilda Display', serif;
-  font-weight: 400;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(200, 230, 255, 1), rgba(120, 180, 255, 0.8));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* ---------- stats / progress ---------- */
-.about-stats {
-  max-width: 320px;
-  padding-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* ---------- CTA 按钮（标题下方）— 蓝色高对比 ---------- */
+.about-cta-inline {
+  margin-top: 28px;
 }
 
-@media (max-width: 1023px) {
-  .about-stats {
-    margin-top: 32px;
-  }
+.about-cta-inline__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 30px;
+  border-radius: 8px;
+  /* 蓝色实底按钮，与深色背景形成对比 */
+  background: linear-gradient(135deg, rgba(50, 120, 220, 0.65), rgba(30, 90, 180, 0.55));
+  border: 1px solid rgba(100, 170, 255, 0.35);
+  color: rgba(220, 240, 255, 0.95);
+  /* CTA 按钮字号；默认标准值：clamp(0.85rem, 1.1vw, 1rem)。与 hero slogan 保持一致。 */
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 16px rgba(60, 140, 255, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
-@media (min-width: 1024px) {
-  .about-stats {
+.about-cta-inline__btn:hover {
+  background: linear-gradient(135deg, rgba(60, 140, 240, 0.8), rgba(40, 100, 200, 0.7));
+  border-color: rgba(120, 190, 255, 0.5);
+  color: rgba(240, 248, 255, 1);
+  box-shadow:
+    0 0 24px rgba(60, 150, 255, 0.25),
+    0 0 48px rgba(50, 130, 240, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 0 10px rgba(140, 200, 255, 0.3);
+}
+
+.about-cta-inline__arrow {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- 宣言摘要 ---------- */
+.about-manifesto {
+  max-width: 480px;
+  padding-top: 8px;
+}
+
+.about-manifesto__text {
+  /* 正文字号对齐 hero slogan；默认标准值：clamp(0.86rem, 1.2vw, 1.02rem) */
+  font-size: clamp(0.86rem, 1.2vw, 1.02rem);
+  line-height: 1.7;
+  color: hsl(var(--about-fg) / 0.55);
+  margin: 0 0 14px;
+}
+
+.about-manifesto__highlight {
+  /* 高亮文字略大于正文；默认标准值：clamp(0.9rem, 1.3vw, 1.08rem) */
+  font-size: clamp(0.9rem, 1.3vw, 1.08rem);
+  line-height: 1.6;
+  font-weight: 500;
+  color: hsl(var(--about-fg) / 0.85);
+  margin: 0;
+  padding-left: 14px;
+  border-left: 2px solid rgba(120, 180, 255, 0.4);
+}
+
+/* ---------- 四大支柱 ---------- */
+.about-pillars {
+  margin-top: 40px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .about-pillars {
     margin-top: 0;
   }
 }
 
-.about-stats__text {
-  font-size: 14px;
-  line-height: 1.6;
-  color: hsl(var(--about-fg) / 0.7);
-}
-
-/* ---------- progress circle ---------- */
-.about-progress {
-  position: relative;
-  width: 120px;
-  height: 120px;
-}
-
-.about-progress__ring {
-  width: 100%;
-  height: 100%;
-}
-
-.about-progress__progress {
-  transition: stroke-dashoffset 1s ease-out;
-}
-
-.about-progress__label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 500;
-  color: hsl(var(--about-fg));
-}
-
-/* ---------- marquee bar ---------- */
-.about-marquee-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  padding: 0 40px;
-}
-
-@media (max-width: 767px) {
-  .about-marquee-bar {
-    padding: 0 24px;
-  }
-}
-
-.about-marquee-bar__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.about-marquee-bar__label {
-  font-size: 12px;
+.about-pillars__label {
+  display: block;
+  /* 支柱标签字号；默认标准值：clamp(0.8rem, 1vw, 0.9rem) */
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: hsl(var(--about-fg));
-}
-
-.about-marquee-bar__sublabel {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: hsl(var(--about-fg));
-}
-
-@media (max-width: 767px) {
-  .about-marquee-bar__sublabel {
-    display: none;
-  }
-}
-
-.about-marquee-bar__track {
-  border-top: 1px solid hsl(var(--about-fg) / 0.1);
-  overflow: hidden;
-  padding: 20px 0;
-}
-
-.about-marquee-bar__scroll {
-  display: flex;
-  gap: 64px;
-  animation: about-marquee 20s linear infinite;
-  width: max-content;
-}
-
-.about-marquee-bar__brand {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
   color: hsl(var(--about-fg) / 0.5);
-  white-space: nowrap;
+  margin-bottom: 16px;
 }
 
-@keyframes about-marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+.about-pillars__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .about-pillars__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .about-pillars__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.about-pillar {
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.about-pillar:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(120, 180, 255, 0.15);
+}
+
+/* 序号 + 标题同行显示 */
+.about-pillar__header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.about-pillar__icon {
+  display: inline-block;
+  /* 序号字号；默认标准值：clamp(0.85rem, 1.1vw, 1rem) */
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 600;
+  color: rgba(140, 200, 255, 0.7);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.about-pillar__title {
+  /* 卡片标题字号；默认标准值：clamp(0.9rem, 1.2vw, 1.05rem) */
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  font-weight: 600;
+  color: hsl(var(--about-fg) / 0.92);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.about-pillar__desc {
+  /* 卡片描述字号；默认标准值：clamp(0.82rem, 1.1vw, 0.95rem) */
+  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  line-height: 1.6;
+  color: hsl(var(--about-fg) / 0.48);
+  margin: 0;
+}
+
+/* ---------- 模糊→清晰出场动画（scroll 触发） ---------- */
+/*
+ * 初始状态：模糊+透明。
+ * 当 framer-motion 检测到 inView 后，添加 .is-revealed 类触发清晰化。
+ * 持续时间；默认标准值：1.2s。模糊程度；默认标准值：16px。
+ */
+.about-blur-reveal {
+  filter: blur(16px);
+  opacity: 0;
+  transition: filter 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-blur-reveal.is-revealed {
+  filter: blur(0px);
+  opacity: 1;
 }

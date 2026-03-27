@@ -124,9 +124,9 @@ export default function HeroSection() {
         <WaveCanvas />
       </div>
 
-      {/* Content overlay */}
+      {/* Content overlay — 从底部向上堆叠：标题 → 分隔线 → 玻璃面板 */}
       <div className="hero__content">
-        {/* Title — LEFT aligned, above divider */}
+        {/* 标题区 */}
         <div className="hero__title-area">
           <div className="hero__title-backdrop">
             <h1 className={`hero__title ${isChinese ? 'hero__title--compact' : ''}`}>
@@ -143,7 +143,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Divider line */}
+        {/* 分隔线 — 在标题与玻璃面板之间 */}
         <Motion.div
           className="hero__divider"
           style={{
@@ -155,7 +155,7 @@ export default function HeroSection() {
           }}
         />
 
-        {/* Subtitle — LEFT aligned, below divider, with glow */}
+        {/* 玻璃面板 — 底部锚定，1/6vh 高度 */}
         <Motion.div
           className="hero__subtitle-area"
           style={{
@@ -180,6 +180,45 @@ export default function HeroSection() {
                 />
               ))}
             </Motion.p>
+
+            {/* 社交链接条 */}
+            <div className="hero__social-bar">
+              <a
+                href="https://x.com/veen_foundation"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hero__social-link"
+                title={copy.socialTwitter}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="hero__social-icon">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                <span>{copy.socialTwitter}</span>
+              </a>
+              <a
+                href="https://github.com/VeenIntelligence/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hero__social-link"
+                title={copy.socialGithub}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="hero__social-icon">
+                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+                <span>{copy.socialGithub}</span>
+              </a>
+              <a
+                href="mailto:contact@veenai.org"
+                className="hero__social-link"
+                title={copy.socialEmail}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="hero__social-icon">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M22 7l-10 7L2 7" />
+                </svg>
+                <span>{copy.socialEmail}</span>
+              </a>
+            </div>
           </div>
         </Motion.div>
       </div>

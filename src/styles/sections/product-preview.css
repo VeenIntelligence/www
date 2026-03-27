@@ -587,3 +587,20 @@
     font-size: 1.85rem;
   }
 }
+
+/* ---------- 模糊→清晰出场动画（scroll 触发） ---------- */
+/*
+ * 初始状态：模糊+透明。
+ * 当 framer-motion 检测到 inView 后，添加 .is-revealed 类触发清晰化。
+ * 持续时间；默认标准值：1.2s。模糊程度；默认标准值：14px。
+ */
+.product-blur-reveal {
+  filter: blur(14px);
+  opacity: 0;
+  transition: filter 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-blur-reveal.is-revealed {
+  filter: blur(0px);
+  opacity: 1;
+}

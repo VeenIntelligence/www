@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion as Motion, useScroll, useTransform } from 'framer-motion';
+import { motion as Motion, useScroll, useTransform, useInView } from 'framer-motion';
 import BrandWordmark from '../../components/common/BrandWordmark';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
@@ -17,9 +17,8 @@ function ProductScreenshot({ src, mobileSrc, alt, className = '' }) {
       className={className}
       width="1372"
       height="1340"
-      loading="eager"
+      loading="lazy"
       decoding="async"
-      fetchPriority="high"
     />
   );
 }
@@ -50,22 +49,22 @@ export default function ProductSection() {
     offset: ['start end', 'end start'],
   });
 
+  /* 模糊→清晰出场：检测文案区域进入视口 */
+  const copyRevealRef = useRef(null);
+  const copyInView = useInView(copyRevealRef, { once: true, margin: '-60px' });
+
   // 差动位移 — 加大幅度
   const ySubtitle = useTransform(scrollYProgress, [0, 0.4], [250, 0]);
   const yTitle    = useTransform(scrollYProgress, [0, 0.45], [380, 0]);
   const yActions  = useTransform(scrollYProgress, [0, 0.5], [500, 0]);
   const yImages   = useTransform(scrollYProgress, [0, 0.55], [600, 0]);
 
-  // 透明度 — 同样差动
-  const opSubtitle = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
-  const opTitle    = useTransform(scrollYProgress, [0.03, 0.3], [0, 1]);
-  const opActions  = useTransform(scrollYProgress, [0.06, 0.35], [0, 1]);
+  // 透明度 — 图片单独保留 scroll-driven
   const opImages   = useTransform(scrollYProgress, [0.08, 0.4], [0, 1]);
 
   // 文字缩放: 从稍大(1.12) → 正常(1.0)
   const scaleSubtitle = useTransform(scrollYProgress, [0, 0.4], [1.12, 1]);
   const scaleTitle    = useTransform(scrollYProgress, [0, 0.45], [1.15, 1]);
-  const scaleActions  = useTransform(scrollYProgress, [0, 0.5], [1.1, 1]);
 
   // 图片翻折: 从 0° 到最终角度
   const foldAngleLeft = useTransform(scrollYProgress, [0.05, 0.5], [0, 33]);
@@ -89,10 +88,10 @@ export default function ProductSection() {
 
       <div className="relative z-1 w-full max-w-[1800px] px-10 flex items-center justify-between max-lg:flex-col max-lg:text-center max-lg:px-6">
         {/* 左侧文案 */}
-        <div className="product-copy ml-[6%] z-10 flex flex-col gap-6 max-lg:flex-auto max-lg:w-full max-lg:ml-0 max-lg:mb-[-60px] max-lg:items-center max-md:mb-[-30px]">
+        <div ref={copyRevealRef} className="product-copy ml-[6%] z-10 flex flex-col gap-6 max-lg:flex-auto max-lg:w-full max-lg:ml-0 max-lg:mb-[-60px] max-lg:items-center max-md:mb-[-30px]">
           <Motion.h2
-            className="product-title"
-            style={{ y: ySubtitle, opacity: opSubtitle, scale: scaleSubtitle }}
+            className={`product-title product-blur-reveal ${copyInView ? 'is-revealed' : ''}`}
+            style={{ y: ySubtitle, scale: scaleSubtitle }}
           >
             <span className="product-title__brand-box">
               <BrandWordmark variant="full" size={28} className="product-title__brand" />
@@ -100,8 +99,8 @@ export default function ProductSection() {
             <span className="product-title__name" data-text={copy.titleName}>{copy.titleName}</span>
           </Motion.h2>
           <Motion.h3
-            className="product-subtitle"
-            style={{ y: yTitle, opacity: opTitle, scale: scaleTitle }}
+            className={`product-subtitle product-blur-reveal ${copyInView ? 'is-revealed' : ''}`}
+            style={{ y: yTitle, scale: scaleTitle, transitionDelay: '0.15s' }}
           >
             <span className="product-subtitle__line">{copy.subtitleLineOne}</span>
             <span className="product-subtitle__line">
@@ -111,8 +110,8 @@ export default function ProductSection() {
             </span>
           </Motion.h3>
           <Motion.div
-            className="flex gap-5 mt-4 flex-wrap max-lg:justify-center"
-            style={{ y: yActions, opacity: opActions, scale: scaleActions }}
+            className={`flex gap-5 mt-4 flex-wrap max-lg:justify-center product-blur-reveal ${copyInView ? 'is-revealed' : ''}`}
+            style={{ y: yActions, transitionDelay: '0.3s' }}
           >
             <button className="product-cta product-cta--primary" onMouseMove={trackGlassCursor}>
               {copy.primaryCta}

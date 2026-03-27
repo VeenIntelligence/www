@@ -1,48 +1,17 @@
-<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="bgGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(512 372) rotate(90) scale(520)">
-      <stop offset="0" stop-color="#111827"/>
-      <stop offset="0.56" stop-color="#05070C"/>
-      <stop offset="1" stop-color="#000000"/>
-    </radialGradient>
-    <linearGradient id="wordmarkFill" x1="312" y1="406" x2="716" y2="666" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#D7DCE5"/>
-    </linearGradient>
-    <filter id="softGlow" x="190" y="250" width="644" height="524" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-      <feGaussianBlur stdDeviation="22" result="effect1_foregroundBlur"/>
-    </filter>
-  </defs>
-
-  <rect width="1024" height="1024" rx="224" fill="url(#bgGlow)"/>
-  <rect x="18" y="18" width="988" height="988" rx="206" stroke="rgba(255,255,255,0.08)"/>
-
-  <g filter="url(#softGlow)" opacity="0.28">
-    <path d="M286 292H738V732H286V292Z" fill="url(#wordmarkFill)"/>
-  </g>
-
-  <g fill="url(#wordmarkFill)" aria-label="Veen AI">
-    <text
-      x="292"
-      y="578"
-      font-family="Avenir Next, Inter, Helvetica Neue, Arial, sans-serif"
-      font-size="318"
-      font-weight="700"
-      letter-spacing="-12"
-    >
-      V
-    </text>
-    <text
-      x="450"
-      y="594"
-      font-family="Avenir Next, Inter, Helvetica Neue, Arial, sans-serif"
-      font-size="132"
-      font-weight="600"
-      letter-spacing="-4"
-    >
-      een AI
-    </text>
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>1024x1024@1x</title>
+    <g id="1024x1024" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#FFFFFF" x="0" y="0" width="1024" height="1024"></rect>
+        <g id="Group">
+            <rect id="Rectangle" stroke="#282828" fill="#000000" x="0.5" y="0.5" width="1023" height="1023"></rect>
+            <text id="Veen-AI" font-family="Helvetica-Bold, Helvetica" font-size="360" font-weight="bold" letter-spacing="-29.1" fill="#FFFFFF">
+                <tspan x="57" y="596">V</tspan>
+                <tspan x="268.017187" y="596" font-family="Helvetica" font-size="232" font-weight="normal" letter-spacing="1">een</tspan>
+                <tspan x="658.099219" y="596" font-family="Helvetica" font-size="232" font-weight="normal" letter-spacing="-9.2"> </tspan>
+                <tspan x="713.35625" y="596" font-size="262" letter-spacing="-9.2">A</tspan>
+                <tspan x="893.364258" y="596" font-size="262">I</tspan>
+            </text>
+        </g>
+    </g>
 </svg>

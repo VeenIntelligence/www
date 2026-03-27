@@ -100,6 +100,61 @@ Every resource you create must have a clear cleanup path:
 - Use `will-change` sparingly and only on elements that actually animate.
 - Use CSS custom properties (variables) for theming — change one variable, update everywhere.
 
+### 4.4 Heavy Asset Management（重型资产冻结与画质自适应）
+
+项目提供两个公共 hook，**任何包含 WebGL / Three.js / 视频 / 高成本动画循环的组件必须接入**：
+
+#### `useSectionFreeze(containerRef, options?)`
+
+位置：`src/hooks/useSectionFreeze.js`
+
+用途：判断容器是否在视口内且页面处于前台。返回 `{ shouldAnimate }`。
+
+接入规范：
+
+- 组件必须通过 `shouldAnimate` 控制 RAF 循环的启停。
+- 冻结时**保留**所有资源（renderer / scene / material / texture），**仅停止渲染循环**。
+- 冻结时必须释放交互状态（拖拽、captured pointer 等）。
+- 唤醒时必须做**时间补偿**（`startTime += now - freezeStart`），避免 `uTime` 跳变。
+- 可选 `onFreeze` / `onThaw` 回调用于暂停/恢复视频等副作用。
+
+```js
+const { shouldAnimate } = useSectionFreeze(containerRef, {
+  activeThreshold: 0.15,   // 可见比例阈值
+  onFreeze: () => video.pause(),
+  onThaw:  () => video.play(),
+});
+```
+
+#### `useAdaptiveQuality(options?)`
+
+位置：`src/hooks/useAdaptiveQuality.js`
+
+用途：GPU 自适应画质，30 帧采样窗口自动调节渲染分辨率。返回 `ref`，命令式 API。
+
+接入规范：
+
+- 在 `useEffect` 内部设置 `quality.onQualityChange` 回调（在闭包内访问 renderer/material）。
+- 每帧末尾调用 `quality.adaptFrame()`。
+- 初始化后调用 `quality.start()` 启动升级调度。
+- 清理时调用 `quality.dispose()`。
+
+```js
+const qualityRef = useAdaptiveQuality({ bootTier: 'low', bootScale: 0.38 });
+useEffect(() => {
+  const quality = qualityRef.current;
+  quality.onQualityChange = ({ tier, scale }) => { /* 更新 renderer */ };
+  quality.start();
+  return () => quality.dispose();
+}, [qualityRef]);
+```
+
+#### 非首屏资源加载约定
+
+- 非首屏图片必须使用 `loading="lazy"`，禁止 `fetchPriority="high"`。
+- 非首屏视频必须延迟到首次可见时才设置 `src` 并调用 `load()`。
+- 冻结 ≠ 卸载：**禁止**在离开视口时 `dispose()` 或 React unmount 重型组件。
+
 ---
 
 ## 5. Architecture & File Organization
@@ -109,6 +164,7 @@ Every resource you create must have a clear cleanup path:
 ```
 src/
 ├── components/          # Global shared components (Navbar, Footer, WaveCanvas)
+├── hooks/               # Shared React hooks (useSectionFreeze, useAdaptiveQuality)
 ├── pages/
 │   ├── HomePage.jsx     # Landing page assembler
 │   ├── NotFound.jsx     # 404
@@ -122,6 +178,8 @@ src/
 │   └── product/         # Styles for product pages
 ├── utils/               # Pure utility functions (noise.js, rippleSimulation.js)
 ├── config/              # Configuration objects (heroConfig.js)
+├── context/             # React Contexts (LanguageContext)
+├── shaders/             # GLSL shader modules
 ├── App.jsx              # Pure router — NO page content here
 ├── main.jsx             # Entry point
 └── index.css            # Global styles & CSS custom properties
@@ -134,6 +192,7 @@ src/
 | Used by ≥2 pages           | `components/`                | Shared globally                  |
 | Used only within one page  | `pages/<page>/components/`   | Co-located, not polluting global |
 | Pure computation, no React | `utils/`                     | Reusable, testable               |
+| Shared React hooks         | `hooks/`                     | Reusable lifecycle logic         |
 | Tunable parameters         | `config/`                    | Centralized, easy to adjust      |
 | Page-level assembler       | `pages/<Name>.jsx`           | Composes sections + layout       |
 | Section of a page          | `pages/<page>/<Section>.jsx` | Focused, single-responsibility   |
@@ -169,4 +228,7 @@ src/
 - [ ] Animation frames cancelled on unmount
 - [ ] Common patterns extracted, not duplicated
 - [ ] UI text is NOT hardcoded (added to `i18n.js` instead)
+- [ ] Heavy components use `useSectionFreeze` + `useAdaptiveQuality` hooks
+- [ ] Non-first-screen images use `loading="lazy"`, no `fetchPriority="high"`
+- [ ] Non-first-screen videos defer loading until first visible
 - [ ] Build passes: `npx vite build`

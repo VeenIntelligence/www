@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import HeroSection from './home/HeroSection';
 import AboutSection from './home/AboutSection';
 import ProductSection from './home/ProductSection';
-import ServicesSection from './home/ServicesSection';
+import ConsultantsSection from './home/ConsultantsSection';
 import Footer from '../components/Footer';
 
 /**
@@ -25,7 +25,7 @@ export default function HomePage() {
       <HeroSection />
       <AboutSection />
       <ProductSection />
-      <ServicesSection />
+      <ConsultantsSection />
       <Footer />
     </main>
   );

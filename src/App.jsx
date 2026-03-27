@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
+import BlogPage from './pages/BlogPage';
+import BlogArticlePage from './pages/BlogArticlePage';
 import NotFound from './pages/NotFound';
 import { LanguageProvider } from './context/LanguageContext';
 import './index.css';
@@ -17,6 +19,12 @@ function App() {
         <Routes>
           {/* Landing Page */}
           <Route path="/" element={<HomePage />} />
+
+          {/* 博客列表页 */}
+          <Route path="/blog" element={<BlogPage />} />
+
+          {/* 博客文章详情页 — 每篇文章独立 URL */}
+          <Route path="/blog/:slug" element={<BlogArticlePage />} />
 
           {/* Product 子路由 — 后续添加 */}
           {/* <Route path="/product/veen-trigger-trade" element={<ProductPage />} /> */}
