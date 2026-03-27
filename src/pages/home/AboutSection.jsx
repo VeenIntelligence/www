@@ -1,7 +1,9 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { motion as Motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import GlassCubeScene from '../../components/GlassCubeScene';
+import MagnetText from '../../components/MagnetText';
+import useCharMagnet from '../../hooks/useCharMagnet';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import '../../styles/sections/about.css';
@@ -61,11 +63,27 @@ function PillarCard({ pillar, index }) {
  * - Mobile (≤767px)：分两屏
  *   · 第一屏：Project Σ 标签 + 标题 + CTA + manifesto（上半留空给方块）
  *   · 第二屏：四大支柱卡片
+ *
+ * 标题支持模糊→清晰出场 + 逐字符磁吸交互
  */
 export default function AboutSection() {
   const { lang } = useLanguage();
   const copy = COPY.about[lang];
   const sectionRef = useRef(null);
+  const headingH2Ref = useRef(null);
+
+  /* 模糊→清晰出场：检测 heading 区域进入视口 */
+  const headingRevealRef = useRef(null);
+  const headingInView = useInView(headingRevealRef, { once: true, margin: '-80px' });
+
+  /* 逐字符磁吸交互 — 参数比 Hero 柔和，匹配较小字号 */
+  const magnetMouseRef = useCharMagnet(headingH2Ref, {
+    radius: 160,    /* 影响半径（px）；默认标准值：160。About 字号较小用更小半径。 */
+    maxY: -10,      /* Y 位移（px）；默认标准值：-10。 */
+    maxScale: 0.12, /* 缩放增益；默认标准值：0.12。 */
+    maxRotate: 3,   /* 旋转角度（deg）；默认标准值：3。 */
+    damping: 0.10,  /* 弹簧阻尼；默认标准值：0.10。 */
+  });
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -74,44 +92,65 @@ export default function AboutSection() {
 
   // 视差 — heading
   const yHeading = useTransform(scrollYProgress, [0, 0.5], [120, 0]);
-  const opHeading = useTransform(scrollYProgress, [0.05, 0.3], [0, 1]);
 
   // 视差 — manifesto + pillars
   const yBody = useTransform(scrollYProgress, [0, 0.55], [160, 0]);
   const opBody = useTransform(scrollYProgress, [0.08, 0.35], [0, 1]);
 
+  const handlePointerMove = useCallback((e) => {
+    magnetMouseRef.current.x = e.clientX;
+    magnetMouseRef.current.y = e.clientY;
+    magnetMouseRef.current.active = true;
+  }, [magnetMouseRef]);
+
+  const handlePointerLeave = useCallback(() => {
+    magnetMouseRef.current.active = false;
+  }, [magnetMouseRef]);
+
   return (
-    <section ref={sectionRef} id="about" className="about-section" style={{ position: 'relative' }}>
+    <section
+      ref={sectionRef}
+      id="about"
+      className="about-section"
+      style={{ position: 'relative' }}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+    >
       {/* Three.js 玻璃方块背景 */}
       <GlassCubeScene />
 
       {/* 主内容 */}
       <div className="about-content">
         {/* ═══ 第一屏（移动端）：标签 + 标题 + CTA + manifesto ═══ */}
-        <div className="about-screen-1">
+        <div className="about-screen-1" ref={headingRevealRef}>
           {/* Project [Σ] 大标签 — 箭头 + 文字 + 白框Σ徽章 */}
-          <Motion.div
-            className="about-subheading"
-            style={{ opacity: opHeading }}
+          <div
+            className={`about-subheading about-blur-reveal ${headingInView ? 'is-revealed' : ''}`}
           >
             <ArrowRight className="about-subheading__icon" />
             <span>{copy.subheading}</span>
             <span className="about-sigma-badge">Σ</span>
-          </Motion.div>
+          </div>
 
           {/* 标题 + CTA + 宣言 */}
           <div className="about-columns">
             {/* 左侧：标题 + CTA 按钮 */}
             <Motion.div
-              className="about-heading"
-              style={{ y: yHeading, opacity: opHeading }}
+              className={`about-heading about-blur-reveal ${headingInView ? 'is-revealed' : ''}`}
+              style={{ y: yHeading, transitionDelay: '0.15s' }}
             >
-              <h2 className="about-heading__h2">
-                <span className="about-heading__light">{copy.headingLines[0]}</span>
+              <h2 className="about-heading__h2" ref={headingH2Ref}>
+                <MagnetText tag="span" className="about-heading__light">
+                  {copy.headingLines[0]}
+                </MagnetText>
                 <br />
-                <span className="about-heading__light">{copy.headingLines[1]}</span>
+                <MagnetText tag="span" className="about-heading__light">
+                  {copy.headingLines[1]}
+                </MagnetText>
                 <br />
-                <span className="about-heading__display">{copy.headingLines[2]}</span>
+                <MagnetText tag="span" className="about-heading__display">
+                  {copy.headingLines[2]}
+                </MagnetText>
               </h2>
 
               {/* CTA 按钮紧跟标题下方 */}
@@ -125,8 +164,8 @@ export default function AboutSection() {
 
             {/* 右侧：宣言摘要 */}
             <Motion.div
-              className="about-manifesto"
-              style={{ y: yBody, opacity: opBody }}
+              className={`about-manifesto about-blur-reveal ${headingInView ? 'is-revealed' : ''}`}
+              style={{ y: yBody, opacity: opBody, transitionDelay: '0.3s' }}
             >
               <p className="about-manifesto__text">{copy.manifesto}</p>
               <p className="about-manifesto__highlight">{copy.manifestoHighlight}</p>
@@ -149,3 +188,4 @@ export default function AboutSection() {
     </section>
   );
 }
+

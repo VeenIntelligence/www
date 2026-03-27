@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import {
   motion as Motion,
   useMotionValue,
@@ -7,6 +7,8 @@ import {
   useTransform,
 } from 'framer-motion';
 import WaveCanvas from '../../components/WaveCanvas';
+import MagnetText from '../../components/MagnetText';
+import useCharMagnet from '../../hooks/useCharMagnet';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import '../../styles/sections/hero.css';
@@ -42,12 +44,14 @@ function HeroSubtitleLine({ line, index, total, scrollYProgress, pointerXSpring,
 /**
  * HeroSection — 纯视觉英雄区
  * 全屏背景 + 左对齐标题 + Hero 内信息带
+ * 主标题支持逐字符磁吸交互（通过 useCharMagnet hook）
  */
 export default function HeroSection() {
   const { lang } = useLanguage();
   const copy = COPY.hero[lang];
   const isChinese = lang === 'zh';
   const sectionRef = useRef(null);
+  const titleAreaRef = useRef(null);
   const dividerSourceRef = useRef(null);
   const [dividerWidth, setDividerWidth] = useState(null);
   const pointerX = useMotionValue(0);
@@ -55,6 +59,9 @@ export default function HeroSection() {
   const pointerXSpring = useSpring(pointerX, { stiffness: 140, damping: 22, mass: 0.5 });
   const pointerYSpring = useSpring(pointerY, { stiffness: 140, damping: 22, mass: 0.5 });
   const subtitleLines = copy.subtitleLines ?? (copy.subtitle ? [copy.subtitle] : []);
+
+  /* 逐字符磁吸交互 — 共享 hook */
+  const magnetMouseRef = useCharMagnet(titleAreaRef);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -99,18 +106,24 @@ export default function HeroSection() {
     };
   }, [lang, copy.titleLines.length]);
 
-  const handlePointerMove = (e) => {
+  const handlePointerMove = useCallback((e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const nextX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const nextY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
     pointerX.set(nextX);
     pointerY.set(nextY);
-  };
 
-  const handlePointerLeave = () => {
+    /* 同步更新磁吸鼠标坐标 */
+    magnetMouseRef.current.x = e.clientX;
+    magnetMouseRef.current.y = e.clientY;
+    magnetMouseRef.current.active = true;
+  }, [pointerX, pointerY, magnetMouseRef]);
+
+  const handlePointerLeave = useCallback(() => {
     pointerX.set(0);
     pointerY.set(0);
-  };
+    magnetMouseRef.current.active = false;
+  }, [pointerX, pointerY, magnetMouseRef]);
 
   return (
     <section
@@ -127,17 +140,18 @@ export default function HeroSection() {
       {/* Content overlay — 从底部向上堆叠：标题 → 分隔线 → 玻璃面板 */}
       <div className="hero__content">
         {/* 标题区 */}
-        <div className="hero__title-area">
+        <div className="hero__title-area" ref={titleAreaRef}>
           <div className="hero__title-backdrop">
             <h1 className={`hero__title ${isChinese ? 'hero__title--compact' : ''}`}>
               {copy.titleLines.map((line, index) => (
-                <span
-                  key={line}
+                <MagnetText
+                  key={`${lang}-${index}`}
+                  tag="span"
                   ref={index === copy.titleLines.length - 1 ? dividerSourceRef : undefined}
                   className={`hero__title-line ${index > 0 ? 'hero__title-line--secondary' : ''}`}
                 >
                   {line}
-                </span>
+                </MagnetText>
               ))}
             </h1>
           </div>
