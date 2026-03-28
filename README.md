@@ -47,12 +47,12 @@ A comprehensive intelligent scheduling infrastructure for strategy generation an
 ```
 Frontend:
   ├── React 19.x
-  ├── Vite 6.x
+  ├── Vite 8.x
   ├── Vanilla CSS (custom design system)
   └── React Router (client-side routing)
 
 Hosting:
-  ├── Vercel (static hosting)
+  ├── Cloudflare Pages (static hosting, free tier)
   └── Custom domain (vennai.org)
 
 Language:
@@ -120,11 +120,47 @@ npm run preview
 
 ## 🌐 Deployment
 
-### Vercel (Recommended)
-1. Push code to GitHub
-2. Import repo in [Vercel Dashboard](https://vercel.com)
-3. Add custom domain `vennai.org` in project settings
-4. Deploy automatically on push
+### Cloudflare Pages (Production)
+
+Repository:
+- Git provider: GitHub
+- Repo: `https://github.com/VeenIntelligence/www`
+- Production branch: `main`
+- Monorepo: yes (current frontend project root is `/`)
+
+Build config:
+- Framework preset: `Vite`
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Root directory: `/`
+- Node.js version: `20.19.0+` (Vite 8 requires `^20.19.0 || >=22.12.0`)
+- Install command: `npm install` (or `npm ci` if lockfile-only CI install is preferred)
+
+Environment variables:
+- Production: none
+
+Routing:
+- SPA fallback: enabled via `public/_redirects` with `/* /index.html 200`
+
+#### Setup Steps
+1. In Cloudflare dashboard, go to `Workers & Pages` -> `Create` -> `Pages` -> `Connect to Git`.
+2. Connect GitHub and select repo `VeenIntelligence/www`.
+3. Set production branch to `main`.
+4. Fill build settings with the values above and deploy.
+5. Add custom domain `vennai.org` in Pages project -> `Custom domains`.
+6. Add `www.vennai.org` as well, then configure a redirect rule from `www` to apex domain (`vennai.org`).
+
+#### Domain Status Note
+You said the domain is purchased but not bound to any server yet. That is fine.
+You only need DNS pointing to Cloudflare (or nameservers switched to Cloudflare) before/while binding `vennai.org` in Pages.
+
+#### Manual Trigger Command
+Default behavior is auto deploy on push to `main`.  
+If you want to force a deploy without code changes, run:
+
+```bash
+git commit --allow-empty -m "chore: trigger cloudflare pages deploy" && git push origin main
+```
 
 ---
 
