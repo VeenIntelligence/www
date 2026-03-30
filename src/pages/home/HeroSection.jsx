@@ -143,16 +143,39 @@ export default function HeroSection() {
         <div className="hero__title-area" ref={titleAreaRef}>
           <div className="hero__title-backdrop">
             <h1 className={`hero__title ${isChinese ? 'hero__title--compact' : ''}`}>
-              {copy.titleLines.map((line, index) => (
-                <MagnetText
-                  key={`${lang}-${index}`}
-                  tag="span"
-                  ref={index === copy.titleLines.length - 1 ? dividerSourceRef : undefined}
-                  className={`hero__title-line ${index > 0 ? 'hero__title-line--secondary' : ''}`}
-                >
-                  {line}
-                </MagnetText>
-              ))}
+              {copy.titleLines.map((line, index) => {
+                const isFoundationLine = !isChinese && line.trim().toLowerCase() === 'foundation';
+                const extraClass = isFoundationLine ? ' hero__title-line--foundation-gradient' : '';
+                const hasChineseFoundation = isChinese && line.includes('基金会');
+
+                if (hasChineseFoundation) {
+                  const [prefix, suffix = ''] = line.split('基金会');
+                  return (
+                    <span
+                      key={`${lang}-${index}`}
+                      ref={index === copy.titleLines.length - 1 ? dividerSourceRef : undefined}
+                      className={`hero__title-line ${index > 0 ? 'hero__title-line--secondary' : ''}`}
+                    >
+                      {prefix ? <MagnetText tag="span">{prefix}</MagnetText> : null}
+                      <MagnetText tag="span" className="hero__title-line--foundation-gradient">
+                        基金会
+                      </MagnetText>
+                      {suffix ? <MagnetText tag="span">{suffix}</MagnetText> : null}
+                    </span>
+                  );
+                }
+
+                return (
+                  <MagnetText
+                    key={`${lang}-${index}`}
+                    tag="span"
+                    ref={index === copy.titleLines.length - 1 ? dividerSourceRef : undefined}
+                    className={`hero__title-line ${index > 0 ? 'hero__title-line--secondary' : ''}${extraClass}`}
+                  >
+                    {line}
+                  </MagnetText>
+                );
+              })}
             </h1>
           </div>
         </div>

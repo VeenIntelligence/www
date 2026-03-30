@@ -68,7 +68,7 @@
     scroll-snap-stop: always;
   }
 
-  .home-page > footer {
+  .home-page .footer {
     scroll-snap-align: end;
     scroll-snap-stop: always;
   }

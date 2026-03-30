@@ -6,13 +6,12 @@ import * as THREE from 'three';
 // ══════════════════════════════════════════════════════════════
 
 // --- GPU 分档 ---
-// 各 GPU 档位对应的渲染分辨率缩放比例。默认 high=0.75, medium=0.5, low=0.35。
-// 调大画面更清晰但更吃 GPU；调小画面模糊但更流畅。
-export const TIER_SCALE = { high: 0.75, medium: 0.5, low: 0.35 };
-// 启动时使用的 GPU 档位。默认 'low'，首帧用低配渲染以减少白屏时间。
-export const BOOT_TIER = 'low';
-// 启动阶段的额外低分辨率缩放。默认 0.38。调小首帧更快但更模糊。
-export const BOOT_SCALE = 0.38;
+// 各 GPU 档位对应的渲染分辨率缩放比例。默认 high=0.54。已移除中低档。
+export const TIER_SCALE = { high: 0.54 };
+// 启动时使用的 GPU 档位。
+export const BOOT_TIER = 'high';
+// 启动阶段的无差别分辨率缩放。统一使用 0.75。
+export const BOOT_SCALE = 0.75;
 // 启动阶段最短持续毫秒数。默认 900ms。低于此时间不会切换到正式档位。
 export const BOOT_MIN_MS = 900;
 
@@ -94,8 +93,8 @@ export const SPIKE_RELEASE_MIN_SPEED = 0.5;
 // About 阶段立方体固定位置 (SDF 空间)。Desktop: 稍偏上居中。Mobile: 居上。
 export const ABOUT_CUBE_POS_DESKTOP = new THREE.Vector3(0, 0.35, 0);
 export const ABOUT_CUBE_POS_MOBILE = new THREE.Vector3(0, 0.55, 0);
-// About 阶段立方体缩放倍数（相对 Hero 阶段）。默认 1.83。让 About 的方块更大。
-export const ABOUT_CUBE_SCALE = 1.83;
+// About 阶段立方体缩放倍数（相对 Hero 阶段）。默认 2.38（原 1.83 放大约30%）。让 About 的方块更大。
+export const ABOUT_CUBE_SCALE = 2.38;
 // 手动被冻结到 About 位置后整个方块变大时用的 GLSL 半边长。默认 0.55。
 export const ABOUT_CUBE_SIZE_GLSL = 0.55;
 // About 阶段空闲自转速度 [x, y, z] 弧度/秒。默认 [0.15, 0.25, 0.08]。

@@ -149,7 +149,7 @@ export default function Navbar() {
   }, [menuOpen]);
 
   return (
-    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-nav">
+    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-nav" data-lang={lang}>
       {/* 导航栏内容：桌面端用 LiquidGlass 液态玻璃，移动端降级为 CSS 磨砂玻璃 */}
       {isMobile ? (
         <div className={`navbar__glass-fallback ${scrolled ? 'navbar__glass-fallback--scrolled' : ''}`}>

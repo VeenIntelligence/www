@@ -45,7 +45,7 @@ export default function GPUDebugPanel() {
   const [collapsed, setCollapsed] = useState(false);
   const [activeTier, setActiveTier] = useState('low');
   const [params, setParams] = useState(() => JSON.parse(JSON.stringify(bus.tierParams)));
-  const [metrics, setMetrics] = useState({ fps: 0, frameTimeMs: 0, activeTier: 'low', activeScale: 0.38, gpuName: '' });
+  const [metrics, setMetrics] = useState({ fps: 0, frameTimeMs: 0, activeTier: 'high', activeScale: 0.75, gpuName: '', memUsed: 0, memTotal: 0 });
   const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 80 });
   const [copied, setCopied] = useState(false);
 
@@ -56,8 +56,8 @@ export default function GPUDebugPanel() {
   // ── 启用 debug bus ──
   useEffect(() => {
     bus.enable();
-    bus.setForcedTier('low');
-    setActiveTier('low');
+    bus.setForcedTier('high');
+    setActiveTier('high');
     return () => bus.disable();
   }, []);
 
@@ -162,7 +162,7 @@ export default function GPUDebugPanel() {
   // ── 重置 ──
   const handleReset = useCallback(() => bus.resetToDefaults(), []);
 
-  const tierParams = params[activeTier] || params.medium;
+  const tierParams = params[activeTier] || params.high;
 
   return (
     <div className="gpu-debug-panel" style={{ left: pos.x, top: pos.y }}>
@@ -189,28 +189,12 @@ export default function GPUDebugPanel() {
             {metrics.gpuName || 'Detecting...'}
           </div>
 
-          {/* 画质切换 */}
-          <div className="gpu-debug-group">
-            <div className="gpu-debug-group-title">画质切换</div>
-            <div className="gpu-debug-tiers">
-              {['low', 'medium', 'high'].map(tier => (
-                <button
-                  key={tier}
-                  className="gpu-debug-tier-btn"
-                  data-tier={tier}
-                  data-active={activeTier === tier}
-                  onClick={() => switchTier(tier)}
-                >
-                  {tier === 'low' ? '低' : tier === 'medium' ? '中' : '高'}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* 画质切换已移除，全设备强制为高画质 */}
 
           {/* 渲染参数滑块 */}
           <div className="gpu-debug-group">
             <div className="gpu-debug-group-title">
-              渲染参数 ({activeTier.toUpperCase()})
+              渲染参数 (HIGH)
             </div>
             {PARAM_DEFS.map(({ key, label, min, max, step, fmt }) => (
               <div className="gpu-debug-slider-row" key={key}>
@@ -245,6 +229,14 @@ export default function GPUDebugPanel() {
                 </span>
                 <span className="gpu-debug-perf-label">帧时间(ms)</span>
               </div>
+              {metrics.memTotal > 0 && (
+                <div className="gpu-debug-perf-stat" title={`总计分配大小: ${metrics.memTotal} MB`}>
+                  <span className="gpu-debug-perf-value" data-good={metrics.memUsed < 150} data-warn={metrics.memUsed >= 150 && metrics.memUsed < 300} data-bad={metrics.memUsed >= 300}>
+                    {metrics.memUsed}
+                  </span>
+                  <span className="gpu-debug-perf-label">JS堆(MB)</span>
+                </div>
+              )}
             </div>
             <canvas ref={canvasRef} className="gpu-debug-perf-canvas" />
             <div className="gpu-debug-perf-meta">

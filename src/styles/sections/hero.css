@@ -190,6 +190,21 @@
   margin-top: -0.12em;
 }
 
+/* 复用 About 第三行同款蓝色渐变，仅作用于 Hero 的 Foundation 行 */
+.hero__title-line--foundation-gradient {
+  color: rgba(200, 230, 255, 0.96);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero__title-line--foundation-gradient .magnet-char {
+    background: linear-gradient(135deg, rgba(200, 230, 255, 1), rgba(120, 180, 255, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
 .hero__divider {
   position: relative;
   margin: var(--hero-divider-gap) 0;

@@ -6,8 +6,8 @@ const BRAND_LABELS = {
 };
 
 const BRAND_TAILS = {
-  full: 'een AI',
-  short: 'een',
+  full: 'enn AI',
+  short: 'enn',
 };
 
 export default function BrandWordmark({

@@ -28,8 +28,9 @@ export default function HomePage() {
       <HeroSection />
       <AboutSection />
       <ProductSection />
-      <ConsultantsSection />
-      <Footer />
+      <ConsultantsSection>
+        <Footer />
+      </ConsultantsSection>
     </main>
   );
 }

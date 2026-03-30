@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
 import { COPY } from '../config/i18n';
 import { useLanguage } from '../context/useLanguage';
-import { IconEmail, IconX, IconGitHub, IconProduct, IconBlog } from './common/SocialIcons';
+import { IconEmail, IconX, IconGitHub } from './common/SocialIcons';
 import '../styles/components/footer.css';
 
 /**
@@ -48,16 +47,6 @@ export default function Footer() {
               <IconGitHub className="footer__link-icon" />
               {copy.github}
             </a>
-          </div>
-          <div className="footer__nav-links">
-            <a href="#product" className="footer__link footer__link--featured">
-              <IconProduct className="footer__link-icon" />
-              {copy.product}
-            </a>
-            <Link to="/blog" className="footer__link footer__link--featured">
-              <IconBlog className="footer__link-icon" />
-              {copy.blog}
-            </Link>
           </div>
         </div>
 

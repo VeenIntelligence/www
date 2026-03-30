@@ -144,29 +144,13 @@ function getSpikeMaterialDefine() {
 // 每个 GPU 档位的独有 define
 const TIER_DEFINES = {
   high: [
-    '#define MAX_STEPS 40',
-    '#define SURF_DIST 0.002',
-    '#define NORMAL_EPS 0.004',
+    '#define MAX_STEPS 30',
+    '#define SURF_DIST 0.01',
+    '#define NORMAL_EPS 0.003',
     '#define GLASS_INTERIOR_STEPS 12',
     '#define QUALITY_HIGH',
     '#define SPIKE_ENABLED',
-  ],
-  medium: [
-    '#define MAX_STEPS 36',
-    '#define SURF_DIST 0.003',
-    '#define NORMAL_EPS 0.003',
-    '#define GLASS_INTERIOR_STEPS 10',
-    '#define QUALITY_MEDIUM',
-    '#define SPIKE_ENABLED',
-  ],
-  low: [
-    '#define MAX_STEPS 24',
-    '#define SURF_DIST 0.006',
-    '#define NORMAL_EPS 0.004',
-    '#define GLASS_INTERIOR_STEPS 8',
-    '#define QUALITY_LOW',
-    '#define SPIKE_ENABLED',
-  ],
+  ]
 };
 
 /**
@@ -175,7 +159,7 @@ const TIER_DEFINES = {
  * @param {Object} overrides - { maxSteps, surfDist, normalEps, glassInteriorSteps }
  */
 function buildTierDefinesFromOverrides(tier, overrides) {
-  const qualityDefine = { high: 'QUALITY_HIGH', medium: 'QUALITY_MEDIUM', low: 'QUALITY_LOW' }[tier] || 'QUALITY_MEDIUM';
+  const qualityDefine = 'QUALITY_HIGH';
   return [
     `#define MAX_STEPS ${overrides.maxSteps}`,
     `#define SURF_DIST ${glslFloat(overrides.surfDist)}`,
@@ -195,27 +179,18 @@ function buildTierDefinesFromOverrides(tier, overrides) {
 export function buildUnifiedShader(tier, tierOverrides = null) {
   const tierDefines = tierOverrides
     ? buildTierDefinesFromOverrides(tier, tierOverrides)
-    : (TIER_DEFINES[tier] || TIER_DEFINES.medium);
+    : TIER_DEFINES.high;
   const materialDefine = getSpikeMaterialDefine();
   const lookDefines = buildLookDefines();
   return [...tierDefines, materialDefine, ...lookDefines].join('\n') + '\n' + fragmentShaderBody;
 }
 
-/** 检测 GPU 性能档位 */
+/** 检测 GPU 性能档位 (已固定为 high) */
 export function detectGPUTier() {
-  const canvas = document.createElement('canvas');
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) return 'low';
-  const ext = gl.getExtension('WEBGL_debug_renderer_info');
-  if (ext) {
-    const r = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL).toLowerCase();
-    if (r.includes('intel') || r.includes('swiftshader') || r.includes('llvmpipe')) return 'low';
-    if (r.includes('apple') || r.includes('nvidia') || r.includes('radeon')) return 'high';
-  }
-  return 'medium';
+  return 'high';
 }
 
-/** 获取 GPU 档位对应的缩放比例 */
+/** 获取 GPU 档位对应的缩放比例 (固定返回 high 的值) */
 export function getTierScale(tier) {
-  return TIER_SCALE[tier] || TIER_SCALE.medium;
+  return TIER_SCALE.high;
 }

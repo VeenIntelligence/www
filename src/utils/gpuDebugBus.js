@@ -18,25 +18,17 @@
 // ── 三档默认 shader 质量参数 ──
 export const DEFAULT_TIER_PARAMS = {
   high: {
-    // 光线行进最大步数。越大越精确但越慢。默认 40。范围 [8, 80]。
-    maxSteps: 40,
-    // 表面距离判定阈值。越小细节越好但越慢。默认 0.002。范围 [0.001, 0.02]。
-    surfDist: 0.002,
-    // 法线计算采样偏移。越小越准但多 3 次 SDF 采样。默认 0.004。范围 [0.001, 0.01]。
-    normalEps: 0.004,
+    // 光线行进最大步数。越大越精确但越慢。默认 30。范围 [8, 80]。
+    maxSteps: 30,
+    // 表面距离判定阈值。越小细节越好但越慢。原默认 0.002，现调整为 0.01。范围 [0.001, 0.02]。
+    surfDist: 0.01,
+    // 法线计算采样偏移。越小越准但多 3 次 SDF 采样。默认 0.003。范围 [0.001, 0.01]。
+    normalEps: 0.003,
     // 玻璃内部折射步数。越大透明效果越好但越慢。默认 12。范围 [2, 24]。
     glassInteriorSteps: 12,
-    // 渲染分辨率缩放。1.0 = 原生 DPR。默认 0.75。范围 [0.1, 1.0]。
-    renderScale: 0.75,
-  },
-  medium: {
-    maxSteps: 36, surfDist: 0.003, normalEps: 0.003,
-    glassInteriorSteps: 10, renderScale: 0.5,
-  },
-  low: {
-    maxSteps: 24, surfDist: 0.006, normalEps: 0.004,
-    glassInteriorSteps: 8, renderScale: 0.35,
-  },
+    // 渲染分辨率缩放。1.0 = 原生 DPR。默认 0.54。范围 [0.1, 1.0]。
+    renderScale: 0.54,
+  }
 };
 
 // 性能采样环形缓冲区大小（约 2 秒 @ 60fps）
@@ -63,8 +55,8 @@ class GPUDebugBus {
     this.frameTimes = new Float32Array(PERF_SAMPLES);
     this.frameIdx = 0;
     this._lastTs = 0;
-    this.activeTier = 'low';
-    this.activeScale = 0.38;
+    this.activeTier = 'high';
+    this.activeScale = 0.54;
     this.gpuName = '';
 
     this._listeners = new Set();
@@ -102,7 +94,7 @@ class GPUDebugBus {
   /** 获取当前激活档位的参数 */
   getActiveTierParams() {
     const tier = this.forcedTier || this.activeTier;
-    return this.tierParams[tier] || this.tierParams.medium;
+    return this.tierParams[tier] || this.tierParams.high;
   }
 
   /** 渲染器每帧尾部调用 */
@@ -128,12 +120,21 @@ class GPUDebugBus {
       if (this.frameTimes[i] > 0) { sum += this.frameTimes[i]; count++; }
     }
     const avgMs = count > 0 ? sum / count : 16.67;
+    
+    let memUsed = 0, memTotal = 0;
+    if (performance && performance.memory) {
+      memUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
+      memTotal = performance.memory.totalJSHeapSize / (1024 * 1024);
+    }
+
     return {
       fps: Math.round(1000 / avgMs),
       frameTimeMs: +avgMs.toFixed(1),
       activeTier: this.activeTier,
       activeScale: this.activeScale,
       gpuName: this.gpuName,
+      memUsed: memUsed ? +memUsed.toFixed(1) : 0,
+      memTotal: memTotal ? +memTotal.toFixed(1) : 0,
     };
   }
 
@@ -172,14 +173,14 @@ class GPUDebugBus {
       '// ══════════════════════════════════════════════════════════════',
       '',
       '// --- waveLook.js → TIER_SCALE ---',
-      `export const TIER_SCALE = { high: ${p.high.renderScale}, medium: ${p.medium.renderScale}, low: ${p.low.renderScale} };`,
+      `export const TIER_SCALE = { high: ${p.high.renderScale} };`,
       '',
       '// --- shader builder → TIER_DEFINES ---',
       'const TIER_DEFINES = {',
     ];
-    for (const tier of ['high', 'medium', 'low']) {
+    for (const tier of ['high']) {
       const t = p[tier];
-      const qd = { high: 'QUALITY_HIGH', medium: 'QUALITY_MEDIUM', low: 'QUALITY_LOW' }[tier];
+      const qd = 'QUALITY_HIGH';
       lines.push(`  ${tier}: [`);
       lines.push(`    '#define MAX_STEPS ${t.maxSteps}',`);
       lines.push(`    '#define SURF_DIST ${t.surfDist}',`);

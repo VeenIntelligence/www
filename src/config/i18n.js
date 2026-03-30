@@ -141,17 +141,19 @@ export const COPY = {
       bio2: 'Co-founder of Venn Intelligence.',
       tiers: [
         {
-          name: 'Acquaintances Chat',
+          label: 'Tier One',
+          name: 'Casual Chat',
           price: '$100',
           duration: '/ 30 min',
-          features: ['Simple casual chat', 'Half hour'],
+          features: ['For mutuals and friends', 'Casual chat without recording', 'Half an hour to solve core confusions'],
           button: 'Book Now',
         },
         {
+          label: 'Tier Two',
           name: 'Formal Consulting',
           price: '$1000',
           duration: '/ hour',
-          features: ['Strangers / Formal', 'Full Google Meeting replay', 'Legal document signing'],
+          features: ['Full Google Meeting replay', 'Requires signing legal documents', 'Formal and comprehensive deep dive'],
           button: 'Book Now',
         }
       ]
@@ -164,6 +166,7 @@ export const COPY = {
       bio2: 'Venn Intelligence 联合创始人。',
       tiers: [
         {
+          label: '层级一',
           name: '熟人简单聊',
           price: '$100',
           duration: '/ 半小时',
@@ -171,6 +174,7 @@ export const COPY = {
           button: '立即预约',
         },
         {
+          label: '层级二',
           name: '正规咨询',
           price: '$1000',
           duration: '/ 小时',

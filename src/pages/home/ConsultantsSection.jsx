@@ -1,10 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
-import LaserSphereBackground from '../../components/LaserSphereBackground';
+import IsometricBlocksBackground from '../../components/IsometricBlocksBackground';
 import '../../styles/sections/consultants.css';
-
-const MOBILE_BREAKPOINT = 768;
 
 /**
  * ArrowRight — 内联箭头图标
@@ -29,17 +27,10 @@ function ArrowRight({ className = '' }) {
 /**
  * ConsultantsSection — 顾问信息 + 双层级咨询卡片
  */
-export default function ConsultantsSection() {
+export default function ConsultantsSection({ children }) {
   const { lang } = useLanguage();
   const content = COPY.consultants[lang];
   const sectionRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT);
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
 
   return (
     <section
@@ -47,76 +38,85 @@ export default function ConsultantsSection() {
       id="consultants"
       className="consultants-section"
     >
-      {/* 绿光地球 Three.js 背景 */}
-      <LaserSphereBackground sectionRef={sectionRef} isMobileProp={isMobile} />
+      {/* 等距3D方块网格背景 */}
+      <IsometricBlocksBackground />
 
-      <div className="consultants-content">
-        <header className="consultants-heading">
-          <span className="consultants-heading__label">{content.sectionTitle}</span>
-          <div className="consultants-heading__line" />
-        </header>
+      <div className="consultants-content-wrapper">
+        <div className="consultants-content">
+          <header className="consultants-heading">
+            <span className="consultants-heading__label">{content.sectionTitle}</span>
+            <div className="consultants-heading__line" />
+          </header>
 
-        <div className="consultants-grid">
-          {/* Panel 1: Profile */}
-          <GlassPanel variant="profile">
-            <div className="consultants-panel__inner consultants-panel__inner--profile">
-              <div className="consultants-avatar" aria-hidden="true">
-                <span className="consultants-avatar__mark">Σ</span>
-              </div>
-
-              <h2 className="consultants-profile__name">{content.name}</h2>
-
-              <div className="consultants-profile__tags">
-                {content.tags.map((tag, idx) => (
-                  <span key={idx} className="consultants-profile__tag">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <p className="consultants-profile__bio">{content.bio1}</p>
-              <p className="consultants-profile__bio consultants-profile__bio--emphasis">{content.bio2}</p>
-            </div>
-          </GlassPanel>
-
-          {/* Panel 2 & 3: Consulting tiers */}
-          {content.tiers.map((tier, idx) => {
-            const isPremium = idx === 1;
-            return (
-              <GlassPanel key={tier.name} variant={isPremium ? 'premium' : 'standard'}>
-                <div className={`consultants-panel__inner consultants-tier ${isPremium ? 'consultants-tier--premium' : ''}`}>
-                  <div className="consultants-tier__head">
-                    <span className="consultants-tier__index">{`Tier 0${idx + 1}`}</span>
-                    <h3 className="consultants-tier__name">{tier.name}</h3>
-                  </div>
-
-                  <div className="consultants-tier__price-wrap">
-                    <span className="consultants-tier__price">{tier.price}</span>
-                    <span className="consultants-tier__duration">{tier.duration}</span>
-                  </div>
-
-                  <ul className="consultants-tier__features">
-                    {tier.features.map((feat, fIdx) => (
-                      <li key={fIdx}>
-                        <span className="consultants-tier__dot" aria-hidden="true" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    type="button"
-                    className={`consultants-cta ${isPremium ? 'consultants-cta--premium' : ''}`}
-                  >
-                    {tier.button}
-                    <ArrowRight className="consultants-cta__arrow" />
-                  </button>
+          <div className="consultants-grid">
+            {/* Panel 1: Profile */}
+            <GlassPanel variant="profile">
+              <div className="consultants-panel__inner consultants-panel__inner--profile">
+                <div className="consultants-avatar">
+                  <img
+                    src="/consul-lines.png"
+                    alt={content.name}
+                    className="consultants-avatar__img"
+                    loading="lazy"
+                  />
                 </div>
-              </GlassPanel>
-            );
-          })}
+
+                <h2 className="consultants-profile__name">{content.name}</h2>
+
+                <div className="consultants-profile__tags">
+                  {content.tags.map((tag, idx) => (
+                    <span key={idx} className="consultants-profile__tag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <p className="consultants-profile__bio">{content.bio1}</p>
+                <p className="consultants-profile__bio consultants-profile__bio--emphasis">{content.bio2}</p>
+              </div>
+            </GlassPanel>
+
+            {/* Panel 2 & 3: Consulting tiers */}
+            {content.tiers.map((tier, idx) => {
+              const isPremium = idx === 1;
+              return (
+                <GlassPanel key={tier.name} variant={isPremium ? 'premium' : 'standard'}>
+                  <div className={`consultants-panel__inner consultants-tier ${isPremium ? 'consultants-tier--premium' : ''}`}>
+                    <div className="consultants-tier__head">
+                      <span className="consultants-tier__index">{tier.label}</span>
+                      <h3 className="consultants-tier__name">{tier.name}</h3>
+                    </div>
+
+                    <div className="consultants-tier__price-wrap">
+                      <span className="consultants-tier__price">{tier.price}</span>
+                      <span className="consultants-tier__duration">{tier.duration}</span>
+                    </div>
+
+                    <ul className="consultants-tier__features">
+                      {tier.features.map((feat, fIdx) => (
+                        <li key={fIdx}>
+                          <span className="consultants-tier__dot" aria-hidden="true" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      type="button"
+                      className={`consultants-cta ${isPremium ? 'consultants-cta--premium' : ''}`}
+                    >
+                      {tier.button}
+                      <ArrowRight className="consultants-cta__arrow" />
+                    </button>
+                  </div>
+                </GlassPanel>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {children}
     </section>
   );
 }

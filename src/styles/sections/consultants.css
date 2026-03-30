@@ -1,6 +1,6 @@
 /* ============================================================
-   Consultants Section — Three.js 绿光地球 + 高阶玻璃面板
-   说明：不使用 CSS 模糊打光层，避免遮住球体；发光交给 Three.js 灯光系统。
+   Consultants Section — 等距 3D 方块网格背景 + 高阶玻璃面板
+   说明：背景用纯 Canvas 2D 渲染等距方块，不使用 Three.js。
    ============================================================ */
 
 .consultants-section {
@@ -12,20 +12,29 @@
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(84px, 10vh, 124px) clamp(18px, 4vw, 64px);
+  flex-direction: column; /* Changed from row for footer */
+  padding: 0; /* Padding moved to content wrapper */
   overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   background:
-    radial-gradient(120% 90% at 78% -12%, rgba(12, 29, 44, 0.35) 0%, rgba(3, 8, 16, 0) 62%),
-    linear-gradient(180deg, #010308 0%, #020610 56%, #010206 100%);
+    radial-gradient(120% 90% at 78% -12%, rgba(80, 220, 140, 0.08) 0%, rgba(18, 18, 18, 0) 62%),
+    linear-gradient(180deg, #161616 0%, #101010 56%, #0a0a0a 100%);
   isolation: isolate;
+}
+
+.consultants-content-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: clamp(84px, 10vh, 124px) clamp(18px, 4vw, 64px);
+  position: relative;
+  z-index: 10;
 }
 
 .consultants-content {
   position: relative;
-  z-index: 10;
   width: min(1220px, 100%);
   display: flex;
   flex-direction: column;
@@ -44,9 +53,9 @@
   justify-content: center;
   padding: 5px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(171, 208, 250, 0.34);
-  background: rgba(18, 27, 41, 0.42);
-  color: rgba(232, 243, 255, 0.9);
+  border: 1px solid rgba(80, 220, 140, 0.3);
+  background: rgba(30, 42, 35, 0.4);
+  color: rgba(240, 255, 245, 0.9);
   font-size: clamp(0.7rem, 0.95vw, 0.78rem);
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -55,7 +64,7 @@
 .consultants-heading__line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, rgba(168, 208, 255, 0.45), rgba(168, 208, 255, 0.02));
+  background: linear-gradient(90deg, rgba(80, 220, 140, 0.45), rgba(80, 220, 140, 0.02));
 }
 
 .consultants-grid {
@@ -71,19 +80,14 @@
   width: 100%;
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid var(--consultants-border);
-  background: linear-gradient(
-    155deg,
-    rgba(14, 22, 39, 0.8) 0%,
-    rgba(7, 14, 26, 0.73) 56%,
-    rgba(4, 9, 18, 0.78) 100%
-  );
-  backdrop-filter: blur(14px) saturate(1.25);
-  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
   box-shadow:
-    0 30px 76px rgba(0, 0, 0, 0.56),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(120, 170, 240, 0.15);
+    0 24px 64px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(80, 220, 140, 0.08);
   transition:
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.35s ease,
@@ -96,8 +100,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120% 84% at 0% 0%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-  opacity: 0.32;
+  background: radial-gradient(120% 84% at 0% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+  opacity: 0.8;
 }
 
 .consultants-panel::after {
@@ -108,49 +112,41 @@
   right: 1px;
   height: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0));
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
 }
 
 .consultants-panel:hover {
   transform: translateY(-4px);
-  border-color: rgba(187, 220, 255, 0.36);
+  border-color: rgba(80, 220, 140, 0.25);
+  background: rgba(255, 255, 255, 0.05);
   box-shadow:
-    0 40px 86px rgba(0, 0, 0, 0.62),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(150, 200, 255, 0.2);
+    0 32px 76px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(80, 220, 140, 0.15);
 }
 
 .consultants-panel--profile {
-  background: linear-gradient(
-    152deg,
-    rgba(12, 20, 35, 0.84) 0%,
-    rgba(6, 12, 24, 0.74) 54%,
-    rgba(5, 10, 19, 0.82) 100%
-  );
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .consultants-panel--premium {
-  border-color: rgba(135, 194, 255, 0.36);
-  background: linear-gradient(
-    152deg,
-    rgba(18, 29, 49, 0.84) 0%,
-    rgba(9, 18, 34, 0.77) 58%,
-    rgba(5, 12, 25, 0.84) 100%
-  );
+  border-color: rgba(80, 220, 140, 0.3);
+  background: rgba(80, 220, 140, 0.04);
   box-shadow:
-    0 34px 80px rgba(0, 0, 0, 0.62),
-    0 0 56px rgba(92, 171, 255, 0.14),
-    inset 0 1px 0 rgba(220, 238, 255, 0.22),
-    inset 0 -1px 0 rgba(140, 190, 255, 0.24);
+    0 28px 72px rgba(0, 0, 0, 0.5),
+    0 0 46px rgba(80, 220, 140, 0.08),
+    inset 0 1px 0 rgba(220, 238, 255, 0.18),
+    inset 0 -1px 0 rgba(80, 220, 140, 0.12);
 }
 
 .consultants-panel--premium:hover {
-  border-color: rgba(181, 223, 255, 0.56);
+  border-color: rgba(80, 220, 140, 0.45);
+  background: rgba(80, 220, 140, 0.08);
   box-shadow:
-    0 42px 92px rgba(0, 0, 0, 0.68),
-    0 0 64px rgba(106, 186, 255, 0.24),
-    inset 0 1px 0 rgba(230, 245, 255, 0.3),
-    inset 0 -1px 0 rgba(158, 207, 255, 0.31);
+    0 36px 86px rgba(0, 0, 0, 0.55),
+    0 0 54px rgba(80, 220, 140, 0.15),
+    inset 0 1px 0 rgba(230, 245, 255, 0.24),
+    inset 0 -1px 0 rgba(80, 220, 140, 0.2);
 }
 
 .consultants-panel__inner {
@@ -168,60 +164,72 @@
 
 .consultants-avatar {
   position: relative;
-  width: clamp(128px, 13vw, 164px);
-  aspect-ratio: 4 / 5;
+  width: 100%;                         /* 横向铺满面板宽度 */
+  aspect-ratio: 16 / 9;               /* 横版比例 */
   border-radius: 14px;
-  border: 1px solid rgba(176, 214, 250, 0.34);
-  background:
-    radial-gradient(120% 86% at 0% 0%, rgba(169, 208, 255, 0.18) 0%, transparent 64%),
-    linear-gradient(160deg, rgba(13, 27, 43, 0.86) 0%, rgba(9, 18, 33, 0.84) 100%);
+  border: 1px solid rgba(80, 220, 140, 0.2);
+  background: #060e09;                /* 纯暗底 — 衬托绿色透明线稿 */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(122, 170, 238, 0.22),
-    0 16px 32px rgba(0, 0, 0, 0.35);
+    inset 0 0 24px rgba(0, 0, 0, 0.6),
+    0 16px 32px rgba(0, 0, 0, 0.35),
+    0 0 36px rgba(40, 140, 80, 0.1),
+    0 4px 20px rgba(30, 100, 60, 0.2);
   overflow: hidden;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
+/* 线稿图片 — 预处理为绿色线条 + 透明背景，无需 CSS 滤镜 */
+.consultants-avatar__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0.85;                       /* 略透 → 融入暗底 */
+  transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* hover: 线条提亮 + 微放大 */
+.consultants-avatar:hover .consultants-avatar__img {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+/* hover: 边框发光 */
+.consultants-avatar:hover {
+  border-color: rgba(80, 220, 140, 0.4);
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.6),
+    0 16px 32px rgba(0, 0, 0, 0.35),
+    0 0 48px rgba(40, 140, 80, 0.2),
+    0 4px 20px rgba(30, 100, 60, 0.3);
+}
+
+/* CRT 扫描线 + 底部渐暗 */
 .consultants-avatar::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(180, 220, 255, 0.12) 0px,
-    rgba(180, 220, 255, 0.12) 1px,
-    transparent 1px,
-    transparent 10px
-  );
-  opacity: 0.36;
-  mix-blend-mode: screen;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(0, 0, 0, 0.12) 3px,
+      rgba(0, 0, 0, 0.12) 4px
+    ),
+    linear-gradient(180deg, transparent 55%, rgba(0, 12, 6, 0.45) 100%);
 }
 
+/* CRT 暗角 */
 .consultants-avatar::after {
   content: '';
   position: absolute;
-  top: -38%;
-  bottom: -38%;
-  width: 48%;
-  left: -52%;
-  background: linear-gradient(90deg, transparent, rgba(180, 225, 255, 0.42), transparent);
-  transform: rotate(22deg);
-  animation: consultants-scan 6s linear infinite;
-}
-
-.consultants-avatar__mark {
-  position: relative;
+  inset: 0;
   z-index: 2;
-  font-size: clamp(1.8rem, 3vw, 2.7rem);
-  font-weight: 600;
-  line-height: 1;
-  color: rgba(217, 241, 255, 0.92);
-  text-shadow:
-    0 0 18px rgba(130, 201, 255, 0.45),
-    0 0 32px rgba(86, 170, 255, 0.26);
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 10, 5, 0.45) 100%);
 }
 
 .consultants-profile__name {
@@ -244,9 +252,9 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(161, 197, 240, 0.28);
-  background: rgba(125, 170, 218, 0.08);
-  color: rgba(212, 228, 246, 0.76);
+  border: 1px solid rgba(80, 220, 140, 0.25);
+  background: rgba(80, 220, 140, 0.08);
+  color: rgba(200, 240, 215, 0.8);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.07em;
@@ -260,7 +268,7 @@
 }
 
 .consultants-profile__bio--emphasis {
-  color: rgba(234, 245, 255, 0.88);
+  color: #fff;
   font-weight: 500;
 }
 
@@ -282,11 +290,12 @@
   min-width: 68px;
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid rgba(162, 199, 246, 0.22);
-  color: rgba(194, 220, 248, 0.66);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
+  border: 1px solid rgba(80, 220, 140, 0.3);
+  color: rgba(160, 240, 190, 0.8);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -295,7 +304,7 @@
   font-size: clamp(1.1rem, 1.55vw, 1.38rem);
   font-weight: 520;
   line-height: 1.35;
-  color: rgba(236, 245, 255, 0.93);
+  color: #fff;
 }
 
 .consultants-tier__price-wrap {
@@ -342,14 +351,14 @@
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: rgba(138, 190, 255, 0.48);
-  box-shadow: 0 0 12px rgba(121, 191, 255, 0.34);
+  background: rgba(80, 220, 140, 0.5);
+  box-shadow: 0 0 12px rgba(80, 220, 140, 0.4);
   flex-shrink: 0;
 }
 
 .consultants-tier--premium .consultants-tier__dot {
-  background: rgba(171, 229, 255, 0.84);
-  box-shadow: 0 0 18px rgba(132, 208, 255, 0.56);
+  background: rgba(80, 220, 140, 0.85);
+  box-shadow: 0 0 18px rgba(80, 220, 140, 0.6);
 }
 
 .consultants-cta {
@@ -388,26 +397,26 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
   box-shadow:
     0 16px 32px rgba(0, 0, 0, 0.34),
-    0 0 18px rgba(176, 217, 255, 0.12),
+    0 0 18px rgba(80, 220, 140, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.26);
 }
 
 .consultants-cta--premium {
-  border-color: rgba(173, 225, 255, 0.36);
-  border-top-color: rgba(216, 241, 255, 0.52);
-  background: linear-gradient(135deg, rgba(165, 221, 255, 0.2), rgba(126, 187, 255, 0.09));
+  border-color: rgba(80, 220, 140, 0.4);
+  border-top-color: rgba(120, 240, 180, 0.5);
+  background: linear-gradient(135deg, rgba(80, 220, 140, 0.15), rgba(80, 220, 140, 0.05));
   box-shadow:
-    0 12px 34px rgba(43, 93, 146, 0.4),
-    inset 0 1px 0 rgba(225, 243, 255, 0.24);
+    0 12px 34px rgba(20, 60, 40, 0.4),
+    inset 0 1px 0 rgba(200, 255, 220, 0.24);
 }
 
 .consultants-cta--premium:hover {
-  border-color: rgba(198, 236, 255, 0.58);
-  background: linear-gradient(135deg, rgba(187, 232, 255, 0.26), rgba(138, 198, 255, 0.12));
+  border-color: rgba(100, 230, 160, 0.6);
+  background: linear-gradient(135deg, rgba(80, 220, 140, 0.2), rgba(80, 220, 140, 0.1));
   box-shadow:
-    0 18px 40px rgba(50, 107, 164, 0.46),
-    0 0 24px rgba(132, 202, 255, 0.3),
-    inset 0 1px 0 rgba(238, 249, 255, 0.36);
+    0 18px 40px rgba(20, 60, 40, 0.46),
+    0 0 24px rgba(80, 220, 140, 0.3),
+    inset 0 1px 0 rgba(200, 255, 220, 0.36);
 }
 
 .consultants-cta__arrow {

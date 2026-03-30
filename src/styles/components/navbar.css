@@ -123,6 +123,14 @@
   border-radius: 0;
 }
 
+/* 中文字体视觉补偿：中文字在同等 font-size 下视觉上比英文小，
+   因此切换到中文时将导航链接字号从 14px 提升到 16px 以匹配视觉重量。
+   默认标准值：16px（中文），14px（英文） */
+.navbar[data-lang="zh"] .navbar__link {
+  font-size: 16px;
+  letter-spacing: 0.16em; /* 中文字间距略宽以保持呼吸感；默认标准值：0.16em */
+}
+
 /* Inactive links dim when there's an active one */
 /* 默认标准值 opacity: 0.45，当前调亮至 0.62；数值越大越亮，越小越灰 */
 .navbar__links:has(.navbar__link--active) .navbar__link:not(.navbar__link--active) {
