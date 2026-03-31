@@ -5,6 +5,7 @@ import BrandWordmark from './common/BrandWordmark';
 import LanguageToggle from './LanguageToggle';
 import { COPY } from '../config/i18n';
 import { useLanguage } from '../context/useLanguage';
+import { getGlassCompatibility } from '../utils/glassCompatibility';
 import '../styles/components/navbar.css';
 
 // 导航栏区块配置，已从硬编码文本变为仅用ID查找，配合多语言字典进行翻译使用
@@ -54,21 +55,28 @@ const NAVBAR_GLASS_SCROLLED = {
   displacementScale: 1.3, // 使表面发生更剧烈的扭曲，增加液体流动或厚玻璃折射的质感
 };
 
-// 移动端断点宽度（与 CSS @media 断点一致）
-const MOBILE_BREAKPOINT = 768;
-
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState('hero');
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= MOBILE_BREAKPOINT);
+  const [glassCompatibility, setGlassCompatibility] = useState(() => getGlassCompatibility());
   const { lang, setLang } = useLanguage();
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const isMobile = glassCompatibility.isMobileViewport;
+  const useLiquidGlass = glassCompatibility.liquidSupported;
   const glassProps = {
     ...NAVBAR_GLASS_BASE,
     ...(scrolled ? NAVBAR_GLASS_SCROLLED : NAVBAR_GLASS_IDLE),
   };
+  const glassFallbackClassName = [
+    'navbar__glass-fallback',
+    scrolled ? 'navbar__glass-fallback--scrolled' : '',
+    isMobile ? 'navbar__glass-fallback--mobile' : 'navbar__glass-fallback--desktop',
+    glassCompatibility.backdropSupported ? '' : 'navbar__glass-fallback--solid',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   useEffect(() => {
     // 记录每个 section 的实时交叉比例
@@ -116,12 +124,18 @@ export default function Navbar() {
 
   useEffect(() => {
     const onResize = () => {
-      const mobile = window.innerWidth <= MOBILE_BREAKPOINT;
-      setIsMobile(mobile);
-      if (!mobile) setMenuOpen(false);
+      const nextCompatibility = getGlassCompatibility();
+      setGlassCompatibility(nextCompatibility);
+      if (!nextCompatibility.isMobileViewport) setMenuOpen(false);
     };
+
+    onResize();
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -138,7 +152,7 @@ export default function Navbar() {
   }, [menuOpen]);
 
   useEffect(() => {
-    if (!menuOpen || window.innerWidth > 768) return undefined;
+    if (!menuOpen || !isMobile) return undefined;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -146,81 +160,87 @@ export default function Navbar() {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [menuOpen]);
+  }, [isMobile, menuOpen]);
+
+  const renderLinks = () => (
+    NAV_LINKS.map(link => {
+      if (link.route) {
+        return (
+          <Link
+            key={link.id}
+            to={link.route}
+            className={`navbar__link ${!isHome && location.pathname === link.route ? 'navbar__link--active' : ''}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            {COPY.nav[lang][link.id]}
+          </Link>
+        );
+      }
+
+      const href = isHome ? `#${link.id}` : `/#${link.id}`;
+      return (
+        <a
+          key={link.id}
+          href={href}
+          className={`navbar__link ${isHome && activeSection === link.id ? 'navbar__link--active' : ''}`}
+          onClick={() => setMenuOpen(false)}
+        >
+          {COPY.nav[lang][link.id]}
+        </a>
+      );
+    })
+  );
+
+  const desktopNavInner = (
+    <div className="navbar__inner">
+      <a href={isHome ? '#hero' : '/'} className="navbar__logo" onClick={() => setMenuOpen(false)}>
+        <BrandWordmark variant="full" size={19} />
+      </a>
+
+      <div className="navbar__links desktop-links">
+        {renderLinks()}
+      </div>
+
+      <div className="navbar__right">
+        <LanguageToggle lang={lang} onChange={setLang} />
+      </div>
+    </div>
+  );
+
+  const mobileNavInner = (
+    <div className="navbar__inner">
+      <a href={isHome ? '#hero' : '/'} className="navbar__logo" onClick={() => setMenuOpen(false)}>
+        <BrandWordmark variant="full" size={19} />
+      </a>
+
+      <div className="navbar__right">
+        <LanguageToggle lang={lang} onChange={setLang} />
+
+        <button
+          type="button"
+          className={`navbar__hamburger ${menuOpen ? 'navbar__hamburger--open' : ''}`}
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav-menu"
+        >
+          <span /><span /><span />
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-nav" data-lang={lang}>
-      {/* 导航栏内容：桌面端用 LiquidGlass 液态玻璃，移动端降级为 CSS 磨砂玻璃 */}
-      {isMobile ? (
-        <div className={`navbar__glass-fallback ${scrolled ? 'navbar__glass-fallback--scrolled' : ''}`}>
-          <div className="navbar__inner">
-            {/* Logo */}
-            <a href={isHome ? '#hero' : '/'} className="navbar__logo" onClick={() => setMenuOpen(false)}>
-              <BrandWordmark variant="full" size={19} />
-            </a>
-
-            {/* Right side */}
-            <div className="navbar__right">
-              <LanguageToggle lang={lang} onChange={setLang} />
-
-              <button
-                type="button"
-                className={`navbar__hamburger ${menuOpen ? 'navbar__hamburger--open' : ''}`}
-                onClick={() => setMenuOpen(v => !v)}
-                aria-label="Toggle menu"
-                aria-expanded={menuOpen}
-                aria-controls="mobile-nav-menu"
-              >
-                <span /><span /><span />
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
+      {/* 导航栏内容：能力优先，Liquid 可用才启用；其余统一走稳定磨砂/实体降级。 */}
+      {useLiquidGlass ? (
         <LiquidGlass {...glassProps}>
-          <div className="navbar__inner">
-            {/* Logo */}
-            <a href={isHome ? '#hero' : '/'} className="navbar__logo" onClick={() => setMenuOpen(false)}>
-              <BrandWordmark variant="full" size={19} />
-            </a>
-
-            {/* Desktop Nav links */}
-            <div className="navbar__links desktop-links">
-              {NAV_LINKS.map(link => {
-                // Blog 使用路由链接
-                if (link.route) {
-                  return (
-                    <Link
-                      key={link.id}
-                      to={link.route}
-                      className={`navbar__link ${!isHome && location.pathname === link.route ? 'navbar__link--active' : ''}`}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {COPY.nav[lang][link.id]}
-                    </Link>
-                  );
-                }
-                // 首页锚点链接
-                const href = isHome ? `#${link.id}` : `/#${link.id}`;
-                return (
-                  <a
-                    key={link.id}
-                    href={href}
-                    className={`navbar__link ${isHome && activeSection === link.id ? 'navbar__link--active' : ''}`}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {COPY.nav[lang][link.id]}
-                  </a>
-                );
-              })}
-            </div>
-
-            {/* Right side */}
-            <div className="navbar__right">
-              <LanguageToggle lang={lang} onChange={setLang} />
-            </div>
-          </div>
+          {desktopNavInner}
         </LiquidGlass>
+      ) : (
+        <div className={glassFallbackClassName}>
+          {isMobile ? mobileNavInner : desktopNavInner}
+        </div>
       )}
 
       {/* Mobile Nav links: top dropdown panel with click-away close area */}
@@ -236,31 +256,7 @@ export default function Navbar() {
           onClick={(event) => event.stopPropagation()}
         >
           <div className="navbar__links mobile-links">
-            {NAV_LINKS.map(link => {
-              if (link.route) {
-                return (
-                  <Link
-                    key={link.id}
-                    to={link.route}
-                    className={`navbar__link ${!isHome && location.pathname === link.route ? 'navbar__link--active' : ''}`}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {COPY.nav[lang][link.id]}
-                  </Link>
-                );
-              }
-              const href = isHome ? `#${link.id}` : `/#${link.id}`;
-              return (
-                <a
-                  key={link.id}
-                  href={href}
-                  className={`navbar__link ${isHome && activeSection === link.id ? 'navbar__link--active' : ''}`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {COPY.nav[lang][link.id]}
-                </a>
-              );
-            })}
+            {renderLinks()}
           </div>
         </div>
       </div>

@@ -493,6 +493,82 @@
   }
 }
 
+/* ---------- Compatibility tiers ---------- */
+html[data-glass-platform="android"] .consultants-panel {
+  backdrop-filter: blur(8px) saturate(1.04);
+  -webkit-backdrop-filter: blur(8px) saturate(1.04);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(200, 140, 40, 0.08);
+}
+
+html[data-glass-platform="android"] .consultants-avatar {
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+}
+
+html[data-glass-platform="android"] .consultants-cta {
+  backdrop-filter: blur(8px) saturate(1.08);
+  -webkit-backdrop-filter: blur(8px) saturate(1.08);
+}
+
+html[data-glass-platform="android"] .consultants-panel:hover {
+  transform: translateY(-2px);
+}
+
+html[data-glass-backdrop="0"] .consultants-panel {
+  background: rgba(20, 14, 8, 0.84);
+  border-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-glass-backdrop="0"] .consultants-panel--profile {
+  background: rgba(20, 14, 8, 0.84);
+}
+
+html[data-glass-backdrop="0"] .consultants-panel--premium {
+  background: rgba(88, 58, 20, 0.5);
+}
+
+html[data-glass-backdrop="0"] .consultants-avatar {
+  background: rgba(16, 11, 7, 0.9);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-glass-backdrop="0"] .consultants-cta {
+  background: rgba(28, 20, 12, 0.88);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .consultants-panel {
+    background: rgba(20, 14, 8, 0.84);
+    border-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .consultants-panel--premium {
+    background: rgba(88, 58, 20, 0.5);
+  }
+
+  .consultants-avatar {
+    background: rgba(16, 11, 7, 0.9);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .consultants-cta {
+    background: rgba(28, 20, 12, 0.88);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .consultants-panel,
   .consultants-cta,

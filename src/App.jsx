@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ScrollToTop from './components/common/ScrollToTop';
 import HomePage from './pages/HomePage';
@@ -7,6 +7,7 @@ import BlogPage from './pages/BlogPage';
 import BlogArticlePage from './pages/BlogArticlePage';
 import NotFound from './pages/NotFound';
 import { LanguageProvider } from './context/LanguageContext';
+import { syncGlassCompatibility } from './utils/glassCompatibility';
 import './index.css';
 
 // GPU 调参面板：仅在 dev:gpu 模式下加载（生产构建完全排除）
@@ -19,6 +20,21 @@ const GPUDebugPanel = import.meta.env.VITE_GPU_DEBUG === 'true'
  * Navbar 在路由外层，所有页面共享
  */
 function App() {
+  useEffect(() => {
+    const updateGlassCompatibility = () => {
+      syncGlassCompatibility();
+    };
+
+    updateGlassCompatibility();
+    window.addEventListener('resize', updateGlassCompatibility, { passive: true });
+    window.addEventListener('orientationchange', updateGlassCompatibility, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', updateGlassCompatibility);
+      window.removeEventListener('orientationchange', updateGlassCompatibility);
+    };
+  }, []);
+
   return (
     <LanguageProvider>
       <BrowserRouter>
