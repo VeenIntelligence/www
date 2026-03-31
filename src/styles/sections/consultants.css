@@ -1,24 +1,23 @@
 /* ============================================================
-   Consultants Section — 等距 3D 方块网格背景 + 高阶玻璃面板
-   说明：背景用纯 Canvas 2D 渲染等距方块，不使用 Three.js。
+   Consultants Section — 液态琥珀 WebGL shader 背景 + 高阶玻璃面板
    ============================================================ */
 
 .consultants-section {
-  --consultants-fg: rgba(239, 247, 255, 0.96);
-  --consultants-muted: rgba(214, 230, 247, 0.62);
-  --consultants-border: rgba(166, 202, 246, 0.2);
-  --consultants-accent: rgba(132, 194, 255, 0.66);
+  /* 琥珀暖金主色调 */
+  --consultants-fg: rgba(255, 246, 230, 0.96);
+  --consultants-muted: rgba(230, 210, 178, 0.65);
+  --consultants-border: rgba(200, 160, 80, 0.22);
+  --consultants-accent: rgba(220, 170, 80, 0.7);
 
   position: relative;
   min-height: 100vh;
   display: flex;
-  flex-direction: column; /* Changed from row for footer */
-  padding: 0; /* Padding moved to content wrapper */
+  flex-direction: column;
+  padding: 0;
   overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  background:
-    radial-gradient(120% 90% at 78% -12%, rgba(80, 220, 140, 0.08) 0%, rgba(18, 18, 18, 0) 62%),
-    linear-gradient(180deg, #161616 0%, #101010 56%, #0a0a0a 100%);
+  /* 深暗底色，让 WebGL 层透过来 */
+  background: #0a0a0a;
   isolation: isolate;
 }
 
@@ -53,9 +52,9 @@
   justify-content: center;
   padding: 5px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(80, 220, 140, 0.3);
-  background: rgba(30, 42, 35, 0.4);
-  color: rgba(240, 255, 245, 0.9);
+  border: 1px solid rgba(200, 149, 80, 0.35);
+  background: rgba(42, 33, 18, 0.5);
+  color: rgba(255, 236, 190, 0.9);
   font-size: clamp(0.7rem, 0.95vw, 0.78rem);
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -64,7 +63,7 @@
 .consultants-heading__line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, rgba(80, 220, 140, 0.45), rgba(80, 220, 140, 0.02));
+  background: linear-gradient(90deg, rgba(200, 149, 80, 0.5), rgba(200, 149, 80, 0.02));
 }
 
 .consultants-grid {
@@ -87,7 +86,7 @@
   box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(80, 220, 140, 0.08);
+    inset 0 -1px 0 rgba(200, 140, 40, 0.08);
   transition:
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.35s ease,
@@ -117,12 +116,12 @@
 
 .consultants-panel:hover {
   transform: translateY(-4px);
-  border-color: rgba(80, 220, 140, 0.25);
+  border-color: rgba(200, 149, 60, 0.3);
   background: rgba(255, 255, 255, 0.05);
   box-shadow:
     0 32px 76px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(80, 220, 140, 0.15);
+    inset 0 -1px 0 rgba(200, 140, 40, 0.18);
 }
 
 .consultants-panel--profile {
@@ -130,23 +129,23 @@
 }
 
 .consultants-panel--premium {
-  border-color: rgba(80, 220, 140, 0.3);
-  background: rgba(80, 220, 140, 0.04);
+  border-color: rgba(200, 149, 60, 0.35);
+  background: rgba(200, 140, 40, 0.06);
   box-shadow:
     0 28px 72px rgba(0, 0, 0, 0.5),
-    0 0 46px rgba(80, 220, 140, 0.08),
-    inset 0 1px 0 rgba(220, 238, 255, 0.18),
-    inset 0 -1px 0 rgba(80, 220, 140, 0.12);
+    0 0 46px rgba(200, 140, 40, 0.1),
+    inset 0 1px 0 rgba(255, 220, 140, 0.18),
+    inset 0 -1px 0 rgba(200, 140, 40, 0.14);
 }
 
 .consultants-panel--premium:hover {
-  border-color: rgba(80, 220, 140, 0.45);
-  background: rgba(80, 220, 140, 0.08);
+  border-color: rgba(220, 170, 80, 0.55);
+  background: rgba(200, 140, 40, 0.1);
   box-shadow:
     0 36px 86px rgba(0, 0, 0, 0.55),
-    0 0 54px rgba(80, 220, 140, 0.15),
-    inset 0 1px 0 rgba(230, 245, 255, 0.24),
-    inset 0 -1px 0 rgba(80, 220, 140, 0.2);
+    0 0 54px rgba(200, 140, 40, 0.18),
+    inset 0 1px 0 rgba(255, 230, 160, 0.24),
+    inset 0 -1px 0 rgba(200, 140, 40, 0.22);
 }
 
 .consultants-panel__inner {
@@ -164,16 +163,16 @@
 
 .consultants-avatar {
   position: relative;
-  width: 100%;                         /* 横向铺满面板宽度 */
-  aspect-ratio: 16 / 9;               /* 横版比例 */
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: 14px;
-  border: 1px solid rgba(80, 220, 140, 0.2);
-  background: #060e09;                /* 纯暗底 — 衬托绿色透明线稿 */
+  border: 1px solid rgba(200, 149, 60, 0.22);
+  background: #0e0b08;
   box-shadow:
     inset 0 0 24px rgba(0, 0, 0, 0.6),
     0 16px 32px rgba(0, 0, 0, 0.35),
-    0 0 36px rgba(40, 140, 80, 0.1),
-    0 4px 20px rgba(30, 100, 60, 0.2);
+    0 0 36px rgba(140, 100, 20, 0.12),
+    0 4px 20px rgba(100, 70, 10, 0.2);
   overflow: hidden;
 }
 
@@ -196,12 +195,12 @@
 
 /* hover: 边框发光 */
 .consultants-avatar:hover {
-  border-color: rgba(80, 220, 140, 0.4);
+  border-color: rgba(220, 170, 80, 0.45);
   box-shadow:
     inset 0 0 24px rgba(0, 0, 0, 0.6),
     0 16px 32px rgba(0, 0, 0, 0.35),
-    0 0 48px rgba(40, 140, 80, 0.2),
-    0 4px 20px rgba(30, 100, 60, 0.3);
+    0 0 48px rgba(160, 110, 20, 0.22),
+    0 4px 20px rgba(120, 80, 10, 0.3);
 }
 
 /* CRT 扫描线 + 底部渐暗 */
@@ -252,9 +251,9 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(80, 220, 140, 0.25);
-  background: rgba(80, 220, 140, 0.08);
-  color: rgba(200, 240, 215, 0.8);
+  border: 1px solid rgba(200, 149, 60, 0.28);
+  background: rgba(180, 120, 30, 0.1);
+  color: rgba(255, 220, 150, 0.85);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.07em;
@@ -290,8 +289,8 @@
   min-width: 68px;
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid rgba(80, 220, 140, 0.3);
-  color: rgba(160, 240, 190, 0.8);
+  border: 1px solid rgba(200, 149, 60, 0.35);
+  color: rgba(255, 210, 120, 0.85);
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.75rem;
@@ -351,14 +350,14 @@
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: rgba(80, 220, 140, 0.5);
-  box-shadow: 0 0 12px rgba(80, 220, 140, 0.4);
+  background: rgba(200, 149, 60, 0.6);
+  box-shadow: 0 0 12px rgba(200, 149, 60, 0.45);
   flex-shrink: 0;
 }
 
 .consultants-tier--premium .consultants-tier__dot {
-  background: rgba(80, 220, 140, 0.85);
-  box-shadow: 0 0 18px rgba(80, 220, 140, 0.6);
+  background: rgba(220, 170, 80, 0.9);
+  box-shadow: 0 0 18px rgba(220, 170, 80, 0.65);
 }
 
 .consultants-cta {
@@ -397,26 +396,26 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
   box-shadow:
     0 16px 32px rgba(0, 0, 0, 0.34),
-    0 0 18px rgba(80, 220, 140, 0.15),
+    0 0 18px rgba(200, 149, 60, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.26);
 }
 
 .consultants-cta--premium {
-  border-color: rgba(80, 220, 140, 0.4);
-  border-top-color: rgba(120, 240, 180, 0.5);
-  background: linear-gradient(135deg, rgba(80, 220, 140, 0.15), rgba(80, 220, 140, 0.05));
+  border-color: rgba(200, 149, 60, 0.45);
+  border-top-color: rgba(240, 190, 100, 0.55);
+  background: linear-gradient(135deg, rgba(200, 149, 60, 0.18), rgba(200, 149, 60, 0.06));
   box-shadow:
-    0 12px 34px rgba(20, 60, 40, 0.4),
-    inset 0 1px 0 rgba(200, 255, 220, 0.24);
+    0 12px 34px rgba(60, 40, 10, 0.4),
+    inset 0 1px 0 rgba(255, 220, 140, 0.24);
 }
 
 .consultants-cta--premium:hover {
-  border-color: rgba(100, 230, 160, 0.6);
-  background: linear-gradient(135deg, rgba(80, 220, 140, 0.2), rgba(80, 220, 140, 0.1));
+  border-color: rgba(220, 175, 80, 0.65);
+  background: linear-gradient(135deg, rgba(200, 149, 60, 0.24), rgba(200, 149, 60, 0.12));
   box-shadow:
-    0 18px 40px rgba(20, 60, 40, 0.46),
-    0 0 24px rgba(80, 220, 140, 0.3),
-    inset 0 1px 0 rgba(200, 255, 220, 0.36);
+    0 18px 40px rgba(60, 40, 10, 0.46),
+    0 0 24px rgba(200, 149, 60, 0.32),
+    inset 0 1px 0 rgba(255, 220, 140, 0.36);
 }
 
 .consultants-cta__arrow {

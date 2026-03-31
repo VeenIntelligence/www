@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
-import IsometricBlocksBackground from '../../components/IsometricBlocksBackground';
+import FluidAmberBackground from '../../components/FluidAmberBackground';
 import '../../styles/sections/consultants.css';
 
 /**
@@ -38,8 +38,8 @@ export default function ConsultantsSection({ children }) {
       id="consultants"
       className="consultants-section"
     >
-      {/* 等距3D方块网格背景 */}
-      <IsometricBlocksBackground />
+      {/* 液态琥珀 WebGL shader 背景 */}
+      <FluidAmberBackground />
 
       <div className="consultants-content-wrapper">
         <div className="consultants-content">
