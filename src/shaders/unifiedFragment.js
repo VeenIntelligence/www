@@ -10,6 +10,7 @@
 //   uCameraTex  — 预录视频纹理
 //   uCameraActive — 视频是否激活
 //   uCameraAspect — 视频宽高比
+//   uGoldFlowSpeed / uGoldViscosity / uGoldUvScale / etc. — 液态金参数
 //
 // 注意：此字符串前面需要由 unifiedShaderBuilder 拼接 #define
 // ═══════════════════════════════════════════════════════════════
@@ -41,6 +42,15 @@ uniform float uCubeFade;     // 立方体整体淡出（0=完全透明, 1=完全
 uniform sampler2D uCameraTex;
 uniform float uCameraActive;
 uniform float uCameraAspect;
+
+// ── 液态背景参数（About 阶段）──
+uniform float uGoldFlowSpeed;
+uniform float uGoldViscosity;
+uniform float uGoldUvScale;
+uniform float uGoldRippleScale;
+uniform float uGoldSpecPower;
+// uGoldMouse: 屏幕像素坐标（WebGL 坐标系，Y 轴朝上）；(-1,-1) 表示无鼠标
+uniform vec2 uGoldMouse;
 
 #define MAX_DIST  16.0
 #define PI 3.14159265
@@ -400,6 +410,149 @@ vec3 backgroundGlow(vec3 rd) {
 }
 
 /* ════════════════════════════════════════════════════
+   液态金背景 — About 阶段原生渲染
+   移植自 LiquidGoldBackground.jsx shader
+   ════════════════════════════════════════════════════ */
+
+float goldHash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float goldNoise(vec2 p) {
+  vec2 i = floor(p); vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = goldHash(i), b = goldHash(i+vec2(1,0)), c = goldHash(i+vec2(0,1)), d = goldHash(i+vec2(1,1));
+  return mix(mix(a,b,f.x), mix(c,d,f.x), f.y);
+}
+
+float goldFbm(vec2 p, float t, float visc) {
+  float val=0., amp=0.5, freq=1.;
+  float decay = 0.45 + visc * 0.2;
+  for (int i=0; i<5; i++) {
+    val += amp * goldNoise(p * freq + t);
+    freq *= 1.8 + visc * 0.2;
+    amp  *= decay;
+    p    += vec2(1.7, 9.2);
+  }
+  return val;
+}
+
+float goldWarpedField(vec2 p, float t, float visc) {
+  vec2 q = vec2(goldFbm(p+vec2(0,0),t*.5,visc), goldFbm(p+vec2(5.2,1.3),t*.5,visc));
+  vec2 r = vec2(goldFbm(p+3.*q+vec2(1.7,9.2),t*.7,visc), goldFbm(p+3.*q+vec2(8.3,2.8),t*.7,visc));
+  float f = goldFbm(p + 2.5*r, t*.4, visc);
+  return f + length(q)*0.4 + length(r)*0.3;
+}
+
+vec3 goldGetNormal(vec2 p, float t, float visc, float wC) {
+  float eps=0.005;
+  float hR = goldWarpedField(p+vec2(eps,0),t,visc);
+  float hU = goldWarpedField(p+vec2(0,eps),t,visc);
+  return normalize(vec3((wC-hR)/eps, (wC-hU)/eps, 1.0));
+}
+
+float goldFresnel(float c, float f0) { return f0+(1.-f0)*pow(1.-c,5.); }
+
+/* 渲染液态灰蓝背景色（给定屏幕 UV）。返回不透明的 RGB 值。
+ * 配色方案：冷灰蓝色系，与网站主体暗色冷调一致。
+ * 从原液态金配色迁移而来，保留流体动力学算法不变。 */
+vec3 liquidGoldBackground(vec2 screenUV) {
+  /* 把屏幕 UV 映射到居中坐标 */
+  vec2 guv = (screenUV - 0.5) * vec2(uResolution.x / min(uResolution.x, uResolution.y),
+                                      uResolution.y / min(uResolution.x, uResolution.y));
+  float gt    = uTime * uGoldFlowSpeed;
+  float visc = uGoldViscosity;
+  float sc   = uGoldUvScale;
+
+  float field = goldWarpedField(guv*sc, gt, visc);
+
+  vec3 gnormal = goldGetNormal(guv*sc, gt, visc, field);
+
+  /* ── 鼠标/触摸扰动：在光标附近隆起表面法线 ──
+   * 与 LiquidGoldBackground 独立版本的实现保持一致：
+   *   bump 衰减半径：exp(-dot * 25)；法线扰动系数：12；field 叠加：0.3
+   * uGoldMouse 为屏幕像素坐标（WebGL Y朝上），(-1,-1) 表示无鼠标。 */
+  if (uGoldMouse.x >= 0.0) {
+    vec2 mUV = (uGoldMouse / uResolution - 0.5) *
+               vec2(uResolution.x / min(uResolution.x, uResolution.y),
+                    uResolution.y / min(uResolution.x, uResolution.y));
+    vec2 toM   = guv - mUV;
+    float bump = exp(-dot(toM, toM) * 25.0);
+    gnormal    = normalize(gnormal + vec3(toM * bump * 12.0, 0.0));
+    field      += bump * 0.3;
+  }
+
+  vec3 gviewDir  = normalize(vec3(0,0,1));
+  vec3 glight1   = normalize(vec3( 0.4, 0.5, 0.9));
+  vec3 glight2   = normalize(vec3(-0.6,-0.3, 0.7));
+  vec3 glight3   = normalize(vec3( 0.0, 0.8, 0.5));
+
+  /* ── 液态背景色板 ──
+   * ✅ 颜色配置在 waveLook.js 中，用 VS Code 选色器修改即可，无需改这里。
+   * 由 unifiedShaderBuilder.js 经 cssColorToVec3 转换后注入为 #define。 */
+  vec3 colBase   = LIQUID_COL_BASE;    /* 主色调：中间调基准 */
+  vec3 colBright = LIQUID_COL_BRIGHT;  /* 高光：亮部反射 */
+  vec3 colDeep   = LIQUID_COL_DEEP;    /* 暗部：阴影中间层 */
+  vec3 colShadow = LIQUID_COL_SHADOW;  /* 最暗处：近黑 */
+  vec3 colPeak   = LIQUID_COL_PEAK;    /* 最亮高光：冷白 */
+
+
+  float NdotL1 = max(dot(gnormal,glight1),0.);
+  float NdotL2 = max(dot(gnormal,glight2),0.);
+  float NdotL3 = max(dot(gnormal,glight3),0.);
+
+  vec3 h1 = normalize(glight1+gviewDir);
+  vec3 h2 = normalize(glight2+gviewDir);
+  vec3 h3 = normalize(glight3+gviewDir);
+
+  float spec1 = pow(max(dot(gnormal,h1),0.), 120.);
+  float spec2 = pow(max(dot(gnormal,h2),0.),  80.);
+  float spec3 = pow(max(dot(gnormal,h3),0.), 200.);
+
+  /* Fresnel 基础反射率降低至 0.5 — 金属感减弱，更像丝绸/流体 */
+  float gfres = goldFresnel(max(dot(gnormal,gviewDir),0.), 0.5);
+
+  float fn = smoothstep(0.3,1.8,field);
+  vec3 gbase = mix(colShadow, colDeep,   smoothstep(0.,.3,fn));
+  gbase      = mix(gbase,     colBase,   smoothstep(.3,.6,fn));
+  gbase      = mix(gbase,     colBright, smoothstep(.6,.9,fn));
+
+  vec3 diffuse  = gbase * (NdotL1*.5 + NdotL2*.3 + NdotL3*.2);
+  vec3 specular = mix(colBright,colPeak,spec1)*spec1*uGoldSpecPower
+                + mix(colBright,colPeak,spec2*.5)*spec2*0.6
+                + mix(colBright,colPeak,spec3)*spec3*1.5;
+
+  /* 环境光映射：从暗灰蓝 → 中灰蓝 → 亮灰蓝 */
+  vec2 reflUv = gnormal.xy*.5+.5;
+  vec3 genv    = mix(vec3(.04,.05,.10), vec3(.14,.18,.28), reflUv.y);
+  genv         = mix(genv, vec3(.30,.38,.55), smoothstep(.6,1.,reflUv.y));
+
+  vec3 gcol = diffuse*.4 + specular*gfres + genv*gfres*.5;
+  gcol += gbase * 0.12;
+
+  // 细纹细部 — 冷白色
+  float ripple = goldNoise(guv*uGoldRippleScale + gt*2.);
+  ripple = ripple*ripple;
+  gcol += colPeak * smoothstep(.6,.9,ripple) * 0.06 * gfres;
+
+  // 晕影与暗角
+  float gdist    = length(guv);
+  float gvignette = 1. - smoothstep(.3,1.2,gdist);
+  gcol *= .30 + gvignette*.70;
+  gcol += colBright * smoothstep(.8,.0,gdist) * 0.10;
+
+  // ACES Tone Mapping
+  gcol = gcol*(2.51*gcol+0.03)/(gcol*(2.43*gcol+0.59)+0.14);
+  /* gamma 色偏：R 稍压、B 稍提，强化冷色调 */
+  gcol = pow(gcol, vec3(1.05, 1.0, 0.92));
+
+  // 暗化叠加
+  gcol *= 0.75;
+
+  return gcol;
+}
+
+/* ════════════════════════════════════════════════════
    视频纹理采样工具
    ════════════════════════════════════════════════════ */
 
@@ -599,10 +752,10 @@ void main() {
   vec3 rd = normalize(vec3(uv, CAM_FOV));
 
   vec3 color;
-  /* hitAlpha: 1.0 = 命中了几何体 (液滴/正方形), 0.0 = 背景
-   * About 阶段 (uPhase>0.5) 背景区域输出 alpha=0 让液态金透出来 */
   float hitAlpha = 1.0;
   bool inAboutPhase = uPhase > 0.5;
+  /* About 阶段背景：直接在 shader 内渲染液态金。
+   * 不再输出 alpha=0 让外部 canvas 透出来 — 整合到一个 WebGL 渲染层。 */
 
   #ifdef SPIKE_MATERIAL_GLASS
   /* ── Glass cube: true see-through refraction with video support ── */
@@ -693,16 +846,23 @@ void main() {
     color = shade(p, rd, calcNormal(p));
     hitAlpha = 1.0;
   } else {
-    color = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
-    hitAlpha = 0.0; // 背景区域
+    if (inAboutPhase) {
+      color = liquidGoldBackground(screenUV);
+      hitAlpha = 1.0; // 液态金是不透明背景
+    } else {
+      color = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
+      hitAlpha = 0.0; // Hero 阶段背景区域保持之前行为
+    }
   }
 
   // 立方体淡出：当 cubeFade < 1 时，将立方体区域混合向背景
   // 对于玻璃材质路径，整个输出已包含立方体和背景的融合
   if (uCubeFade < 0.999) {
-    vec3 bgColor = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
+    vec3 bgColor = inAboutPhase
+      ? liquidGoldBackground(screenUV)
+      : envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
     color = mix(bgColor, color, uCubeFade);
-    hitAlpha *= uCubeFade;
+    hitAlpha = inAboutPhase ? 1.0 : hitAlpha * uCubeFade;
   }
 
   #else
@@ -713,15 +873,22 @@ void main() {
     color = shade(p, rd, calcNormal(p));
     hitAlpha = 1.0;
   } else {
-    color = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
-    hitAlpha = 0.0; // 背景区域
+    if (inAboutPhase) {
+      color = liquidGoldBackground(screenUV);
+      hitAlpha = 1.0;
+    } else {
+      color = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
+      hitAlpha = 0.0;
+    }
   }
 
   // 立方体淡出（非玻璃路径）
   if (uCubeFade < 0.999) {
-    vec3 bgColor = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
+    vec3 bgColor = inAboutPhase
+      ? liquidGoldBackground(screenUV)
+      : envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
     color = mix(bgColor, color, uCubeFade);
-    hitAlpha *= uCubeFade;
+    hitAlpha = inAboutPhase ? 1.0 : hitAlpha * uCubeFade;
   }
   #endif
 
@@ -732,10 +899,12 @@ void main() {
   vec2 vig = vUv - 0.5;
   color *= 1.0 - dot(vig, vig) * 0.35;
 
-  /* About 阶段：背景区域输出 alpha=0（透明），让液态金背景从下面透出来。
-   * Hero 阶段：保持 alpha=1.0（不透明），维持原有效果。
+  /* About 阶段：液态金背景已原生渲染，输出完全不透明。
+   * Hero 阶段：背景区域保持 alpha=0（透明，露出页面背景）。
    * 过渡：使用 uPhase 平滑混合，避免突变。 */
   float alpha = mix(1.0, hitAlpha, smoothstep(0.3, 0.7, uPhase));
+  /* About 阶段强制 alpha=1.0 — 液态金不需要透明 */
+  if (inAboutPhase) alpha = max(alpha, hitAlpha);
   gl_FragColor = vec4(color * alpha, alpha);
 }
 `;

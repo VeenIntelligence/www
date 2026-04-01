@@ -124,6 +124,8 @@ export default function UnifiedStage() {
       uGoldUvScale:     { value: LIQUID_BG_UV_SCALE },
       uGoldRippleScale: { value: LIQUID_BG_RIPPLE_SCALE },
       uGoldSpecPower:   { value: LIQUID_BG_SPEC_POWER },
+      /* (-1,-1) 表示"无鼠标"，shader 中 x >= 0 才触发扰动 */
+      uGoldMouse:       { value: new THREE.Vector2(-1, -1) },
     };
 
     const material = new THREE.ShaderMaterial({
@@ -441,6 +443,13 @@ export default function UnifiedStage() {
         } else {
           container.style.cursor = '';
         }
+
+        // About 阶段：更新液态背景鼠标位置（WebGL 坐标系：Y 轴朝上）
+        const dpr = (window.devicePixelRatio || 1) * scale;
+        uniforms.uGoldMouse.value.set(
+          (event.clientX - rect.left) * dpr,
+          (rect.height - (event.clientY - rect.top)) * dpr
+        );
       }
     };
 
@@ -452,8 +461,30 @@ export default function UnifiedStage() {
       if (event.pointerType === 'mouse' && !spike.dragging && !spike.arcballDragging && interaction.draggedDropIndex < 0) {
         interaction.pointerActive = false;
         container.style.cursor = '';
+        // 鼠标离开时重置液态背景鼠标状态
+        uniforms.uGoldMouse.value.set(-1, -1);
       }
     };
+
+    /* ── 全局 mousemove：捕获文字层(pointer-events:auto)上方的鼠标移动 ──
+     * About content 有 pointer-events:auto，事件不会到达 UnifiedStage 层。
+     * 通过全局监听确保 About 阶段始终能跟踪鼠标。 */
+    const onGlobalMouseMove = (ev) => {
+      if (spike.phase !== 'about') return;
+      const rect = container.getBoundingClientRect();
+      // 确认鼠标在 About section 区域内
+      if (ev.clientX < rect.left || ev.clientX > rect.right ||
+          ev.clientY < rect.top  || ev.clientY > rect.bottom) {
+        uniforms.uGoldMouse.value.set(-1, -1);
+        return;
+      }
+      const dpr = (window.devicePixelRatio || 1) * scale;
+      uniforms.uGoldMouse.value.set(
+        (ev.clientX - rect.left) * dpr,
+        (rect.height - (ev.clientY - rect.top)) * dpr
+      );
+    };
+    window.addEventListener('mousemove', onGlobalMouseMove);
 
     const onScroll = () => {
       const nextScrollY = window.scrollY;
@@ -793,6 +824,7 @@ export default function UnifiedStage() {
     // ── 清理 ──
     return () => {
       window.removeEventListener('gpu-debug-rebuild', onDebugRebuild);
+      window.removeEventListener('mousemove', onGlobalMouseMove);
       cancelAnimationFrame(animId);
       releaseDrag();
       container.style.cursor = '';

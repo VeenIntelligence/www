@@ -1,6 +1,7 @@
 /* ============================================================
    Consultants Section — 液态琥珀 WebGL shader 背景 + 高阶玻璃面板
    三级兼容：liquid → frost → solid
+   调参请修改：src/config/consultantsLook.js
    ============================================================ */
 
 .consultants-section {
@@ -17,9 +18,8 @@
   padding: 0;
   overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  /* 磨砂半透明底色，让 WebGL 背景透出来而不是完全遮死
-   * 默认标准值：rgba(8,5,2,0.82) — 调低 alpha 可让背景更透，调高则更暗更遮 */
-  background: rgba(8, 5, 2, 0.82);
+  /* 调参区 --section-overlay-bg 控制：调低 alpha 可让背景更透，调高则更暗更遮 */
+  background: var(--section-overlay-bg);
   isolation: isolate;
 }
 
@@ -82,16 +82,14 @@
   width: 100%;
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  /* 基础背景：较高不透明度纯色，保证即使 backdrop-filter 完全失效
-   * 也有可读的深色底。在 frost 层会叠加 backdrop-filter 增强磨砂感。
-   * 默认标准值：rgba(18,13,8,0.78) */
-  background: rgba(18, 13, 8, 0.78);
-  backdrop-filter: blur(12px) saturate(1.1);
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border: 1px solid var(--panel-border-base);
+  /* → 调参区 --panel-bg / --panel-blur / --panel-saturate 控制磨砂底色与强度 */
+  background: var(--panel-bg);
+  backdrop-filter: blur(var(--panel-blur)) saturate(var(--panel-saturate));
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(var(--panel-saturate));
   box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 var(--panel-inset-top),
     inset 0 -1px 0 rgba(200, 140, 40, 0.08);
   transition:
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
@@ -123,7 +121,7 @@
 .consultants-panel:hover {
   transform: translateY(-4px);
   border-color: rgba(200, 149, 60, 0.3);
-  background: rgba(22, 16, 10, 0.82);
+  background: var(--panel-bg-hover);
   box-shadow:
     0 32px 76px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
@@ -131,22 +129,24 @@
 }
 
 .consultants-panel--profile {
-  background: rgba(18, 13, 8, 0.78);
+  /* → 与普通卡片共享 --panel-bg（同一变量即可 */
+  background: var(--panel-bg);
 }
 
 .consultants-panel--premium {
-  border-color: rgba(200, 149, 60, 0.35);
-  background: rgba(48, 34, 16, 0.8);
+  /* → 调参区 --panel-border-premium / --panel-premium-bg / --panel-premium-glow / --panel-inset-premium-top */
+  border-color: var(--panel-border-premium);
+  background: var(--panel-premium-bg);
   box-shadow:
     0 28px 72px rgba(0, 0, 0, 0.5),
-    0 0 46px rgba(200, 140, 40, 0.1),
-    inset 0 1px 0 rgba(255, 220, 140, 0.18),
+    0 0 46px var(--panel-premium-glow),
+    inset 0 1px 0 var(--panel-inset-premium-top),
     inset 0 -1px 0 rgba(200, 140, 40, 0.14);
 }
 
 .consultants-panel--premium:hover {
   border-color: rgba(220, 170, 80, 0.55);
-  background: rgba(58, 42, 18, 0.85);
+  background: var(--panel-premium-bg-hover);
   box-shadow:
     0 36px 86px rgba(0, 0, 0, 0.55),
     0 0 54px rgba(200, 140, 40, 0.18),

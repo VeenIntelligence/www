@@ -18,8 +18,6 @@
   background: transparent;
   color: hsl(var(--about-fg));
   overflow: visible;
-  isolation: isolate;
-  contain: layout;
   font-family: var(--font-sans);
   /* 让点击穿透到 UnifiedStage，内容子元素单独开启 pointer-events */
   pointer-events: none;
@@ -200,17 +198,17 @@
   border-radius: 14px;
   background: conic-gradient(
     from var(--sigma-halo-angle, 0deg),
-    rgba(120, 180, 255, 0.0) 0%,
-    rgba(120, 180, 255, 0.18) 8%,
-    rgba(160, 210, 255, 0.35) 15%,
-    rgba(200, 235, 255, 0.45) 20%,
-    rgba(160, 210, 255, 0.35) 25%,
-    rgba(120, 180, 255, 0.18) 32%,
-    rgba(120, 180, 255, 0.0) 42%,
+    rgba(255, 255, 255, 0.0) 0%,
+    rgba(255, 255, 255, 0.25) 8%,
+    rgba(255, 255, 255, 0.55) 15%,
+    rgba(255, 255, 255, 0.75) 20%,
+    rgba(255, 255, 255, 0.55) 25%,
+    rgba(255, 255, 255, 0.25) 32%,
+    rgba(255, 255, 255, 0.0) 42%,
     transparent 100%
   );
   /* 关键：大幅模糊让旋转光形成柔和渐变，不再有锐利金属边 */
-  filter: blur(8px);
+  filter: blur(7px);
   animation: sigma-halo-spin 3.5s linear infinite;
   pointer-events: none;
   z-index: -1;
@@ -225,12 +223,12 @@
   border-radius: 22px;
   background: radial-gradient(
     circle,
-    rgba(120, 190, 255, 0.12) 0%,
-    rgba(100, 170, 255, 0.06) 40%,
-    rgba(80, 150, 255, 0.02) 65%,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(220, 235, 255, 0.10) 40%,
+    rgba(200, 220, 255, 0.03) 65%,
     transparent 80%
   );
-  filter: blur(6px);
+  filter: blur(8px);
   animation: sigma-glow-pulse 3s ease-in-out infinite;
   pointer-events: none;
   z-index: -2;
@@ -382,10 +380,27 @@
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
 }
 
-/* ---------- 宣言摘要 ---------- */
+/* ---------- 宣言摘要（含磨砂玻璃底板） ---------- */
+/*
+ * 白色磨砂玻璃底板：托住 "The internet connected 5 billion people..."
+ * 和 "believes it is not a failure..." 两段小字内容。
+ * 默认标准值：rgba(255,255,255,0.06) + blur(14px)。
+ * 调大 alpha 则底板更明显；调大 blur 则磨砂感更强。
+ */
 .about-manifesto {
   max-width: 480px;
-  padding-top: 8px;
+  padding: 20px 24px;
+
+  /* \u6bd4\u4e0b\u65b9\u5361\u7247\u66f4\u6d45\uff0c\u5f62\u6210\u5c42\u7ea7\u533a\u5206\uff1b\u9ed8\u8ba4\u6807\u51c6\u503c\uff1argba(255,255,255,0.04) + blur(10px)\u3002\n   * \u8c03\u5927 alpha/blur \u5219\u66f4\u63a5\u8fd1\u5361\u7247\u3002 */
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top-color: rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
 .about-manifesto__text {
@@ -452,18 +467,21 @@
 .about-pillar {
   padding: 20px;
   border-radius: 12px;
-  /* 基底不透明度足够，即使 backdrop-filter 失效也能看到卡片
-   * 默认标准值：rgba(14,16,22,0.55) */
-  background: rgba(14, 16, 22, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: background 0.3s ease, border-color 0.3s ease;
+  /* 白色磨砂玻璃卡片底板；默认标准值：rgba(255,255,255,0.08) + blur(14px)。
+   * 调大 alpha 则底板更不透明；调大 blur 则磨砂感更强。 */
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .about-pillar:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(120, 180, 255, 0.15);
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 /* 序号 + 标题同行显示 */
@@ -497,7 +515,8 @@
   /* 卡片描述字号；默认标准值：clamp(0.82rem, 1.1vw, 0.95rem) */
   font-size: clamp(0.82rem, 1.1vw, 0.95rem);
   line-height: 1.6;
-  color: hsl(var(--about-fg) / 0.48);
+  /* 底板变浅后从 0.48 提到 0.72，保证可读性；默认标准值：0.72 */
+  color: hsl(var(--about-fg) / 0.72);
   margin: 0;
 }
 

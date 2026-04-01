@@ -1,4 +1,4 @@
-import { WAVE_LOOK, TIER_SCALE } from '../config/waveLook';
+import { WAVE_LOOK, RENDER_SCALE } from '../config/waveLook';
 import { fragmentShaderBody } from '../shaders/waveFragment';
 
 // ══════════════════════════════════════════════════════════════
@@ -210,5 +210,5 @@ export function detectGPUTier() {
  * 获取 GPU 档位对应的缩放比例。
  */
 export function getTierScale(tier) {
-  return TIER_SCALE[tier] || TIER_SCALE.medium;
+  return RENDER_SCALE;
 }

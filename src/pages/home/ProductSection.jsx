@@ -1,172 +1,165 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { motion as Motion, useScroll, useTransform, useInView } from 'framer-motion';
-import BrandWordmark from '../../components/common/BrandWordmark';
+import MagnetText from '../../components/MagnetText';
+import useCharMagnet from '../../hooks/useCharMagnet';
+import PendulumBackground from './PendulumBackground';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import '../../styles/sections/product-preview.css';
 
-const PRODUCT_SCREENSHOT_SIZES = '(max-width: 768px) 92vw, (max-width: 1024px) 78vw, 42vw';
+/**
+ * PillarCard — Project Ω 四大支柱卡片
+ */
+function PillarCard({ pillar, index }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
 
-function ProductScreenshot({ src, mobileSrc, alt, className = '' }) {
   return (
-    <img
-      src={src}
-      srcSet={`${mobileSrc} 1280w, ${src} 2744w`}
-      sizes={PRODUCT_SCREENSHOT_SIZES}
-      alt={alt}
-      className={className}
-      width="1372"
-      height="1340"
-      loading="lazy"
-      decoding="async"
-    />
+    <Motion.div
+      ref={ref}
+      className="product-pillar"
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+    >
+      <div className="product-pillar__header">
+        <span className="product-pillar__icon">{pillar.icon}</span>
+        <h3 className="product-pillar__title">{pillar.title}</h3>
+      </div>
+      <p className="product-pillar__desc">{pillar.desc}</p>
+    </Motion.div>
   );
 }
 
-/** Update CSS custom properties so the cursor-reflection spot follows the mouse */
-function trackGlassCursor(e) {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  e.currentTarget.style.setProperty('--glass-cursor-x', `${x}px`);
-  e.currentTarget.style.setProperty('--glass-cursor-y', `${y}px`);
-}
-
 /**
- * ProductSection — Landing Page 内的产品展示预览
- * 滚动驱动差动: 各元素以不同速率响应滚动
- * 图片从平面(0°)翻折到目标透视角度(33°)
+ * ProductSection — Project Ω
+ *
+ * 布局：
+ * - Ω 标签行
+ * - 大标题（磁吸字符）
+ * - 副标题（结束语提升到此位置，黄金色，视觉分量仅次于标题）
+ * - 单 CTA 按钮
+ * - 右侧宣言（磨砂玻璃底板）
+ * - 底部四支柱卡片
  */
 export default function ProductSection() {
   const { lang } = useLanguage();
   const copy = COPY.product[lang];
-  const sectionRef = useRef(null);
 
-  // 追踪 section 在视口中的滚动进度
-  // offset: 元素底部碰到视口底部(0) → 元素顶部碰到视口顶部(1)
+  const sectionRef = useRef(null);
+  const headingH2Ref = useRef(null);
+
+  const headingRevealRef = useRef(null);
+  const headingInView = useInView(headingRevealRef, { once: true, margin: '-80px' });
+
+  const magnetMouseRef = useCharMagnet(headingH2Ref, {
+    radius: 160,
+    maxY: -10,
+    maxScale: 0.12,
+    maxRotate: 3,
+    damping: 0.10,
+  });
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
   });
 
-  /* 模糊→清晰出场：检测文案区域进入视口 */
-  const copyRevealRef = useRef(null);
-  const copyInView = useInView(copyRevealRef, { once: true, margin: '-60px' });
+  const yHeading = useTransform(scrollYProgress, [0, 0.5], [120, 0]);
+  const yBody = useTransform(scrollYProgress, [0, 0.55], [160, 0]);
+  const opBody = useTransform(scrollYProgress, [0.08, 0.35], [0, 1]);
 
-  // 差动位移 — 加大幅度
-  const ySubtitle = useTransform(scrollYProgress, [0, 0.4], [250, 0]);
-  const yTitle    = useTransform(scrollYProgress, [0, 0.45], [380, 0]);
-  const yActions  = useTransform(scrollYProgress, [0, 0.5], [500, 0]);
-  const yImages   = useTransform(scrollYProgress, [0, 0.55], [600, 0]);
+  const handlePointerMove = useCallback((e) => {
+    magnetMouseRef.current.x = e.clientX;
+    magnetMouseRef.current.y = e.clientY;
+    magnetMouseRef.current.active = true;
+  }, [magnetMouseRef]);
 
-  // 透明度 — 图片单独保留 scroll-driven
-  const opImages   = useTransform(scrollYProgress, [0.08, 0.4], [0, 1]);
-
-  // 文字缩放: 从稍大(1.12) → 正常(1.0)
-  const scaleSubtitle = useTransform(scrollYProgress, [0, 0.4], [1.12, 1]);
-  const scaleTitle    = useTransform(scrollYProgress, [0, 0.45], [1.15, 1]);
-
-  // 图片翻折: 从 0° 到最终角度
-  const foldAngleLeft = useTransform(scrollYProgress, [0.05, 0.5], [0, 33]);
-  const foldAngleRight = useTransform(scrollYProgress, [0.05, 0.5], [0, -33]);
-
-  // 图片缩放: 从放大(1.25) → 正常(1.0)
-  const scaleImages = useTransform(scrollYProgress, [0.05, 0.55], [1.25, 1]);
-
-  // 图片水平展开: 从两端扩散 → 回归原位
-  const spreadLeft  = useTransform(scrollYProgress, [0.05, 0.5], [-120, 0]);
-  const spreadRight = useTransform(scrollYProgress, [0.05, 0.5], [120, 0]);
+  const handlePointerLeave = useCallback(() => {
+    magnetMouseRef.current.active = false;
+  }, [magnetMouseRef]);
 
   return (
     <section
       ref={sectionRef}
       id="product"
-      className="product-section relative min-h-screen flex items-center justify-center overflow-hidden border-t border-white/10 py-30"
+      className="product-section relative min-h-screen overflow-hidden border-t border-white/10"
+      style={{ position: 'relative' }}
     >
-      {/* 双光源衍射光晕 */}
-      <div className="product-glow absolute inset-0 z-0 pointer-events-none overflow-hidden" />
+      <PendulumBackground containerRef={sectionRef} />
+      <div className="product-vignette absolute inset-0 z-1 pointer-events-none" />
 
-      <div className="relative z-1 w-full max-w-[1800px] px-10 flex items-center justify-between max-lg:flex-col max-lg:text-center max-lg:px-6">
-        {/* 左侧文案 */}
-        <div ref={copyRevealRef} className="product-copy ml-[6%] z-10 flex flex-col gap-6 max-lg:flex-auto max-lg:w-full max-lg:ml-0 max-lg:mb-[-60px] max-lg:items-center max-md:mb-[-30px]">
-          <Motion.h2
-            className={`product-title product-blur-reveal ${copyInView ? 'is-revealed' : ''}`}
-            style={{ y: ySubtitle, scale: scaleSubtitle }}
-          >
-            <span className="product-title__brand-box">
-              <BrandWordmark variant="full" size={28} className="product-title__brand" />
-            </span>
-            <span className="product-title__name" data-text={copy.titleName}>{copy.titleName}</span>
-          </Motion.h2>
-          <Motion.h3
-            className={`product-subtitle product-blur-reveal ${copyInView ? 'is-revealed' : ''}`}
-            style={{ y: yTitle, scale: scaleTitle, transitionDelay: '0.15s' }}
-          >
-            <span className="product-subtitle__line">{copy.subtitleLineOne}</span>
-            <span className="product-subtitle__line">
-              {copy.subtitleLineTwoPrefix}{' '}
-              <span className="product-subtitle__highlight gradient-pulse">{copy.subtitleHighlight}</span>
-              {copy.subtitleLineTwoSuffix ? ` ${copy.subtitleLineTwoSuffix}` : ''}
-            </span>
-          </Motion.h3>
-          <Motion.div
-            className={`flex gap-5 mt-4 flex-wrap max-lg:justify-center product-blur-reveal ${copyInView ? 'is-revealed' : ''}`}
-            style={{ y: yActions, transitionDelay: '0.3s' }}
-          >
-            <button className="product-cta product-cta--primary" onMouseMove={trackGlassCursor}>
-              {copy.primaryCta}
-            </button>
-            <button className="product-cta product-cta--ghost" onMouseMove={trackGlassCursor}>
-              {copy.secondaryCta}
-            </button>
-          </Motion.div>
-        </div>
+      <div
+        className="product-content"
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+      >
+        {/* ═══ 第一屏：标签 + 标题 + 副标题 + 宣言 ═══ */}
+        <div className="product-screen-1" ref={headingRevealRef}>
+          {/* Project [Ω] 标签行 */}
+          <div className={`product-subheading product-blur-reveal ${headingInView ? 'is-revealed' : ''}`}>
+            <div className="product-subheading__line" />
+            <span>{copy.subheading}</span>
+            <span className="product-omega-badge">Ω</span>
+          </div>
 
-        {/* 右侧 3D V 字形展示 */}
-        <Motion.div
-          className="product-media flex-1 flex justify-end items-center -ml-[150px] mr-5 z-5 max-lg:justify-center max-lg:w-full max-lg:ml-0 max-lg:mr-0"
-          style={{ perspective: '1000px', opacity: opImages }}
-        >
-          <div
-            className="relative flex w-[1200px] max-w-full gap-0 max-lg:w-[900px] max-md:flex-col max-md:gap-5 max-md:pb-10"
-            style={{ transformStyle: 'preserve-3d' }}
-          >
+          {/* 两栏：左侧标题区 + 右侧宣言 */}
+          <div className="product-columns">
+            {/* 左侧：大标题 + 副标题 + CTA */}
             <Motion.div
-              className="product-card flex-1 relative rounded-xl overflow-hidden border border-white/10 bg-black"
-              style={{
-                transformOrigin: 'center left',
-                x: spreadLeft,
-                y: yImages,
-                rotateY: foldAngleLeft,
-                scale: scaleImages,
-              }}
+              className={`product-heading product-blur-reveal ${headingInView ? 'is-revealed' : ''}`}
+              style={{ y: yHeading, transitionDelay: '0.15s' }}
             >
-              <ProductScreenshot
-                src="/screenshot1.jpg"
-                mobileSrc="/screenshot1-mobile.jpg"
-                alt={copy.episodesAlt}
-                className="w-full h-auto block opacity-85 transition-opacity duration-500 hover:opacity-100"
-              />
+              <h2 className="product-heading__h2" ref={headingH2Ref}>
+                <MagnetText key={`${lang}-0`} tag="span" className="product-heading__light">
+                  {copy.headingLines[0]}
+                </MagnetText>
+                <br />
+                <MagnetText key={`${lang}-1`} tag="span" className="product-heading__light">
+                  {copy.headingLines[1]}
+                </MagnetText>
+                <br />
+                <MagnetText key={`${lang}-2`} tag="span" className="product-heading__display">
+                  {copy.headingLines[2]}
+                </MagnetText>
+              </h2>
+
+              {/* 副标题 — 结束语升至此位置，金色大字 */}
+              <p className={`product-subline product-blur-reveal ${headingInView ? 'is-revealed' : ''}`}
+                style={{ transitionDelay: '0.22s' }}>
+                {copy.subtitle}
+              </p>
+
+              {/* 单 CTA 按钮 */}
+              <div className="product-cta-inline">
+                <button className="product-cta product-cta--ghost">
+                  {copy.cta}
+                </button>
+              </div>
             </Motion.div>
+
+            {/* 右侧：宣言 */}
             <Motion.div
-              className="product-card flex-1 relative -ml-[80px] max-md:ml-0 rounded-xl overflow-hidden border border-white/10 bg-black"
-              style={{
-                transformOrigin: 'center right',
-                x: spreadRight,
-                y: yImages,
-                rotateY: foldAngleRight,
-                scale: scaleImages,
-              }}
+              className={`product-manifesto product-blur-reveal ${headingInView ? 'is-revealed' : ''}`}
+              style={{ y: yBody, opacity: opBody, transitionDelay: '0.3s' }}
             >
-              <ProductScreenshot
-                src="/screenshot2.jpg"
-                mobileSrc="/screenshot2-mobile.jpg"
-                alt={copy.dashboardAlt}
-                className="w-full h-auto block opacity-85 transition-opacity duration-500 hover:opacity-100"
-              />
+              <p className="product-manifesto__text">{copy.manifesto}</p>
+              <p className="product-manifesto__highlight">{copy.manifestoHighlight}</p>
             </Motion.div>
           </div>
-        </Motion.div>
+        </div>
+
+        {/* ═══ 第二屏：四大支柱卡片 ═══ */}
+        <div className="product-screen-2">
+          <div className="product-pillars">
+            <span className="product-pillars__label">{copy.pillarTitle}</span>
+            <div className="product-pillars__grid">
+              {copy.pillars.map((pillar, i) => (
+                <PillarCard key={pillar.icon} pillar={pillar} index={i} />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

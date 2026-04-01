@@ -1,4 +1,7 @@
-import { WAVE_LOOK, TIER_SCALE } from '../config/waveLook';
+import { WAVE_LOOK, RENDER_SCALE, cssColorToVec3,
+  LIQUID_BG_COL_BASE, LIQUID_BG_COL_BRIGHT,
+  LIQUID_BG_COL_DEEP, LIQUID_BG_COL_SHADOW, LIQUID_BG_COL_PEAK,
+} from '../config/waveLook';
 import { fragmentShaderBody } from '../shaders/unifiedFragment';
 
 // ══════════════════════════════════════════════════════════════
@@ -20,6 +23,13 @@ function glslVec3(values) {
 const bg = WAVE_LOOK.background;
 const st = WAVE_LOOK.studio;
 const sp = WAVE_LOOK.spike;
+
+// 液态背景色板：CSS 字符串 → [r,g,b] float 数组
+const lbBase   = cssColorToVec3(LIQUID_BG_COL_BASE);
+const lbBright = cssColorToVec3(LIQUID_BG_COL_BRIGHT);
+const lbDeep   = cssColorToVec3(LIQUID_BG_COL_DEEP);
+const lbShadow = cssColorToVec3(LIQUID_BG_COL_SHADOW);
+const lbPeak   = cssColorToVec3(LIQUID_BG_COL_PEAK);
 
 // 配置 → GLSL #define 映射
 const LOOK_MAP = [
@@ -121,6 +131,14 @@ const LOOK_MAP = [
   ['CAMERA_REFRACT_SCALE',             sp.cameraRefractScale],
   ['CAMERA_REFLECT_MIX',               sp.cameraReflectMix],
   ['CAMERA_TRANSMIT_DIM',              sp.cameraTransmitDim],
+
+  // ── 液态背景色板（About 阶段）──
+  // 来源：waveLook.js 里的 CSS 颜色字符串，此处经 cssColorToVec3 转换后注入为 #define
+  ['LIQUID_COL_BASE',   lbBase,   'v3'],
+  ['LIQUID_COL_BRIGHT', lbBright, 'v3'],
+  ['LIQUID_COL_DEEP',   lbDeep,   'v3'],
+  ['LIQUID_COL_SHADOW', lbShadow, 'v3'],
+  ['LIQUID_COL_PEAK',   lbPeak,   'v3'],
 ];
 
 function buildLookDefines() {
@@ -141,56 +159,47 @@ function getSpikeMaterialDefine() {
   return MATERIAL_DEFINE_MAP[WAVE_LOOK.spikeMaterialMode] || '#define SPIKE_MATERIAL_METAL';
 }
 
-// 每个 GPU 档位的独有 define
-const TIER_DEFINES = {
-  high: [
-    '#define MAX_STEPS 30',
-    '#define SURF_DIST 0.01',
-    '#define NORMAL_EPS 0.003',
-    '#define GLASS_INTERIOR_STEPS 12',
-    '#define QUALITY_HIGH',
-    '#define SPIKE_ENABLED',
-  ]
-};
+// 固定 shader 编译参数（单一画质档位）
+const FIXED_DEFINES = [
+  '#define MAX_STEPS 30',
+  '#define SURF_DIST 0.01',
+  '#define NORMAL_EPS 0.003',
+  '#define GLASS_INTERIOR_STEPS 12',
+  '#define QUALITY_HIGH',
+  '#define SPIKE_ENABLED',
+];
 
 /**
- * 从 debug 面板覆盖参数构建 tier defines
- * @param {'high'|'medium'|'low'} tier
+ * 从 debug 面板覆盖参数构建 defines
  * @param {Object} overrides - { maxSteps, surfDist, normalEps, glassInteriorSteps }
  */
-function buildTierDefinesFromOverrides(tier, overrides) {
-  const qualityDefine = 'QUALITY_HIGH';
+function buildDefinesFromOverrides(overrides) {
   return [
     `#define MAX_STEPS ${overrides.maxSteps}`,
     `#define SURF_DIST ${glslFloat(overrides.surfDist)}`,
     `#define NORMAL_EPS ${glslFloat(overrides.normalEps)}`,
     `#define GLASS_INTERIOR_STEPS ${overrides.glassInteriorSteps}`,
-    `#define ${qualityDefine}`,
+    '#define QUALITY_HIGH',
     '#define SPIKE_ENABLED',
   ];
 }
 
 /**
  * 构建完整的统一 fragment shader。
- * @param {'high'|'medium'|'low'} tier - GPU 性能档位
+ * @param {string} [_tier='high'] - 保留参数（兼容 GPU 调参面板）
  * @param {Object} [tierOverrides=null] - 可选的参数覆盖（来自 GPU 调参面板）
  * @returns {string} 完整的 GLSL fragment shader
  */
-export function buildUnifiedShader(tier, tierOverrides = null) {
-  const tierDefines = tierOverrides
-    ? buildTierDefinesFromOverrides(tier, tierOverrides)
-    : TIER_DEFINES.high;
+export function buildUnifiedShader(_tier = 'high', tierOverrides = null) {
+  const defines = tierOverrides
+    ? buildDefinesFromOverrides(tierOverrides)
+    : FIXED_DEFINES;
   const materialDefine = getSpikeMaterialDefine();
   const lookDefines = buildLookDefines();
-  return [...tierDefines, materialDefine, ...lookDefines].join('\n') + '\n' + fragmentShaderBody;
+  return [...defines, materialDefine, ...lookDefines].join('\n') + '\n' + fragmentShaderBody;
 }
 
-/** 检测 GPU 性能档位 (已固定为 high) */
-export function detectGPUTier() {
-  return 'high';
-}
-
-/** 获取 GPU 档位对应的缩放比例 (固定返回 high 的值) */
-export function getTierScale(tier) {
-  return TIER_SCALE.high;
+/** 获取渲染分辨率缩放 */
+export function getRenderScale() {
+  return RENDER_SCALE;
 }

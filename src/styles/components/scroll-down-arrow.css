@@ -1,0 +1,136 @@
+/* ============================================================
+   ScrollDownArrow — 全局滚动引导箭头
+   固定在视口底部居中，微动闪烁 + 模糊呼吸效果
+   ============================================================ */
+
+/* 容器：固定定位，不遮挡交互 */
+.scroll-arrow {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80; /* 高于内容，低于 Navbar (z:100) */
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  /* 渐隐过渡，默认标准值 0.6s。调大后消失更柔和，调小后更干脆。 */
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* 底部安全区 + 留白，默认标准值 28px。调大后离底部更远，调小后更贴底。 */
+  padding-bottom: 28px;
+}
+
+/* 隐藏态 */
+.scroll-arrow--hidden {
+  opacity: 0;
+}
+
+/* ── 箭头 SVG 图标 ── */
+.scroll-arrow__chevron {
+  /* 箭头尺寸，默认标准值 28px。调大后箭头更醒目，调小后更含蓄。 */
+  width: 28px;
+  height: 28px;
+  /* 箭头颜色亮度，默认标准值 0.7。调大后更醒目，调小后更含蓄。 */
+  color: rgba(224, 224, 224, 0.7);
+  filter: blur(0.6px);
+
+  /* 复合动画：上下弹跳 + 闪烁 + 模糊脉冲 */
+  animation:
+    scroll-arrow-bounce 2.4s cubic-bezier(0.37, 0, 0.63, 1) infinite,
+    scroll-arrow-flicker 3.6s ease-in-out infinite,
+    scroll-arrow-blur-pulse 4s ease-in-out infinite;
+}
+
+/* 第二个箭头：偏移延迟，形成级联效果 */
+.scroll-arrow__chevron:nth-child(2) {
+  /* 第二箭头透明度更低，默认标准值 0.45。调大后第二箭头更明显。 */
+  color: rgba(224, 224, 224, 0.45);
+  /* 第二箭头尺寸稍小，默认标准值 24px */
+  width: 24px;
+  height: 24px;
+  margin-top: -10px; /* 与第一个箭头重叠，默认标准值 -10px */
+  animation-delay: 0.3s, 0.5s, 0.2s;
+}
+
+/* ── @keyframes ── */
+
+/* 上下弹跳：小幅度柔和浮动 */
+@keyframes scroll-arrow-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    /* 弹跳幅度，默认标准值 6px。调大后动作更大，调小后更微妙。 */
+    transform: translateY(6px);
+  }
+}
+
+/* 闪烁：透明度波动，模拟微弱信号灯 */
+@keyframes scroll-arrow-flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.55;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0.45;
+  }
+  55% {
+    opacity: 0.8;
+  }
+  70% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.5;
+  }
+}
+
+/* 模糊呼吸：blur 强度周期性变化 */
+@keyframes scroll-arrow-blur-pulse {
+  0%, 100% {
+    /* 最小模糊，默认标准值 0.4px */
+    filter: blur(0.4px);
+  }
+  40% {
+    /* 最大模糊，默认标准值 1.8px。调大后更"虚"，调小后更实。 */
+    filter: blur(1.8px);
+  }
+  70% {
+    filter: blur(0.8px);
+  }
+}
+
+/* ── 无障碍：减少动画偏好 ── */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-arrow__chevron {
+    animation: none;
+    opacity: 0.35;
+  }
+}
+
+/* ── 移动端微调 ── */
+@media (max-width: 768px) {
+  .scroll-arrow {
+    /* 移动端底部间距，默认标准值 18px */
+    padding-bottom: 18px;
+  }
+
+  .scroll-arrow__chevron {
+    /* 移动端箭头尺寸，默认标准值 22px */
+    width: 22px;
+    height: 22px;
+  }
+
+  .scroll-arrow__chevron:nth-child(2) {
+    width: 18px;
+    height: 18px;
+  }
+}

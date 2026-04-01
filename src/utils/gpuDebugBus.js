@@ -36,8 +36,6 @@ export const DEFAULT_TIER_PARAMS = {
     goldRippleScale: 5.0,
     // 高光强度。默认 1.2。范围 [0.1, 3.0]。
     goldSpecPower: 1.2,
-    // 液滴半径。默认 0.25。范围 [0.05, 0.6]。
-    goldMetaRadius: 0.25,
   }
 };
 

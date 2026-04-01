@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import UnifiedStage from '../components/UnifiedStage';
+import ScrollDownArrow from '../components/ScrollDownArrow';
 import HeroSection from './home/HeroSection';
 import AboutSection from './home/AboutSection';
 import ProductSection from './home/ProductSection';
@@ -25,6 +26,7 @@ export default function HomePage() {
   return (
     <main className="home-page">
       <UnifiedStage />
+      <ScrollDownArrow />
       <HeroSection />
       <AboutSection />
       <ProductSection />

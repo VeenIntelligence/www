@@ -5,15 +5,9 @@ import * as THREE from 'three';
 // 调参改这里即可，不用翻 shader 或组件代码
 // ══════════════════════════════════════════════════════════════
 
-// --- GPU 分档 ---
-// 各 GPU 档位对应的渲染分辨率缩放比例。默认 high=0.54。已移除中低档。
-export const TIER_SCALE = { high: 0.54 };
-// 启动时使用的 GPU 档位。
-export const BOOT_TIER = 'high';
-// 启动阶段的无差别分辨率缩放。统一使用 0.75。
-export const BOOT_SCALE = 0.75;
-// 启动阶段最短持续毫秒数。默认 900ms。低于此时间不会切换到正式档位。
-export const BOOT_MIN_MS = 900;
+// --- GPU 渲染 ---
+// 渲染分辨率缩放比例。默认 0.54。调大画质更高但更吃 GPU，调小性能更好。
+export const RENDER_SCALE = 0.54;
 
 // --- 相机 ---
 // 相机 Z 轴位置（离场景的距离）。默认 12。调大视角更远、物体更小；调小更近更大。
@@ -94,7 +88,7 @@ export const SPIKE_RELEASE_MIN_SPEED = 0.5;
 export const ABOUT_CUBE_POS_DESKTOP = new THREE.Vector3(0, 0.35, 0);
 export const ABOUT_CUBE_POS_MOBILE = new THREE.Vector3(0, 0.55, 0);
 // About 阶段立方体缩放倍数（相对 Hero 阶段）。默认 2.38（原 1.83 放大约30%）。让 About 的方块更大。
-export const ABOUT_CUBE_SCALE = 2.38;
+export const ABOUT_CUBE_SCALE = 2.18;
 // 手动被冻结到 About 位置后整个方块变大时用的 GLSL 半边长。默认 0.55。
 export const ABOUT_CUBE_SIZE_GLSL = 0.55;
 // About 阶段空闲自转速度 [x, y, z] 弧度/秒。默认 [0.15, 0.25, 0.08]。
@@ -140,6 +134,73 @@ export const CUBE_FADEOUT_END = 0.95;
 
 // --- 视频纹理路径 ---
 export const DEMO_VIDEO_PATH = '/video/demo-fallback.mp4';
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  液态背景色板 — About 阶段背景配色入口                       ║
+// ║  全部使用 CSS 颜色字符串，VS Code / Hub 选色器可直接点击     ║
+// ║  改色后 Vite HMR 自动刷新，无需改任何 GLSL 文件             ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+/**
+ * 把 CSS 颜色字符串（rgb / rgba / hex）转为归一化 [r, g, b] float 数组（0-1）。
+ * 供 shader builder 的 glslVec3 消费，注入为 GLSL #define。
+ * 支持：'rgb(56,72,97)' | 'rgba(56,72,97,1)' | '#384861' | '#RGB'
+ */
+export function cssColorToVec3(css) {
+  const hex3 = css.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
+  if (hex3) return [
+    parseInt(hex3[1] + hex3[1], 16) / 255,
+    parseInt(hex3[2] + hex3[2], 16) / 255,
+    parseInt(hex3[3] + hex3[3], 16) / 255,
+  ];
+  const hex6 = css.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
+  if (hex6) return [
+    parseInt(hex6[1], 16) / 255,
+    parseInt(hex6[2], 16) / 255,
+    parseInt(hex6[3], 16) / 255,
+  ];
+  const rgba = css.match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
+  if (rgba) return [parseInt(rgba[1]) / 255, parseInt(rgba[2]) / 255, parseInt(rgba[3]) / 255];
+  console.warn('[cssColorToVec3] 无法解析颜色:', css);
+  return [0, 0, 0];
+}
+
+// ──────────────────────────────────────────────────────────────
+// 🎨 液态背景色板（About 阶段）
+// 直接用 VS Code 选色器点击颜色块修改，改完 HMR 自动生效
+// 色板关系：colBase 是主色，其余按对比度比例缩放
+// ──────────────────────────────────────────────────────────────
+
+// 主色调：中间调基准色。整体偏色从这里开始改。
+// 默认标准值：rgba(60, 83, 93)（灰蓝绿）
+export const LIQUID_BG_COL_BASE   = /* #rgb */ 'rgba(73, 114, 117, 1)';
+
+// 高光色：亮部反射，约为 colBase 的 2.2× 提亮。
+// 默认标准值：rgba(133, 166, 194)（蒸汽蓝）
+export const LIQUID_BG_COL_BRIGHT = /* #rgb */ 'rgba(117, 158, 153, 1)';
+
+// 暗部色：阴影中间层，约为 colBase 的 0.45×。
+// 默认标准值：rgba(26, 36, 43)（深蓝绿灰）
+export const LIQUID_BG_COL_DEEP   = /* #rgb */ 'rgba(26, 43, 43, 1)';
+
+// 最暗处：接近纯黑，轻微色偏即可。
+// 默认标准值：rgba(8, 10, 15)（近黑微蓝）
+export const LIQUID_BG_COL_SHADOW = /* #rgb */ 'rgba(0, 0, 0, 1)';
+
+// 最亮高光：镜面反射点，保持冷白即可，一般无需修改。
+// 默认标准值：rgba(217, 235, 255)（冷白偏青）
+export const LIQUID_BG_COL_PEAK   = /* #rgb */ 'rgba(217, 255, 252, 1)';
+
+// 流动速度 — 默认 0.03。调大(→0.3)：流动更快；调小(→0.02)：接近静止
+export const LIQUID_BG_FLOW_SPEED = 0.03;
+// 粘度 — 默认 0.8。调大(→1.0)：更稠密更多细节；调小(→0.0)：更水更流畅
+export const LIQUID_BG_VISCOSITY = 0.8;
+// 纹路粗细（UV 缩放）— 默认 0.8。调大(→2.0)：纹理更密；调小(→0.2)：更疏大块
+export const LIQUID_BG_UV_SCALE = 0.8;
+// 细纹频率 — 默认 8.0。调大(→15)：细纹更多更碎；调小(→1)：更平滑
+export const LIQUID_BG_RIPPLE_SCALE = 8.0;
+// 高光强度 — 默认 1.2。调大(→3.0)：高光更刺眼；调小(→0)：消除高光
+export const LIQUID_BG_SPEC_POWER = 1.2;
 
 // ══════════════════════════════════════════════════════════════
 // 视觉外观配置（shader 注入参数）

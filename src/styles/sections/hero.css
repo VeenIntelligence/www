@@ -159,8 +159,11 @@
 }
 
 .hero__title--compact {
-  font-size: clamp(2.7rem, 5.1vw, 5rem);
-  letter-spacing: -0.035em;
+  /* 中文字体视觉偏小，略微放大以匹配英文的视觉重量；
+     默认标准值：clamp(3.0rem, 5.8vw, 5.8rem)。
+     调大 → 中文标题更醒目；调小 → 与英文差距更小 */
+  font-size: clamp(3.0rem, 5.8vw, 5.8rem);
+  letter-spacing: -0.02em;
   line-height: 1.02;
 }
 
@@ -529,9 +532,10 @@
   }
 
   .hero__title--compact {
-    font-size: clamp(2.2rem, 10vw, 3.2rem);
+    /* 移动端中文标题；默认标准值：clamp(2.45rem, 11.5vw, 3.5rem)。 */
+    font-size: clamp(2.45rem, 11.5vw, 3.5rem);
     line-height: 1.04;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.015em;
   }
 
   .hero__title-line--secondary {

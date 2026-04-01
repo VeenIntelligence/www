@@ -1,244 +1,307 @@
 /* ============================================================
-   Product Section — Background glow + Liquid Glass CTA Buttons
+   Product Section — Project Ω
+   排版仿 About：Ω 标签 + 两栏大标题 + 支柱卡片 + 结束语
+   Desktop: 单屏底部对齐 / Mobile: 分两屏
    ============================================================ */
 
+/* ---------- 容器 ---------- */
 .product-section {
-  /* Layout */
-  --product-copy-basis: min(720px, 48vw);
-  --product-copy-max-width: 760px;
+  --product-bg: 0 0% 0%;
+  --product-fg: 0 0% 100%;
 
-  /* Ambient background light */
-  /* Base wash brightness */
-  --product-ambient-base-a: rgba(96, 70, 196, 0.18);
-  --product-ambient-base-b: rgba(58, 122, 224, 0.16);
-  --product-ambient-base-c: rgba(82, 182, 238, 0.08);
-  --product-ambient-vignette: rgba(6, 10, 22, 0.34);
-
-  /* Main light source colors */
-  --product-ambient-before-color-a: rgba(132, 96, 238, 0.34);
-  --product-ambient-before-color-b: rgba(72, 126, 236, 0.18);
-  --product-ambient-after-color-a: rgba(66, 146, 246, 0.30);
-  --product-ambient-after-color-b: rgba(98, 82, 214, 0.16);
-
-  /* Main light source size */
-  --product-ambient-before-size: 96vw;
-  --product-ambient-before-max-size: 1500px;
-  --product-ambient-after-size: 96vw;
-  --product-ambient-after-max-size: 1500px;
-  --product-ambient-blur: 200px;
-
-  /* Main light source placement */
-  --product-ambient-before-top: -24%;
-  --product-ambient-before-left: -8%;
-  --product-ambient-after-bottom: -26%;
-  --product-ambient-after-right: -6%;
-
-  /* Main light source brightness range */
-  --product-ambient-before-opacity: 0.46;
-  --product-ambient-before-opacity-peak: 0.64;
-  --product-ambient-after-opacity: 0.42;
-  --product-ambient-after-opacity-peak: 0.58;
-
-  /* Main light source motion range */
-  --product-ambient-before-drift-x: 18%;
-  --product-ambient-before-drift-y: 22%;
-  --product-ambient-after-drift-x: -16%;
-  --product-ambient-after-drift-y: -18%;
-
-  /* Main light source scale range */
-  --product-ambient-before-scale-start: 1;
-  --product-ambient-before-scale-end: 1.18;
-  --product-ambient-after-scale-start: 1;
-  --product-ambient-after-scale-end: 1.16;
-
-  /* Main light source speed */
-  --product-ambient-before-duration: 26s;
-  --product-ambient-after-duration: 31s;
-
-  /* Whole ambient layer breathe */
-  --product-ambient-breathe-opacity-dim: 0.76;
-  --product-ambient-breathe-opacity-bright: 0.94;
-  --product-ambient-breathe-brightness-dim: 1;
-  --product-ambient-breathe-brightness-bright: 1.24;
-  --product-ambient-breathe-saturation-dim: 1;
-  --product-ambient-breathe-saturation-bright: 1.08;
-  --product-ambient-breathe-duration: 14s;
-
-  /* Card light */
-  --product-card-shadow-core: rgba(0, 0, 0, 0.62);
-  --product-card-shadow-blue: rgba(78, 162, 255, 0.28);
-  --product-card-shadow-violet: rgba(126, 108, 255, 0.18);
-  --product-card-edge-glow: rgba(116, 212, 255, 0.20);
-  --product-card-edge-violet: rgba(136, 112, 255, 0.14);
-  --product-card-outline: rgba(206, 236, 255, 0.16);
-  --product-card-inner-rim: rgba(255, 255, 255, 0.08);
-
-  /* Subtitle */
-  --product-subtitle-color: rgba(228, 228, 228, 0.9);
-
-  /* Beta sucker highlight */
-  --product-beta-gradient-start: #7d39e8;
-  --product-beta-gradient-end: #4d86ff;
-  --product-beta-shadow: rgba(112, 118, 255, 0.34);
-  --product-beta-breathe-duration: 4.8s;
-  --product-beta-brightness-dim: 0.74;
-  --product-beta-brightness-bright: 1.44;
-}
-
-.product-copy {
-  flex: 0 0 var(--product-copy-basis);
-  max-width: var(--product-copy-max-width);
-}
-
-.product-title,
-.product-subtitle,
-.product-media,
-.product-card {
-  will-change: transform, opacity;
-}
-
-.product-media,
-.product-card,
-.product-card img {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-.product-glow {
-  opacity: 0.82;
-  background:
-    radial-gradient(circle at 24% 26%, var(--product-ambient-base-a), transparent 30%),
-    radial-gradient(circle at 76% 62%, var(--product-ambient-base-b), transparent 34%),
-    radial-gradient(circle at 52% 48%, var(--product-ambient-base-c), transparent 28%),
-    linear-gradient(180deg, rgba(9, 15, 32, 0.12) 0%, rgba(9, 15, 32, 0) 24%, var(--product-ambient-vignette) 100%);
-  will-change: opacity, filter;
-  animation: product-ambient-breathe var(--product-ambient-breathe-duration) ease-in-out infinite;
-}
-
-/* 动态环境光层：比原先的紫色光晕更克制，更像屏幕反射出来的背景光 */
-.product-glow::before,
-.product-glow::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(var(--product-ambient-blur));
-  mix-blend-mode: screen;
-}
-
-.product-glow::before {
-  width: var(--product-ambient-before-size);
-  height: var(--product-ambient-before-size);
-  max-width: var(--product-ambient-before-max-size);
-  max-height: var(--product-ambient-before-max-size);
-  background: radial-gradient(circle, var(--product-ambient-before-color-a) 0%, var(--product-ambient-before-color-b) 42%, transparent 72%);
-  top: var(--product-ambient-before-top);
-  left: var(--product-ambient-before-left);
-  opacity: var(--product-ambient-before-opacity);
-  animation: float-glow-1 var(--product-ambient-before-duration) cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-}
-
-.product-glow::after {
-  width: var(--product-ambient-after-size);
-  height: var(--product-ambient-after-size);
-  max-width: var(--product-ambient-after-max-size);
-  max-height: var(--product-ambient-after-max-size);
-  background: radial-gradient(circle, var(--product-ambient-after-color-a) 0%, var(--product-ambient-after-color-b) 48%, transparent 76%);
-  bottom: var(--product-ambient-after-bottom);
-  right: var(--product-ambient-after-right);
-  opacity: var(--product-ambient-after-opacity);
-  animation: float-glow-2 var(--product-ambient-after-duration) cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-}
-
-@keyframes product-ambient-breathe {
-  0%, 100% {
-    opacity: var(--product-ambient-breathe-opacity-dim);
-    filter: brightness(var(--product-ambient-breathe-brightness-dim)) saturate(var(--product-ambient-breathe-saturation-dim));
-  }
-  50% {
-    opacity: var(--product-ambient-breathe-opacity-bright);
-    filter: brightness(var(--product-ambient-breathe-brightness-bright)) saturate(var(--product-ambient-breathe-saturation-bright));
-  }
-}
-
-@keyframes float-glow-1 {
-  0% {
-    transform: translate(0, 0) scale(var(--product-ambient-before-scale-start));
-    opacity: var(--product-ambient-before-opacity);
-  }
-  100% {
-    transform: translate(var(--product-ambient-before-drift-x), var(--product-ambient-before-drift-y)) scale(var(--product-ambient-before-scale-end));
-    opacity: var(--product-ambient-before-opacity-peak);
-  }
-}
-
-@keyframes float-glow-2 {
-  0% {
-    transform: translate(0, 0) scale(var(--product-ambient-after-scale-start));
-    opacity: var(--product-ambient-after-opacity);
-  }
-  100% {
-    transform: translate(var(--product-ambient-after-drift-x), var(--product-ambient-after-drift-y)) scale(var(--product-ambient-after-scale-end));
-    opacity: var(--product-ambient-after-opacity-peak);
-  }
-}
-
-.product-card {
   position: relative;
-  isolation: isolate;
-  border-color: var(--product-card-outline);
-  box-shadow:
-    0 0 28px rgba(116, 212, 255, 0.10),
-    0 0 56px rgba(136, 112, 255, 0.08),
-    0 34px 72px var(--product-card-shadow-core),
-    0 0 44px var(--product-card-shadow-blue),
-    0 0 86px var(--product-card-shadow-violet);
-  transition:
-    box-shadow 0.45s ease,
-    border-color 0.45s ease,
-    filter 0.45s ease;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  color: hsl(var(--product-fg));
+  overflow: visible;
+  font-family: var(--font-sans);
+  pointer-events: none;
+  cursor: default;
 }
 
-.product-card::before {
+/* ---------- 渐进遮罩 ---------- */
+/*
+ * 上下黑边 + 中心淡化，让摆波 canvas 平滑融入。
+ * 默认标准值：上下 18%，中心透明度 0.55。
+ */
+.product-vignette {
+  background:
+    linear-gradient(to bottom,
+      rgba(10, 10, 10, 0.82) 0%,
+      rgba(10, 10, 10, 0)    18%,
+      rgba(10, 10, 10, 0.55) 50%,
+      rgba(10, 10, 10, 0)    82%,
+      rgba(10, 10, 10, 0.82) 100%
+    );
+}
+
+/* ---------- 主内容 ---------- */
+.product-content {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 40px 60px;
+  pointer-events: auto;
+}
+
+@media (max-width: 767px) {
+  .product-content {
+    justify-content: flex-start;
+    padding: 0 24px 0;
+  }
+}
+
+/* ---------- 两屏布局（移动端） ---------- */
+@media (max-width: 767px) {
+  .product-screen-1 {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .product-screen-2 {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+}
+
+/* ---------- Project [Ω] 大标签 ---------- */
+/*
+ * 字号；默认标准值：clamp(1.6rem, 4vw, 3.2rem)。与 About 对齐。
+ */
+.product-subheading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: clamp(1.6rem, 4vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  color: hsl(var(--product-fg));
+}
+
+/* 发光呼吸竖线 — 金琥珀色（区别于 About 的蓝色） */
+.product-subheading__line {
+  width: 5px;
+  height: 1.1em;
+  background: linear-gradient(180deg, rgba(255, 210, 120, 1) 0%, rgba(210, 140, 40, 0.9) 100%);
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 12px rgba(255, 200, 80, 0.8),
+    0 0 24px rgba(210, 140, 40, 0.6),
+    inset 0 0 4px rgba(255, 255, 255, 0.8);
+  animation: omega-line-breathe 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes omega-line-breathe {
+  0% {
+    opacity: 0.6;
+    box-shadow:
+      0 0 8px rgba(255, 200, 80, 0.4),
+      0 0 16px rgba(210, 140, 40, 0.2),
+      inset 0 0 2px rgba(255, 255, 255, 0.5);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    box-shadow:
+      0 0 16px rgba(255, 220, 100, 0.9),
+      0 0 32px rgba(210, 160, 60, 0.7),
+      0 0 48px rgba(180, 120, 30, 0.5),
+      inset 0 0 6px rgba(255, 255, 255, 0.9);
+    filter: blur(0.5px);
+  }
+}
+
+/* Ω 标志白框容器 */
+.product-omega-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  font-size: inherit;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* 旋转光晕 — 金色版 */
+.product-omega-badge::before {
   content: '';
   position: absolute;
-  inset: -16px;
-  border-radius: inherit;
-  background:
-    radial-gradient(circle at 30% 28%, rgba(113, 205, 255, 0.18), transparent 42%),
-    radial-gradient(circle at 72% 70%, rgba(122, 102, 255, 0.14), transparent 46%);
-  filter: blur(28px);
-  opacity: 0.75;
+  /* 光晕扩散范围；默认标准值：-10px */
+  inset: -10px;
+  border-radius: 14px;
+  background: conic-gradient(
+    from var(--omega-halo-angle, 0deg),
+    rgba(255, 200, 80, 0.0)   0%,
+    rgba(255, 200, 80, 0.18)  8%,
+    rgba(255, 220, 120, 0.35) 15%,
+    rgba(255, 235, 160, 0.45) 20%,
+    rgba(255, 220, 120, 0.35) 25%,
+    rgba(255, 200, 80, 0.18)  32%,
+    rgba(255, 200, 80, 0.0)   42%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  animation: omega-halo-spin 3.5s linear infinite;
   pointer-events: none;
   z-index: -1;
 }
 
-.product-card::after {
+/* 外层呼吸柔光 — 金色散射 */
+.product-omega-badge::after {
   content: '';
   position: absolute;
-  inset: 1px;
-  border-radius: calc(0.75rem - 1px);
-  box-shadow:
-    inset 0 0 0 1px var(--product-card-inner-rim),
-    inset 0 18px 38px rgba(255, 255, 255, 0.04),
-    inset 0 -18px 28px rgba(0, 0, 0, 0.18);
+  /* 外层柔光范围；默认标准值：-18px */
+  inset: -18px;
+  border-radius: 22px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 200, 80, 0.12)  0%,
+    rgba(210, 150, 40, 0.06)  40%,
+    rgba(180, 120, 20, 0.02)  65%,
+    transparent 80%
+  );
+  filter: blur(6px);
+  animation: omega-glow-pulse 3s ease-in-out infinite;
   pointer-events: none;
+  z-index: -2;
 }
 
-.product-card:hover {
-  border-color: rgba(222, 244, 255, 0.24);
-  box-shadow:
-    0 0 36px rgba(136, 226, 255, 0.16),
-    0 0 72px rgba(138, 124, 255, 0.12),
-    0 40px 80px rgba(0, 0, 0, 0.68),
-    0 0 56px rgba(78, 162, 255, 0.3),
-    0 0 102px rgba(126, 108, 255, 0.22);
-  filter: brightness(1.02);
+@property --omega-halo-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
 
-/* ============================================================
-   Product CTA Buttons — Liquid Glass
-   ============================================================ */
+@keyframes omega-halo-spin {
+  to { --omega-halo-angle: 360deg; }
+}
+
+@keyframes omega-glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.12); }
+}
+
+/* ---------- 两栏布局 ---------- */
+.product-columns {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 60px;
+}
+
+@media (max-width: 1023px) {
+  .product-columns {
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+  }
+}
+
+/* ---------- 标题 ---------- */
+.product-heading {
+  flex: 1;
+}
+
+.product-heading__h2 {
+  font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: hsl(var(--product-fg));
+}
+
+.product-heading__light {
+  font-weight: 300;
+  /* key 变更重挂载时触发此动画；默认标准值：320ms */
+  animation: product-title-reveal 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.product-heading__light + br + .product-heading__light {
+  animation-delay: 50ms;
+}
+
+.product-heading__light + br + .product-heading__light + br + .product-heading__display,
+.product-heading__display {
+  font-weight: 600;
+  /* 兜底色 */
+  color: rgba(255, 230, 160, 0.96);
+  animation: product-title-reveal 320ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both;
+}
+
+/* MagnetText 拆字后的渐变裁剪 — 金琥珀色 */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .product-heading__display .magnet-char {
+    background: linear-gradient(135deg, rgba(255, 230, 160, 1), rgba(210, 150, 60, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* ---------- 副标题（结束语升至此位置） ---------- */
+/*
+ * 紧跟大标题下方，视觉分量仅次于 h2。
+ * 字号；默认标准值：clamp(1.05rem, 1.9vw, 1.6rem)。字重 300 保持轻盈。
+ * 颜色用暖金，与 h2 display 行的金色形成呼吸感延续。
+ */
+.product-subline {
+  margin-top: 18px;
+  /* 字号；默认标准值：clamp(1.05rem, 1.9vw, 1.6rem)。调大则更醒目。 */
+  font-size: clamp(1.05rem, 1.9vw, 1.6rem);
+  /* 字重提升到 400，让警示内容有足够分量；默认标准值：400 */
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.005em;
+  /*
+   * 冰蓝白（steel-white）：与大标题金色形成冷暖对比，避免金色堆积的视觉疲劳。
+   * 默认标准值：rgba(200, 220, 240, 0.82)。
+   * 调高 alpha → 更接近纯白；降低 blue 分量 → 偏中性灰白。
+   */
+  color: rgb(231, 243, 255);
+  /*
+   * 蓝色外发光：内层锐利 + 外层大范围模糊，营造透亮激光感。
+   * 默认标准值：内层 rgba(120,200,255,0.55) blur 8px / 外层 rgba(80,160,255,0.25) blur 24px。
+   * 调大 alpha → 更强；调大 blur → 更漫射柔和。
+   */
+  text-shadow:
+    0 0 8px  rgba(120, 200, 255, 0.55),
+    0 0 24px rgba(80,  160, 255, 0.30),
+    0 0 48px rgba(60,  140, 255, 0.15);
+  /* 最大宽度；默认标准值：576px（原 480px 增大 20%）。调大可减少换行。 */
+  max-width: 500px;
+}
+
+/* ---------- CTA 按钮区 ---------- */
+/*
+ * 复用 About 按钮风格，左对齐，水平排列
+ */
+.product-cta-inline {
+  margin-top: 32px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
 /* ---- Base ---- */
 .product-cta {
@@ -247,12 +310,13 @@
 
   position: relative;
   display: inline-block;
-  padding: 11px 28px;
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  border-radius: 10px;
+  padding: 14px 32px;
+  font-family: var(--font-sans);
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 100px;
   cursor: pointer;
   border: none;
   overflow: hidden;
@@ -263,7 +327,7 @@
     border-color 0.45s ease;
 }
 
-/* ---- Hover cursor reflection spot (follows mouse) ---- */
+/* 鼠标跟随光斑 */
 .product-cta::before {
   content: '';
   position: absolute;
@@ -280,91 +344,41 @@
   transition: opacity 0.35s ease;
 }
 
-.product-cta:hover::before {
-  opacity: 1;
-}
+.product-cta:hover::before { opacity: 1; }
 
-/* ---- Bottom reflection (mirror of the button itself) ---- */
-.product-cta::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 50%;
-  border-radius: 10px;
-  opacity: 0;
-  transform: scaleY(-1);
-  filter: blur(4px);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.18), transparent 65%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.18), transparent 65%);
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-.product-cta:hover::after {
-  opacity: 1;
-}
-
-/* ---- Shared hover ---- */
 .product-cta:hover {
-  transform: translateY(-3px) scale(1.03);
+  transform: translateY(-2px);
 }
 
-/* ============================================================
-   Primary — Blue themed glossy button
-   蓝色主题色，带顶部光泽高光
-   ============================================================ */
+/* ---- Primary — 金色玻璃 ---- */
 .product-cta--primary {
-  background: linear-gradient(
-    180deg,
-    #1b7aaa 0%,
-    #15608c 40%,
-    #104a6e 100%
-  );
-  color: #fff;
-  font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.35);
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
   box-shadow:
-    0 4px 20px rgba(16, 74, 110, 0.5),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.25) inset;
+    0 12px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .product-cta--primary:hover {
-  background: linear-gradient(
-    180deg,
-    #2088b8 0%,
-    #1b7aaa 40%,
-    #15608c 100%
-  );
-  border-color: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, rgba(255, 220, 100, 0.12), rgba(210, 150, 40, 0.06));
+  border-color: rgba(255, 220, 100, 0.3);
+  border-top-color: rgba(255, 220, 100, 0.5);
+  color: #fff;
   box-shadow:
-    0 8px 36px rgba(16, 74, 110, 0.65),
-    0 0 48px rgba(16, 74, 110, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.18) inset;
+    0 16px 40px rgba(0, 0, 0, 0.3),
+    0 0 24px rgba(255, 200, 80, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 12px rgba(255, 220, 100, 0.4);
 }
 
-.product-cta--primary::after {
-  background: linear-gradient(
-    180deg,
-    rgba(16, 74, 110, 0.3) 0%,
-    rgba(16, 74, 110, 0.1) 100%
-  );
-}
-
-/* ============================================================
-   Ghost — Ultra-transparent glass, subtle border + low blur
-   超透明玻璃，低模糊，柔和边框
-   ============================================================ */
+/* ---- Ghost ---- */
 .product-cta--ghost {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.005) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 50%, rgba(255, 255, 255, 0.02) 100%);
   color: rgba(255, 255, 255, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.10);
   backdrop-filter: blur(6px) saturate(1.1);
@@ -375,12 +389,7 @@
 }
 
 .product-cta--ghost:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.015) 50%,
-    rgba(255, 255, 255, 0.04) 100%
-  );
+  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 50%, rgba(255,255,255,0.04) 100%);
   color: rgba(255, 255, 255, 0.85);
   border-color: rgba(255, 255, 255, 0.20);
   box-shadow:
@@ -389,215 +398,156 @@
     0 -1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
-.product-cta--ghost::after {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-/* ---- Mobile ---- */
-@media (max-width: 768px) {
-  .product-cta {
-    padding: 10px 22px;
-    font-size: 13px;
-  }
-}
-
-/* ============================================================
-   Product Title
-   ============================================================ */
-.product-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 18px;
-  width: fit-content;
-  max-width: min(760px, 100%);
-  font-family: var(--font-sans);
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  white-space: nowrap;
-  line-height: 1;
-}
-
-.product-title__brand-box {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 18px;
-  border: 1.5px solid rgba(255, 255, 255, 0.92);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-    0 16px 40px rgba(0, 0, 0, 0.18);
-}
-
-.product-title__brand {
-  --brand-wordmark-color: rgba(224, 224, 224, 0.85);
-  --brand-wordmark-mark-color: #ffffff;
-  letter-spacing: -0.04em;
-}
-
-.product-title__name {
-  display: inline-block;
-  position: relative;
-  white-space: nowrap;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, #4fc3f7, #81d4fa, #b3e5fc, #4fc3f7);
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation:
-    product-title-shimmer 6s ease-in-out infinite,
-    product-title-name-glow 3.2s ease-in-out infinite;
-}
-
-.product-subtitle {
-  width: min(760px, 100%);
-  max-width: 760px;
-  font-size: 2.9rem;
-  line-height: 1.02;
-  font-weight: 560;
-  color: var(--product-subtitle-color);
-}
-
-.product-subtitle__line {
-  display: block;
-  white-space: nowrap;
-  color: var(--product-subtitle-color);
-}
-
-.product-subtitle__highlight {
-  display: inline-block;
-  font-size: 1.14em;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  background: linear-gradient(
-    90deg,
-    var(--product-beta-gradient-start) 0%,
-    var(--product-beta-gradient-end) 100%
-  );
-  background-size: 100% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  filter: brightness(var(--product-beta-brightness-dim)) saturate(0.9);
-  animation: beta-breathe var(--product-beta-breathe-duration) ease-in-out infinite;
-}
-
-/* ============================================================
-   Blue Gradient Breathe — for Beta sucker highlight text
-   ============================================================ */
-.gradient-pulse {
-  will-change: filter;
-}
-
-@keyframes product-title-shimmer {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
-}
-
-@keyframes product-title-name-glow {
-  0%, 100% {
-    filter:
-      drop-shadow(0 0 8px rgba(79, 195, 247, 0.18))
-      drop-shadow(0 0 18px rgba(79, 195, 247, 0.12));
-  }
-  50% {
-    filter:
-      drop-shadow(0 0 14px rgba(129, 212, 250, 0.34))
-      drop-shadow(0 0 28px rgba(79, 195, 247, 0.24));
-  }
-}
-
-@keyframes beta-breathe {
-  0%, 100% {
-    filter:
-      brightness(var(--product-beta-brightness-dim))
-      saturate(0.92)
-      drop-shadow(0 0 0 rgba(0, 0, 0, 0));
-  }
-  50% {
-    filter:
-      brightness(var(--product-beta-brightness-bright))
-      saturate(1.16)
-      drop-shadow(0 0 16px var(--product-beta-shadow));
-  }
-}
-
-@media (max-width: 1280px) {
-  .product-copy {
-    flex-basis: min(660px, 52vw);
-    max-width: 680px;
-  }
-
-  .product-title {
-    font-size: 2.7rem;
-  }
-
-  .product-subtitle {
-    max-width: 680px;
-    font-size: 2.45rem;
-  }
-}
-
-@media (max-width: 1024px) {
-  .product-title {
-    flex-wrap: wrap;
-    justify-content: center;
-    white-space: normal;
-  }
-
-  .product-subtitle {
-    font-size: 2.15rem;
-    text-align: center;
-  }
-
-  .product-subtitle__line {
-    white-space: normal;
-  }
-}
-
-@media (max-width: 768px) {
-  .product-title {
-    gap: 14px;
-    max-width: 100%;
-    font-size: 2.2rem;
-  }
-
-  .product-title__brand-box {
-    padding: 10px 16px;
-  }
-
-  .product-title__name {
-    flex-basis: 100%;
-    white-space: normal;
-    text-align: center;
-    text-wrap: balance;
-    letter-spacing: 0.1em;
-  }
-
-  .product-subtitle {
-    width: 100%;
-    max-width: 100%;
-    font-size: 1.85rem;
-  }
-}
-
-/* ---------- 模糊→清晰出场动画（scroll 触发） ---------- */
+/* ---------- 宣言摘要（磨砂玻璃底板） ---------- */
 /*
- * 初始状态：模糊+透明。
- * 当 framer-motion 检测到 inView 后，添加 .is-revealed 类触发清晰化。
- * 持续时间；默认标准值：1.2s。模糊程度；默认标准值：14px。
+ * 白色磨砂玻璃底板；默认标准值：rgba(255,255,255,0.04) + blur(10px)。
+ * 调大 alpha 则底板更明显；调大 blur 则磨砂感更强。
+ */
+.product-manifesto {
+  max-width: 480px;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top-color: rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.product-manifesto__text {
+  /* 正文字号；默认标准值：clamp(0.86rem, 1.2vw, 1.02rem) */
+  font-size: clamp(0.86rem, 1.2vw, 1.02rem);
+  line-height: 1.7;
+  color: hsl(var(--product-fg) / 0.55);
+  margin: 0 0 14px;
+}
+
+.product-manifesto__highlight {
+  /* 高亮文字略大于正文；默认标准值：clamp(0.9rem, 1.3vw, 1.08rem) */
+  font-size: clamp(0.9rem, 1.3vw, 1.08rem);
+  line-height: 1.6;
+  font-weight: 500;
+  color: hsl(var(--product-fg) / 0.85);
+  margin: 0;
+  padding-left: 14px;
+  /* 金琥珀分割线，区别于 About 的蓝色 */
+  border-left: 2px solid rgba(255, 200, 80, 0.4);
+}
+
+/* ---------- 四大支柱 ---------- */
+.product-pillars {
+  margin-top: 40px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .product-pillars {
+    margin-top: 0;
+  }
+}
+
+.product-pillars__label {
+  display: block;
+  /* 支柱标签字号；默认标准值：clamp(0.8rem, 1vw, 0.9rem) */
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: hsl(var(--product-fg) / 0.5);
+  margin-bottom: 16px;
+}
+
+.product-pillars__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .product-pillars__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .product-pillars__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 支柱卡片 — 金色点缀磨砂玻璃 */
+.product-pillar {
+  padding: 20px;
+  border-radius: 12px;
+  /*
+   * 白色磨砂玻璃卡片底板；默认标准值：rgba(255,255,255,0.08) + blur(14px)。
+   * 调大 alpha 则底板更不透明；调大 blur 则磨砂感更强。
+   */
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-pillar:hover {
+  background: rgba(255, 220, 100, 0.06);
+  border-color: rgba(255, 200, 80, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 0 12px rgba(255, 200, 80, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.product-pillar__header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.product-pillar__icon {
+  display: inline-block;
+  /* 序号字号；默认标准值：clamp(0.85rem, 1.1vw, 1rem) */
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 600;
+  /* 金色序号，区别于 About 的蓝色 */
+  color: rgba(255, 200, 80, 0.7);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.product-pillar__title {
+  /* 卡片标题字号；默认标准值：clamp(0.9rem, 1.2vw, 1.05rem) */
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  font-weight: 600;
+  color: hsl(var(--product-fg) / 0.92);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.product-pillar__desc {
+  /* 卡片描述字号；默认标准值：clamp(0.82rem, 1.1vw, 0.95rem) */
+  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  line-height: 1.6;
+  color: hsl(var(--product-fg) / 0.72);
+  margin: 0;
+}
+
+/* ---------- 模糊→清晰出场动画 ---------- */
+/*
+ * 初始状态：模糊+透明。inView 后添加 .is-revealed 触发清晰化。
+ * 持续时间；默认标准值：1.2s。模糊程度；默认标准值：16px。
  */
 .product-blur-reveal {
-  filter: blur(14px);
+  filter: blur(16px);
   opacity: 0;
-  transition: filter 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    filter  1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .product-blur-reveal.is-revealed {
@@ -605,4 +555,19 @@
   opacity: 1;
 }
 
-/* Product Ghost 按钮：安卓/所有平台统一保持磨砂半透明，不加实底色 */
+/*
+ * 语言切换标题行入场动画
+ * 初始标准值：blur 8px，translateY 0.3em，持续 320ms。
+ */
+@keyframes product-title-reveal {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}

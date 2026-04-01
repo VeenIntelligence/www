@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 import MagnetText from '../../components/MagnetText';
 import useCharMagnet from '../../hooks/useCharMagnet';
-import LiquidGoldBackground from '../../components/LiquidGoldBackground';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import '../../styles/sections/about.css';
@@ -114,12 +113,6 @@ export default function AboutSection() {
       className="about-section"
       style={{ position: 'relative' }}
     >
-      {/* 实验：液态金 WebGL shader 背景
-        * z-index:-1 沉到 UnifiedStage(z-index:0) 下面，
-        * 正方形在液态金上面显示 */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: -1 }}>
-        <LiquidGoldBackground />
-      </div>
 
       {/* 主内容 */}
       <div

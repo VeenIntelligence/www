@@ -3,6 +3,36 @@ import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import LiquidGoldBackground from '../../components/LiquidGoldBackground';
 import '../../styles/sections/consultants.css';
+import {
+  SECTION_OVERLAY_BG,
+  PANEL_BG,
+  PANEL_BG_HOVER,
+  PANEL_BLUR,
+  PANEL_SATURATE,
+  PANEL_BORDER_BASE,
+  PANEL_INSET_TOP,
+  PANEL_PREMIUM_BG,
+  PANEL_PREMIUM_BG_HOVER,
+  PANEL_PREMIUM_GLOW,
+  PANEL_BORDER_PREMIUM,
+  PANEL_INSET_PREMIUM_TOP,
+} from '../../config/consultantsLook';
+
+// 把 JS 调参注入为 CSS 自定义属性，供 consultants.css 中的 var() 消费
+const PANEL_CSS_VARS = {
+  '--section-overlay-bg':       SECTION_OVERLAY_BG,
+  '--panel-bg':                 PANEL_BG,
+  '--panel-bg-hover':           PANEL_BG_HOVER,
+  '--panel-blur':               PANEL_BLUR,
+  '--panel-saturate':           String(PANEL_SATURATE),
+  '--panel-border-base':        PANEL_BORDER_BASE,
+  '--panel-inset-top':          PANEL_INSET_TOP,
+  '--panel-premium-bg':         PANEL_PREMIUM_BG,
+  '--panel-premium-bg-hover':   PANEL_PREMIUM_BG_HOVER,
+  '--panel-premium-glow':       PANEL_PREMIUM_GLOW,
+  '--panel-border-premium':     PANEL_BORDER_PREMIUM,
+  '--panel-inset-premium-top':  PANEL_INSET_PREMIUM_TOP,
+};
 
 /**
  * ArrowRight — 内联箭头图标
@@ -37,6 +67,7 @@ export default function ConsultantsSection({ children }) {
       ref={sectionRef}
       id="consultants"
       className="consultants-section"
+      style={PANEL_CSS_VARS}
     >
       {/* 液态金 WebGL shader 背景 */}
       <LiquidGoldBackground />
