@@ -10,7 +10,7 @@
   --about-fg: 0 0% 100%;
 
   position: relative;
-  z-index: 1; /* 内容层高于 UnifiedStage(z-index:0) */
+  z-index: 1; /* 内容层高于 UnifiedStage(z-index:0)；About 阶段 UnifiedStage 会提升到 z-index:2 */
   min-height: 100vh;
   display: flex;
   flex-direction: column;

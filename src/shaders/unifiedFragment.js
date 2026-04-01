@@ -599,6 +599,10 @@ void main() {
   vec3 rd = normalize(vec3(uv, CAM_FOV));
 
   vec3 color;
+  /* hitAlpha: 1.0 = 命中了几何体 (液滴/正方形), 0.0 = 背景
+   * About 阶段 (uPhase>0.5) 背景区域输出 alpha=0 让液态金透出来 */
+  float hitAlpha = 1.0;
+  bool inAboutPhase = uPhase > 0.5;
 
   #ifdef SPIKE_MATERIAL_GLASS
   /* ── Glass cube: true see-through refraction with video support ── */
@@ -682,12 +686,15 @@ void main() {
     vec3 edgeGlow = GLASS_EDGE_GLOW * pow(1.0 - cosTheta, 3.0) * GLASS_EDGE_GLOW_BOOST;
 
     color = mix(transmitted, reflColor, fresnel) + specColor + edgeGlow;
+    hitAlpha = 1.0;
 
   } else if (dScene < MAX_DIST) {
     vec3 p = ro + rd * dScene;
     color = shade(p, rd, calcNormal(p));
+    hitAlpha = 1.0;
   } else {
     color = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
+    hitAlpha = 0.0; // 背景区域
   }
 
   // 立方体淡出：当 cubeFade < 1 时，将立方体区域混合向背景
@@ -695,6 +702,7 @@ void main() {
   if (uCubeFade < 0.999) {
     vec3 bgColor = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
     color = mix(bgColor, color, uCubeFade);
+    hitAlpha *= uCubeFade;
   }
 
   #else
@@ -703,14 +711,17 @@ void main() {
   if (d < MAX_DIST) {
     vec3 p = ro + rd * d;
     color = shade(p, rd, calcNormal(p));
+    hitAlpha = 1.0;
   } else {
     color = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
+    hitAlpha = 0.0; // 背景区域
   }
 
   // 立方体淡出（非玻璃路径）
   if (uCubeFade < 0.999) {
     vec3 bgColor = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
     color = mix(bgColor, color, uCubeFade);
+    hitAlpha *= uCubeFade;
   }
   #endif
 
@@ -721,6 +732,10 @@ void main() {
   vec2 vig = vUv - 0.5;
   color *= 1.0 - dot(vig, vig) * 0.35;
 
-  gl_FragColor = vec4(color, 1.0);
+  /* About 阶段：背景区域输出 alpha=0（透明），让液态金背景从下面透出来。
+   * Hero 阶段：保持 alpha=1.0（不透明），维持原有效果。
+   * 过渡：使用 uPhase 平滑混合，避免突变。 */
+  float alpha = mix(1.0, hitAlpha, smoothstep(0.3, 0.7, uPhase));
+  gl_FragColor = vec4(color * alpha, alpha);
 }
 `;

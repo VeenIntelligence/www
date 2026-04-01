@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import '../styles/components/liquid-gold-bg.css';
 import useSectionFreeze from '../hooks/useSectionFreeze';
 import useAdaptiveQuality from '../hooks/useAdaptiveQuality';
@@ -210,11 +210,6 @@ const IS_ANDROID = typeof navigator !== 'undefined' && /Android/i.test(navigator
 export default function LiquidGoldBackground() {
   const containerRef = useRef(null);
   const canvasRef    = useRef(null);
-  const glRef        = useRef(null);
-  const uniformsRef  = useRef(null);
-  const animIdRef    = useRef(null);
-  const freezeStart  = useRef(0);
-  const startTime    = useRef(performance.now());
   const mouseRef     = useRef({ x: -1, y: -1 });
 
   const { shouldAnimate } = useSectionFreeze(containerRef, { activeThreshold: 0 });
@@ -223,145 +218,91 @@ export default function LiquidGoldBackground() {
     bootScale: IS_ANDROID ? 0.38 : 0.54 
   });
 
-  /* ── 核心 WebGL 初始化 ── */
-  useEffect(() => {
+  // 把 shouldAnimate 存入 ref，动画循环闭包内读取
+  const shouldAnimateRef = useRef(shouldAnimate);
+  shouldAnimateRef.current = shouldAnimate;
+
+  /* ── 鼠标轨迹同步 ── */
+  const onMouseMove = useCallback((e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const r = canvas.getBoundingClientRect();
+    const isOver = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    if (isOver) {
+      const dpr = (window.devicePixelRatio || 1) * qualityRef.current.scale;
+      mouseRef.current = {
+        x: (e.clientX - r.left) * dpr,
+        y: (r.height - (e.clientY - r.top)) * dpr
+      };
+    } else {
+      mouseRef.current = { x: -1, y: -1 };
+    }
+  }, [qualityRef]);
+
+  /* ══════════════════════════════════════════════════════════════
+     单一 effect：WebGL 初始化 + ResizeObserver + 动画循环
+     ──────────────────────────────────────────────────────────────
+     关键设计：
+     1. waitForLayout() 等非零尺寸后再初始化 WebGL
+     2. 初始化后立即绘制一帧静态画面（不依赖 shouldAnimate）
+     3. 动画循环用 shouldAnimate 控制"是否持续动画"
+     这样 canvas 永远不会出现空白——初始化即有画面。
+     ══════════════════════════════════════════════════════════════ */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const gl = canvas.getContext('webgl', {
-      alpha: false,
-      antialias: false,
-      preserveDrawingBuffer: false,
-    });
-    if (!gl) return;
-    glRef.current = gl;
+    // ── 状态容器 ──
+    let animId = null;
+    let gl = null;
+    let uniforms = null;
+    let initialized = false;
+    let waitId = null;
+    let disposed = false;
+    let startTime = performance.now();
+    let freezeStart = 0;
+    let wasFrozen = false;
+    let lastCssW = 0;
+    let lastCssH = 0;
 
-    function compile(type, src) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.warn('Shader error:', gl.getShaderInfoLog(s));
-      return s;
-    }
-
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT_SRC));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG_SRC));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
-    const aPos = gl.getAttribLocation(prog, 'a_pos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-    uniformsRef.current = {
-      uTime:        gl.getUniformLocation(prog, 'u_time'),
-      uRes:         gl.getUniformLocation(prog, 'u_res'),
-      uMouse:       gl.getUniformLocation(prog, 'u_mouse'),
-      uFlowSpeed:   gl.getUniformLocation(prog, 'u_flowSpeed'),
-      uViscosity:   gl.getUniformLocation(prog, 'u_viscosity'),
-      uUvScale:     gl.getUniformLocation(prog, 'u_uvScale'),
-      uRippleScale: gl.getUniformLocation(prog, 'u_rippleScale'),
-      uSpecPower:   gl.getUniformLocation(prog, 'u_specPower'),
-      uMetaRadius:  gl.getUniformLocation(prog, 'u_metaRadius'),
-      prefersReduced,
-    };
-
-    /* 画质变更回调 */
-    qualityRef.current.onQualityChange = ({ scale }) => {
-      handleResize(canvas, gl, uniformsRef.current.uRes, scale);
-    };
-    qualityRef.current.start();
-
-    /* 初始 Resize */
-    handleResize(canvas, gl, uniformsRef.current.uRes, qualityRef.current.scale);
-
-    return () => {
-      cancelAnimationFrame(animIdRef.current);
-      qualityRef.current.dispose();
-      gl.deleteProgram(prog);
-      gl.deleteBuffer(buf);
-      glRef.current = null;
-    };
-  }, []);
-
-  /* ── ResizeObserver 处理 ── */
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const ro = new ResizeObserver(() => {
-      if (glRef.current && canvasRef.current && uniformsRef.current) {
-        handleResize(canvasRef.current, glRef.current, uniformsRef.current.uRes, qualityRef.current.scale);
+    function applySize(scale) {
+      const dpr = (window.devicePixelRatio || 1) * scale;
+      const cw = canvas.clientWidth;
+      const ch = canvas.clientHeight;
+      if (cw === 0 || ch === 0) return false;
+      const w = Math.round(cw * dpr);
+      const h = Math.round(ch * dpr);
+      /* 只有尺寸真正变化时才重设 canvas.width/height（会清空 buffer）。
+       * 但 gl.viewport 和 u_res uniform 必须 ALWAYS 设置 ——
+       * 因为 React StrictMode 会拆建 effect，新 program 的 uniform
+       * 默认值是 0；如果跳过设置，shader 除以 0 → 全黑。 */
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
       }
-    });
-    ro.observe(container);
-    return () => ro.disconnect();
-  }, []);
-
-  /* ── 鼠标轨迹同步 ── */
-  useEffect(() => {
-    const onMove = (e) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const r = canvas.getBoundingClientRect();
-      const isOver = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-      
-      if (isOver) {
-        const dpr = (window.devicePixelRatio || 1) * qualityRef.current.scale;
-        mouseRef.current = {
-          x: (e.clientX - r.left) * dpr,
-          y: (r.height - (e.clientY - r.top)) * dpr
-        };
-      } else {
-        mouseRef.current = { x: -1, y: -1 };
-      }
-    };
-    window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
-  }, []);
-
-  /* ── 动画主循环 ── */
-  useEffect(() => {
-    const gl = glRef.current;
-    const u  = uniformsRef.current;
-    if (!gl || !u) return;
-
-    if (!shouldAnimate) {
-      freezeStart.current = performance.now();
-      cancelAnimationFrame(animIdRef.current);
-      return;
+      gl.viewport(0, 0, w, h);
+      if (uniforms?.uRes) gl.uniform2f(uniforms.uRes, w, h);
+      lastCssW = cw;
+      lastCssH = ch;
+      return true;
     }
 
-    if (freezeStart.current > 0) {
-      startTime.current += performance.now() - freezeStart.current;
-      freezeStart.current = 0;
-    }
-
-    const db = window.__GPU_DEBUG__;
-
-    const tick = (now) => {
-      animIdRef.current = requestAnimationFrame(tick);
-      
-      // 动态分辨率调节采样
-      qualityRef.current.adaptFrame();
-
-      // 获取动态参数（优先 GPU Debug Panel，其次默认值）
+    /* 绘制一帧（提取为函数，初始化和动画循环都调用） */
+    function drawFrame(time) {
+      const db = window.__GPU_DEBUG__;
       const p = db ? db.getActiveTierParams() : null;
-      
-      gl.uniform1f(u.uTime, u.prefersReduced ? 0 : (performance.now() - startTime.current) * 0.001);
-      gl.uniform2f(u.uMouse, mouseRef.current.x, mouseRef.current.y);
-      
-      gl.uniform1f(u.uFlowSpeed,   p?.goldFlowSpeed   ?? CFG.flowSpeed);
-      gl.uniform1f(u.uViscosity,   p?.goldViscosity   ?? CFG.viscosity);
-      gl.uniform1f(u.uUvScale,     p?.goldUvScale     ?? CFG.uvScale);
-      gl.uniform1f(u.uRippleScale, p?.goldRippleScale ?? CFG.rippleScale);
-      gl.uniform1f(u.uSpecPower,   p?.goldSpecPower   ?? CFG.specPower);
-      gl.uniform1f(u.uMetaRadius,  p?.goldMetaRadius  ?? CFG.metaRadius);
+
+      gl.uniform1f(uniforms.uTime, prefersReduced ? 0 : time);
+      gl.uniform2f(uniforms.uMouse, mouseRef.current.x, mouseRef.current.y);
+      gl.uniform1f(uniforms.uFlowSpeed,   p?.goldFlowSpeed   ?? CFG.flowSpeed);
+      gl.uniform1f(uniforms.uViscosity,   p?.goldViscosity   ?? CFG.viscosity);
+      gl.uniform1f(uniforms.uUvScale,     p?.goldUvScale     ?? CFG.uvScale);
+      gl.uniform1f(uniforms.uRippleScale, p?.goldRippleScale ?? CFG.rippleScale);
+      gl.uniform1f(uniforms.uSpecPower,   p?.goldSpecPower   ?? CFG.specPower);
+      gl.uniform1f(uniforms.uMetaRadius,  p?.goldMetaRadius  ?? CFG.metaRadius);
 
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -369,11 +310,172 @@ export default function LiquidGoldBackground() {
         db.reportFrame();
         db.reportMetrics('liquid-gold', qualityRef.current.scale);
       }
-    };
+    }
 
-    animIdRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(animIdRef.current);
-  }, [shouldAnimate]);
+    function initWebGL() {
+      /* preserveDrawingBuffer: true — 关键修复！
+       * 默认 false 时，浏览器在每次合成后可能清空 buffer。
+       * 如果动画冻结（shouldAnimate=false）不重画，canvas 就变空白。
+       * 设为 true 保证已画内容持久存在，直到下一次 drawArrays。 */
+      gl = canvas.getContext('webgl', {
+        alpha: false,
+        antialias: false,
+        preserveDrawingBuffer: true,
+      });
+      if (!gl) return false;
+
+      function compile(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.warn('Shader error:', gl.getShaderInfoLog(s));
+        }
+        return s;
+      }
+
+      const prog = gl.createProgram();
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT_SRC));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG_SRC));
+      gl.linkProgram(prog);
+
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        console.warn('Program link error:', gl.getProgramInfoLog(prog));
+        return false;
+      }
+
+      gl.useProgram(prog);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+      const aPos = gl.getAttribLocation(prog, 'a_pos');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      uniforms = {
+        uTime:        gl.getUniformLocation(prog, 'u_time'),
+        uRes:         gl.getUniformLocation(prog, 'u_res'),
+        uMouse:       gl.getUniformLocation(prog, 'u_mouse'),
+        uFlowSpeed:   gl.getUniformLocation(prog, 'u_flowSpeed'),
+        uViscosity:   gl.getUniformLocation(prog, 'u_viscosity'),
+        uUvScale:     gl.getUniformLocation(prog, 'u_uvScale'),
+        uRippleScale: gl.getUniformLocation(prog, 'u_rippleScale'),
+        uSpecPower:   gl.getUniformLocation(prog, 'u_specPower'),
+        uMetaRadius:  gl.getUniformLocation(prog, 'u_metaRadius'),
+        prog,
+        buf,
+      };
+
+      // 画质变更回调 — 升级后 canvas 尺寸会变，buffer 被清空，需要重画
+      qualityRef.current.onQualityChange = ({ scale }) => {
+        if (gl && !disposed) {
+          applySize(scale);
+          drawFrame((performance.now() - startTime) * 0.001);
+        }
+      };
+      qualityRef.current.start();
+
+      // 设置尺寸
+      applySize(qualityRef.current.scale);
+
+      /* ★ 立即绘制第一帧 ★
+       * 不等 shouldAnimate — canvas 永远不应空白。
+       * useSectionFreeze 的 IO 可能延迟数秒才触发，等它则用户看到空白。 */
+      drawFrame(0);
+
+      return true;
+    }
+
+    /* ── 等待 canvas 有非零 CSS 尺寸后再初始化 ── */
+    let retries = 0;
+    const MAX_RETRIES = 180;
+
+    function waitForLayout() {
+      if (disposed) return;
+      if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
+        if (initWebGL()) {
+          initialized = true;
+          startAnimLoop();
+        }
+        return;
+      }
+      retries++;
+      if (retries < MAX_RETRIES) {
+        waitId = requestAnimationFrame(waitForLayout);
+      }
+    }
+
+    function startAnimLoop() {
+      function tick() {
+        if (disposed) return;
+        animId = requestAnimationFrame(tick);
+
+        // ── 冻结 ↔ 解冻 ──
+        const animate = shouldAnimateRef.current;
+        if (!animate) {
+          if (!wasFrozen) {
+            freezeStart = performance.now();
+            wasFrozen = true;
+          }
+          return;
+        }
+        if (wasFrozen) {
+          if (freezeStart > 0) {
+            startTime += performance.now() - freezeStart;
+            freezeStart = 0;
+          }
+          wasFrozen = false;
+        }
+
+        // ── 每帧脏检查尺寸 ──
+        const cw = canvas.clientWidth;
+        const ch = canvas.clientHeight;
+        if (cw !== lastCssW || ch !== lastCssH) {
+          applySize(qualityRef.current.scale);
+        }
+
+        // 画质自适应采样
+        qualityRef.current.adaptFrame();
+
+        // 绘制当前帧
+        drawFrame((performance.now() - startTime) * 0.001);
+      }
+
+      animId = requestAnimationFrame(tick);
+    }
+
+    // ── ResizeObserver ──
+    const ro = new ResizeObserver(() => {
+      if (!initialized || !gl || disposed) return;
+      if (applySize(qualityRef.current.scale)) {
+        // 尺寸变更后立刻补画一帧，避免 resize 后瞬间空白
+        // （因为 shouldAnimate 可能是 false，动画循环不会画）
+        drawFrame((performance.now() - startTime) * 0.001);
+      }
+    });
+    ro.observe(container);
+
+    // ── 鼠标事件 ──
+    window.addEventListener('mousemove', onMouseMove);
+
+    // ── 启动 ──
+    waitForLayout();
+
+    // ── 清理 ──
+    return () => {
+      disposed = true;
+      if (waitId != null) cancelAnimationFrame(waitId);
+      if (animId != null) cancelAnimationFrame(animId);
+      ro.disconnect();
+      window.removeEventListener('mousemove', onMouseMove);
+      qualityRef.current.dispose();
+      if (gl && uniforms) {
+        gl.deleteProgram(uniforms.prog);
+        gl.deleteBuffer(uniforms.buf);
+      }
+    };
+  }, [onMouseMove, qualityRef]);
 
   return (
     <div ref={containerRef} className="liquid-gold-bg">
@@ -382,16 +484,4 @@ export default function LiquidGoldBackground() {
       <canvas ref={canvasRef} className="liquid-gold-bg__canvas" />
     </div>
   );
-}
-
-function handleResize(canvas, gl, uRes, scale) {
-  const dpr = (window.devicePixelRatio || 1) * scale;
-  const w = Math.round(canvas.clientWidth * dpr);
-  const h = Math.round(canvas.clientHeight * dpr);
-  if (canvas.width !== w || canvas.height !== h) {
-    canvas.width = w;
-    canvas.height = h;
-    gl.viewport(0, 0, w, h);
-    if (uRes) gl.uniform2f(uRes, w, h);
-  }
 }
