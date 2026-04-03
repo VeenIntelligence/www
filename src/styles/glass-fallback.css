@@ -143,3 +143,24 @@
   box-shadow: 0 4px 28px var(--gf-solid-shadow);
   border: 1px solid var(--gf-solid-border);
 }
+
+/* ================================================================
+   纯 CSS @supports 兜底 — 浏览器真不支持 backdrop-filter 时的最终防线
+   此规则优先级低于 [data-glass-tier] 选择器，仅在 JS 未运行或
+   浏览器确实不支持时生效。确保磨砂玻璃组件至少有可读的底色。
+   ================================================================ */
+@supports not (backdrop-filter: blur(1px)) {
+  .omega-manifesto,
+  .sigma-manifesto {
+    background: rgba(12, 16, 24, 0.75) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .omega-pillar,
+  .sigma-pillar {
+    background: rgba(16, 20, 28, 0.80) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}

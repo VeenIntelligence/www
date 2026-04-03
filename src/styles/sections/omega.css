@@ -245,9 +245,9 @@
   line-height: 1.0;
   letter-spacing: -0.02em;
   color: hsl(var(--omega-fg));
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
+  /* 大标题短文本，禁止词内断行，整词换行 */
   word-break: keep-all;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
 }
 
 .omega-heading__light {
@@ -303,9 +303,9 @@
     0 0 48px rgba(60,  140, 255, 0.15);
   /* 最大宽度；默认标准值：576px（原 480px 增大 20%）。调大可减少换行。 */
   max-width: 500px;
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
-  word-break: keep-all;
-  overflow-wrap: normal;
+  /* 允许长单词在容器边界断行，防止移动端撑出卡片 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- CTA 按钮区 ---------- */
@@ -496,6 +496,62 @@
   -webkit-backdrop-filter: none;
 }
 
+/*
+ * 安卓 solid tier fallback — 宣言面板 (manifesto)
+ * 安卓上 backdrop-filter 渲染透明，文字不可读。改用增强半透明底。
+ * 默认标准值：rgba(12,16,24,0.72)；调大更实，调小面板会变透明。
+ */
+[data-glass-tier="solid"] .omega-manifesto {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    rgba(12, 16, 24, 0.72);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.20);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/*
+ * 安卓 solid tier fallback — 支柱卡片 (pillar)
+ * 金色点缀保持不变，底板改为不透明深色。
+ * 默认标准值：rgba(16,20,28,0.78)；调大更实，调小卡片会变透明。
+ */
+[data-glass-tier="solid"] .omega-pillar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 200, 80, 0.06) 0%,
+      rgba(255, 255, 255, 0.03) 40%,
+      transparent 100%
+    ),
+    rgba(16, 20, 28, 0.78);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(255, 255, 255, 0.16);
+  border-top-color: rgba(255, 255, 255, 0.26);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+[data-glass-tier="solid"] .omega-pillar:hover {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 200, 80, 0.10) 0%,
+      rgba(255, 200, 80, 0.04) 40%,
+      transparent 100%
+    ),
+    rgba(20, 24, 32, 0.82);
+}
+
 /* ---- Arrow icon inside ghost CTA ---- */
 .omega-cta__arrow {
   width: 14px;
@@ -518,6 +574,8 @@
  */
 .omega-manifesto {
   max-width: 480px;
+  min-width: 0; /* flex/grid 子项默认 min-width:auto，显式置零防止移动端溢出 */
+  overflow: hidden;
   padding: 20px 24px;
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(10px) saturate(1.1);
@@ -536,9 +594,9 @@
   line-height: 1.7;
   color: hsl(var(--omega-fg) / 0.55);
   margin: 0 0 14px;
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
-  word-break: keep-all;
-  overflow-wrap: normal;
+  /* 允许长单词在容器边界断行，防止移动端撑出卡片 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-manifesto__highlight {
@@ -551,9 +609,9 @@
   padding-left: 14px;
   /* 金琥珀分割线，区别于 About 的蓝色 */
   border-left: 2px solid rgba(255, 200, 80, 0.4);
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
-  word-break: keep-all;
-  overflow-wrap: normal;
+  /* 允许长单词在容器边界断行，防止移动端撑出卡片 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- 四大支柱 ---------- */
@@ -578,9 +636,9 @@
   text-transform: uppercase;
   color: hsl(var(--omega-fg) / 0.5);
   margin-bottom: 16px;
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
-  word-break: keep-all;
-  overflow-wrap: normal;
+  /* 允许长单词在容器边界断行，防止移动端撑出卡片 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-pillars__grid {
@@ -603,6 +661,8 @@
 
 /* 支柱卡片 — 金色点缀磨砂玻璃 */
 .omega-pillar {
+  min-width: 0; /* grid 子项默认 min-width:auto，显式置零防止移动端溢出 */
+  overflow: hidden;
   padding: 20px;
   border-radius: 12px;
   /*
@@ -649,9 +709,9 @@
   color: hsl(var(--omega-fg) / 0.92);
   margin: 0;
   letter-spacing: 0.01em;
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
-  word-break: keep-all;
-  overflow-wrap: normal;
+  /* 允许长单词在容器边界断行，防止移动端撑出卡片 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-pillar__desc {
@@ -660,9 +720,9 @@
   line-height: 1.6;
   color: hsl(var(--omega-fg) / 0.72);
   margin: 0;
-  /* 防止移动端单词被截断，只按空格换行，单词内部永不截断 */
-  word-break: keep-all;
-  overflow-wrap: normal;
+  /* 允许长单词在容器边界断行，防止移动端撑出卡片 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- 出场动画 ---------- */

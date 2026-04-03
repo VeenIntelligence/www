@@ -12,6 +12,12 @@
      透明度异常、甚至完全透明），因此安卓统一降级到 'solid' 层。
    - 'solid' 层用较高不透明度的纯色背景 + box-shadow 模拟玻璃质感，
      视觉上接近磨砂但不依赖 backdrop-filter。
+
+   DevTools 模拟处理：
+   - 桌面 DevTools 模拟移动端时 UA 可通过设备模拟注入 Android 标记，
+     底层渲染引擎仍是桌面 Chrome，backdrop-filter 看起来正常。
+   - 为确保开发调试时能预览真实的 solid 降级效果，当 DevTools 注入
+     了 Android UA 时同样降级到 solid。
    ================================================================ */
 
 const GLASS_MOBILE_BREAKPOINT = 768;
@@ -40,6 +46,7 @@ function supportsBackdropFilter(win) {
  * 对安卓平台即使通过特性检测也标记为不可靠。
  */
 function isBackdropReliable(platform, win) {
+  // 安卓一律不可靠 — 包括真机和 DevTools 模拟
   if (platform === 'android') return false;
   return supportsBackdropFilter(win);
 }
