@@ -41,11 +41,21 @@ export const COPY = {
   sigma: {
     en: {
       subheading: 'Project',
-      headingLines: [
-        'Building the next-gen',
-        'infrastructure protocol for',
-        'human collective intelligence',
-      ],
+      headingLines: {
+        /* 桌面端（≥768px）：3 行，标准排版 */
+        lg: [
+          'Building the next-gen',
+          'infrastructure protocol for',
+          'human collective intelligence',
+        ],
+        /* 手机端（<768px）：4 行，每行更短避免单词截断 */
+        sm: [
+          'Building the',
+          'next-gen infrastructure',
+          'protocol for human',
+          'collective intelligence',
+        ],
+      },
       manifesto: 'The internet connected 5 billion people, but it never made us collectively smarter. Social platforms became attention extraction machines — algorithms optimize for dwell time, not cognitive growth. Misinformation spreads 6x faster than truth.',
       manifestoHighlight: 'Project Σ believes this is not a failure of human nature, but a failure of infrastructure.',
       pillarTitle: 'Four Pillars',
@@ -111,11 +121,21 @@ export const COPY = {
   omega: {
     en: {
       subheading: 'Project',
-      headingLines: [
-        'Trading frameworks exist.',
-        'Their development process',
-        'never does.',
-      ],
+      headingLines: {
+        /* 桌面端（≥768px）：3 行，保留戏剧节奏 */
+        lg: [
+          'Trading frameworks exist.',
+          'Their development process',
+          'never does.',
+        ],
+        /* 手机端（<768px）：4 行，每行更短避免溢出 */
+        sm: [
+          'Trading frameworks',
+          'exist.',
+          'Their development',
+          'process never does.',
+        ],
+      },
       subtitle: 'Every strategy listed for sale is either already dead or a deliberate trap — malicious code embedded to drain your wallet. A system that still earns never leaves its creator. What we sell is not the system — it is the complete documented journey of building one.',
       manifesto: 'Every serious team keeps their real system locked away. What makes it to market — the tutorials, the pre-built strategies, the polished dashboards — is either already obsolete or deliberately incomplete. The development process, the actual commit-by-commit record of how a real system was reasoned through, revised, and hardened, is never for sale.',
       manifestoHighlight: 'Project Ω is the first to change that. What you buy is the complete evolutionary record: every architecture decision, every failed approach, every pivot — documented in real time as the system was built.',

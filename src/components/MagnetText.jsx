@@ -23,15 +23,31 @@ const MagnetText = forwardRef(function MagnetText(
 ) {
   const text = typeof children === 'string' ? children : String(children ?? '');
 
+  /*
+   * 按空格拆分成单词，每个单词内部的字符用 inline-block span 包裹，
+   * 整个单词再用 inline-flex span 包裹（防止单词内部断行）。
+   * 单词之间插入普通空格字符（允许浏览器在此处换行）。
+   */
+  const words = text.split(' ');
+
   return (
     <Tag ref={ref} className={className} {...rest}>
-      {[...text].map((char, i) => (
-        <span
-          key={i}
-          className={`magnet-char ${charClassName}`.trim()}
-          style={{ display: 'inline-block', willChange: 'transform' }}
-        >
-          {char === ' ' ? '\u00A0' : char}
+      {words.map((word, wi) => (
+        <span key={wi}>
+          {/* 单词容器：inline-flex 确保内部字符不会被拆散到不同行 */}
+          <span style={{ display: 'inline-flex' }}>
+            {[...word].map((char, ci) => (
+              <span
+                key={ci}
+                className={`magnet-char ${charClassName}`.trim()}
+                style={{ display: 'inline-block', willChange: 'transform' }}
+              >
+                {char}
+              </span>
+            ))}
+          </span>
+          {/* 单词之间插入普通空格，允许浏览器在此处自然换行 */}
+          {wi < words.length - 1 ? ' ' : null}
         </span>
       ))}
     </Tag>

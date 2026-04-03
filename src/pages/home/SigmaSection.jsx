@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { Fragment, useCallback, useRef } from 'react';
 import { motion as Motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -6,6 +6,7 @@ import MagnetText from '../../components/MagnetText';
 import useCharMagnet from '../../hooks/useCharMagnet';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
+import useBreakpoint, { resolveHeadingLines } from '../../hooks/useBreakpoint';
 import '../../styles/sections/sigma.css';
 
 /**
@@ -68,6 +69,8 @@ function PillarCard({ pillar, index }) {
 export default function SigmaSection() {
   const { lang } = useLanguage();
   const copy = COPY.sigma[lang];
+  const bp = useBreakpoint();
+  const lines = resolveHeadingLines(copy.headingLines, bp);
   const sectionRef = useRef(null);
   const headingH2Ref = useRef(null);
 
@@ -139,17 +142,21 @@ export default function SigmaSection() {
               style={{ y: yHeading, transitionDelay: '0.15s' }}
             >
               <h2 className="sigma-heading__h2" ref={headingH2Ref}>
-                <MagnetText key={`${lang}-0`} tag="span" className="sigma-heading__light">
-                  {copy.headingLines[0]}
-                </MagnetText>
-                <br />
-                <MagnetText key={`${lang}-1`} tag="span" className="sigma-heading__light">
-                  {copy.headingLines[1]}
-                </MagnetText>
-                <br />
-                <MagnetText key={`${lang}-2`} tag="span" className="sigma-heading__display">
-                  {copy.headingLines[2]}
-                </MagnetText>
+                {lines.map((line, i) => {
+                  const isLast = i === lines.length - 1;
+                  return (
+                    <Fragment key={i}>
+                      {i > 0 && <br />}
+                      <MagnetText
+                        key={`${lang}-${bp}-${i}`}
+                        tag="span"
+                        className={isLast ? 'sigma-heading__display' : 'sigma-heading__light'}
+                      >
+                        {line}
+                      </MagnetText>
+                    </Fragment>
+                  );
+                })}
               </h2>
 
               {/* CTA 按钮紧跟标题下方 */}
