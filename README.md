@@ -2,9 +2,9 @@
 
 > **Venn Intelligence Foundation LLC** — Decentralized Privacy × LLM Infrastructure × Intelligent Trading
 
-Official landing page for Venn Intelligence Foundation, a Wyoming-based LLC specializing in next-generation AI infrastructure, quantitative trading systems, academic donations, and technical consulting.
+Official website for Venn Intelligence Foundation, a Wyoming-based LLC specializing in next-generation AI infrastructure, quantitative trading systems, academic donations, and technical consulting.
 
-🌐 **Domain**: [vennai.org](https://vennai.org)
+🌐 **Live**: [vennai.org](https://vennai.org)
 
 ---
 
@@ -26,19 +26,19 @@ Official landing page for Venn Intelligence Foundation, a Wyoming-based LLC spec
 
 ## 🎯 What We Do
 
-### Core Focus Areas
-- **Decentralized Privacy** — Building infrastructure for a privacy-first future
-- **LLM-Era Infrastructure** — Tools and platforms for the age of large language models
-- **Intelligent Trading Systems** — AI-agent-driven quantitative trading infrastructure
+### Project Σ (Sigma) — Collective Intelligence Infrastructure
+Building the next-generation infrastructure protocol for human collective intelligence. Four pillars: Proof of Humanity (ZK-based), Σ Engine (information-theoretic evaluation), Cognitive Topology (self-organizing knowledge fields), and Bazaar of Currencies (multi-tribe token economics).
 
-### Our Product — VennTriggerTrade
-A comprehensive intelligent scheduling infrastructure for strategy generation and execution, powered by large language model agents and featuring a smart hook-based architecture.
+### Project Ω (Omega) — AI Trading Development Documentation
+The first product to sell the complete evolutionary record of building an AI-agent-driven trading system — every architecture decision, every failed approach, every pivot, documented in real time. Featuring agent-native intelligence, trigger-driven execution, reflection dashboards, and human-agent co-governance via Telegram.
 
-→ [Product Details →](/product/venn-trigger-trade)
+### Consulting Services
+Personal consulting from Taitan Pascal (co-founder), offered in two tiers:
+- **Casual Chat** — $100 / 30 min
+- **Formal Consulting** — $1000 / hour (with Google Meeting replay & legal documentation)
 
-### Services
-- **Academic Donation Program** — Supporting research and education
-- **Technical Consulting** — Linux systems, AI agents, prompt engineering, and more
+### Blog
+Markdown-based blog system with per-article routing (`/blog/:slug`), table of contents generation, and full i18n support.
 
 ---
 
@@ -46,19 +46,27 @@ A comprehensive intelligent scheduling infrastructure for strategy generation an
 
 ```
 Frontend:
-  ├── React 19.x
-  ├── Vite 8.x
-  ├── Vanilla CSS (custom design system)
-  └── React Router (client-side routing)
+  ├── React 19.x            (SPA with client-side routing)
+  ├── Vite 8.x              (dev server & build tooling)
+  ├── Tailwind CSS 4.x      (utility-first styling)
+  ├── Three.js 0.183.x      (WebGL rendering pipeline)
+  ├── Framer Motion 12.x    (page transitions & animations)
+  ├── React Router 7.x      (client-side routing)
+  └── @liquidglass/react    (glassmorphism effects)
+
+Rendering Pipeline:
+  ├── UnifiedStage           (full-screen fixed WebGL compositor)
+  ├── Custom GLSL shaders    (droplet, frosted wave, sequin looks)
+  ├── GPU adaptive quality   (auto-scales resolution by frame rate)
+  └── Section freeze system  (pauses off-screen heavy renders)
 
 Hosting:
-  ├── Cloudflare Workers (GitHub auto deploy)
-  └── Custom domain (vennai.org)
+  ├── Cloudflare Workers     (edge deployment, auto-deploy from GitHub)
+  └── Custom domain          (vennai.org)
 
-Language:
-  ├── Default: English
-  ├── Supported: Chinese (中文)
-  └── Others: via Google Translate
+i18n:
+  ├── English (default)
+  └── Chinese (中文)
 ```
 
 ---
@@ -68,35 +76,128 @@ Language:
 ```
 Vennai/
 ├── public/
-│   ├── favicon.ico
-│   └── assets/                # Static images, icons
+│   ├── brand/                  # Brand assets (avatar SVG/PNG)
+│   ├── video/                  # Video assets
+│   ├── favicon.svg             # Site favicon
+│   ├── screenshot*.jpg         # OG / preview screenshots
+│   └── consul-lines.png        # Consultant section decoration
 ├── src/
-│   ├── components/            # Reusable UI components
-│   │   ├── Navbar.jsx
-│   │   ├── Hero.jsx
-│   │   ├── About.jsx
-│   │   ├── Product.jsx
-│   │   ├── Services.jsx
-│   │   └── Footer.jsx
-│   ├── pages/                 # Page-level components
-│   │   ├── Home.jsx           # Main landing page
-│   │   ├── ProductDetail.jsx  # VennTriggerTrade detail page
-│   │   └── NotFound.jsx       # 404
-│   ├── i18n/                  # Internationalization
-│   │   ├── en.json            # English strings
-│   │   └── zh.json            # Chinese strings
-│   ├── styles/                # CSS files
-│   │   ├── index.css          # Global styles & design tokens
-│   │   └── components/        # Component-specific styles
-│   ├── App.jsx                # Root component with routing
-│   └── main.jsx               # Entry point
-├── todos/                     # Development task tracking
-│   └── phase1-design-layout.md
-├── index.html
-├── vite.config.js
+│   ├── components/             # Global shared components
+│   │   ├── Navbar.jsx          # Sticky navigation bar
+│   │   ├── Footer.jsx          # Site footer
+│   │   ├── UnifiedStage.jsx    # Full-screen WebGL rendering compositor
+│   │   ├── LiquidGoldBackground.jsx  # Frosted gold canvas background
+│   │   ├── ScrollDownArrow.jsx # Animated scroll indicator
+│   │   ├── LanguageToggle.jsx  # EN/ZH language switcher
+│   │   ├── MagnetText.jsx      # Magnetic text hover effect
+│   │   ├── GPUDebugPanel.jsx   # Dev-only GPU tuning panel
+│   │   └── common/             # Shared micro-components
+│   │       ├── BrandWordmark.jsx
+│   │       ├── I18nSwap.jsx
+│   │       ├── ScrollToTop.jsx
+│   │       └── SocialIcons.jsx
+│   ├── pages/
+│   │   ├── HomePage.jsx        # Landing page assembler
+│   │   ├── BlogPage.jsx        # Blog listing page
+│   │   ├── BlogArticlePage.jsx # Individual blog post page
+│   │   ├── NotFound.jsx        # 404
+│   │   ├── home/               # Landing page sections
+│   │   │   ├── HeroSection.jsx       # Hero with animated title
+│   │   │   ├── SigmaSection.jsx      # Project Σ introduction
+│   │   │   ├── OmegaSection.jsx      # Project Ω introduction
+│   │   │   ├── ConsultantsSection.jsx # Consulting services
+│   │   │   └── PendulumBackground.jsx # Pendulum animation
+│   │   └── blog/
+│   │       ├── registry.js     # Blog post metadata registry
+│   │       └── posts/          # Markdown blog articles
+│   ├── hooks/                  # Shared React hooks
+│   │   ├── useSectionFreeze.js     # Pause off-screen heavy renders
+│   │   ├── useAdaptiveQuality.js   # GPU auto-quality scaling
+│   │   └── useCharMagnet.js        # Character magnet interaction
+│   ├── config/                 # Centralized configuration
+│   │   ├── i18n.js             # All UI text (EN + ZH)
+│   │   ├── dropletLook.js      # Hero droplet shader params
+│   │   ├── frostedWaveLook.js  # Sigma frosted wave params
+│   │   ├── sequinLook.js       # Omega sequin shader params
+│   │   └── consultantsLook.js  # Consultants visual params
+│   ├── shaders/                # GLSL shader modules
+│   │   ├── unifiedFragment.js  # Main fragment shader (all looks)
+│   │   └── fullscreenVertex.js # Fullscreen quad vertex shader
+│   ├── utils/                  # Pure utility functions
+│   │   ├── unifiedShaderBuilder.js  # Shader compilation pipeline
+│   │   ├── unifiedPhysics.js        # Physics simulation engine
+│   │   ├── gpuDebugBus.js           # GPU debug event bus
+│   │   ├── glassCompatibility.js    # Device glass effect detection
+│   │   ├── glassUtils.js            # Glass rendering helpers
+│   │   └── frameThrottle.js         # Frame rate throttling
+│   ├── context/                # React Contexts
+│   │   ├── LanguageContext.jsx # Language provider (EN/ZH)
+│   │   └── useLanguage.js      # Language hook shorthand
+│   ├── styles/
+│   │   ├── components/         # Component stylesheets
+│   │   │   ├── navbar.css
+│   │   │   ├── footer.css
+│   │   │   ├── gpu-debug-panel.css
+│   │   │   ├── liquid-gold-bg.css
+│   │   │   ├── scroll-down-arrow.css
+│   │   │   └── brand-wordmark.css
+│   │   ├── sections/           # Landing page section styles
+│   │   │   ├── hero.css
+│   │   │   ├── sigma.css
+│   │   │   ├── omega.css
+│   │   │   └── consultants.css
+│   │   ├── pages/              # Page-level styles
+│   │   │   └── blog.css
+│   │   └── glass-fallback.css  # Fallback for non-glass devices
+│   ├── assets/                 # Bundled static assets
+│   ├── App.jsx                 # Root component (pure router)
+│   ├── main.jsx                # Entry point
+│   └── index.css               # Global reset & CSS custom properties
+├── scripts/
+│   └── audit.mjs               # Code quality audit script
+├── docs/
+│   ├── audit.md                # Audit documentation
+│   └── conpanyinfo.md          # Company information
+├── todos/                      # Development task tracking
+├── index.html                  # HTML entry point
+├── vite.config.js              # Vite configuration
+├── wrangler.toml               # Cloudflare Workers config
+├── worker.js                   # Worker entry point
+├── eslint.config.js            # ESLint flat config
 ├── package.json
-└── README.md
+├── AGENT.md                    # AI agent instructions (triple-sync)
+├── GEMINI.md                   # AI agent instructions (triple-sync)
+└── CLAUDE.md                   # AI agent instructions (triple-sync)
 ```
+
+---
+
+## ✨ Key Features
+
+### WebGL Rendering Pipeline
+The site features a **UnifiedStage** — a full-screen fixed-position WebGL compositor built with Three.js. It renders multiple shader "looks" that transition seamlessly as the user scrolls between sections:
+
+| Section | Shader Look | Description |
+|---------|-------------|-------------|
+| Hero | Droplet | Organic liquid droplet simulation |
+| Sigma | Frosted Wave | Cool-toned frosted glass wave |
+| Omega | Sequin | Warm gold sequin/hexagonal grid |
+| Consultants | Custom | Pendulum background animation |
+
+### GPU Adaptive Quality
+The `useAdaptiveQuality` hook automatically monitors frame rate over a 30-frame sliding window and scales rendering resolution to maintain smooth performance across devices — from high-end desktops to mobile phones.
+
+### Section Freeze System
+The `useSectionFreeze` hook uses IntersectionObserver + Page Visibility API to completely pause WebGL rendering loops for off-screen sections, dramatically reducing GPU usage on long-scroll pages.
+
+### GPU Debug Panel
+In development mode (`npm run dev:gpu`), a floating GPU tuning panel allows real-time adjustment of shader parameters, quality tiers, and resolution scaling. Production builds completely tree-shake this panel — zero runtime overhead.
+
+### Glassmorphism Compatibility
+Automatic detection of device glass effect support with graceful CSS fallbacks for Android and lower-end devices.
+
+### Internationalization
+All UI text is centralized in `src/config/i18n.js` with full English and Chinese translations. Language toggle persists user preference.
 
 ---
 
@@ -106,14 +207,23 @@ Vennai/
 # Install dependencies
 npm install
 
-# Start development server
+# Start development server (port 5273)
 npm run dev
+
+# Start with GPU debug panel enabled
+npm run dev:gpu
 
 # Build for production
 npm run build
 
 # Preview production build
 npm run preview
+
+# Run code quality audit
+npm run audit
+
+# Lint
+npm run lint
 ```
 
 ---
@@ -122,77 +232,61 @@ npm run preview
 
 ### Cloudflare Workers (Production)
 
-Repository:
-- Git provider: GitHub
-- Repo: `https://github.com/VeenIntelligence/www`
-- Production branch: `main`
-- Monorepo: yes (current frontend project root is `/`)
+| | |
+|---|---|
+| **Git Provider** | GitHub |
+| **Repository** | `VeenIntelligence/www` |
+| **Production Branch** | `main` |
+| **Auto Deploy** | On push to `main` |
 
-Build config:
-- Build command: `npm run build`
-- Build output directory: `dist`
-- Root directory: `/`
-- Node.js version: `20.19.0+` (Vite 8 requires `^20.19.0 || >=22.12.0`)
-- Install command: `npm install` (or `npm ci`)
-- Config file: `wrangler.toml`
-- Worker entrypoint: `worker.js`
+**Build Configuration:**
 
-Wrangler config:
-- `name = "www"`
-- `main = "worker.js"`
-- `assets.directory = "./dist"`
-- `assets.binding = "ASSETS"`
-- `assets.not_found_handling = "single-page-application"`
+| | |
+|---|---|
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+| **Root Directory** | `/` |
+| **Node.js Version** | `^20.19.0 \|\| >=22.12.0` (Vite 8 requirement) |
+| **Worker Entrypoint** | `worker.js` |
 
-Cloudflare dashboard checks:
-- Service name should be `www`
-- Git repo should be `VeenIntelligence/www`
-- Automatic deployments should be enabled
-- Latest deployment logs should show your repo build output (not default template)
+**Wrangler Config** (`wrangler.toml`):
+```toml
+name = "www"
+main = "worker.js"
+compatibility_date = "2026-03-28"
 
-If you still see `Hello World`, open `Workers & Pages -> www -> Deployments` and check logs for missing `wrangler.toml`, wrong root directory, or failed build.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+```
 
-Environment variables:
-- Production: none
+**SPA Routing:** Handled at the Workers asset level via `not_found_handling = "single-page-application"`. No `_redirects` file needed.
 
-Routing:
-- SPA fallback: enabled at Worker assets level via `not_found_handling = "single-page-application"`
-- `public/_redirects` remains compatible for static hosting fallback
-
-#### Setup Steps
-1. In Cloudflare dashboard, go to `Workers & Pages` -> `www` -> `Settings` -> `Builds & deployments`.
-2. Connect GitHub repo `VeenIntelligence/www` and set production branch to `main`.
-3. Set root directory to `/`, build command to `npm run build`, output directory to `dist`.
-4. Keep `wrangler.toml` at repo root so Cloudflare can resolve `worker.js` and static asset binding.
-5. Redeploy from `Deployments` after saving settings.
-6. Bind custom domain `vennai.org` (and optional `www.vennai.org`) to Worker `www`.
-
-#### Domain Status Note
-You said the domain is purchased but not bound to any server yet. That is fine.
-You only need DNS pointing to Cloudflare (or nameservers switched to Cloudflare) before/while binding `vennai.org` to this Worker service.
-
-#### Manual Trigger Command
-Default behavior is auto deploy on push to `main`.
-If you want to force a deploy without code changes, run:
+### Manual Deploy Trigger
 
 ```bash
 git commit --allow-empty -m "chore: trigger cloudflare workers deploy" && git push origin main
 ```
 
+### Cloudflare Worker + Pages Deploy
+
+```bash
+npm run cf:deploy
+```
+
 ---
 
-## 📋 Development Phases
+## 🧪 Development Tools
 
-Development is tracked in the [`todos/`](./todos/) directory.
-
-| Phase | Focus | Status |
-|-------|-------|--------|
-| **Phase 1** | Page layout & content structure | 🔄 In Progress |
-| Phase 2 | Visual polish & animations | ⏳ Pending |
-| Phase 3 | Stripe payment + backend integration | ⏳ Pending |
-| Phase 4 | Email, analytics, production deploy | ⏳ Pending |
-
-→ See [todos/phase1-design-layout.md](./todos/phase1-design-layout.md) for current tasks.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Standard dev server on port 5273 |
+| `npm run dev:gpu` | Dev server with GPU debug panel enabled |
+| `npm run build` | Production build (also used for validation) |
+| `npm run audit` | Code quality & performance audit |
+| `npm run cf:dev` | Build + local Wrangler dev server |
+| `npm run cf:deploy` | Build + deploy to Cloudflare Workers |
 
 ---
 

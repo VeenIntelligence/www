@@ -935,6 +935,10 @@ void main() {
     // Reflection
     vec3 reflDir = reflect(rd, nFront);
     vec3 reflProcedural = envMap(reflDir) * GLASS_REFLECT_MIX;
+    // 暖金色色偏：随 uMorphFactor 从冷蓝环境光过渡到暖金色调
+    // 环境光 × 暖金滤镜，模拟金色玻璃对环境光的有色反射
+    vec3 warmReflTint = vec3(1.0, 0.82, 0.45); // 暖琥珀金色滤镜
+    reflProcedural = mix(reflProcedural, reflProcedural * warmReflTint * 1.6, uMorphFactor);
     vec3 reflColor;
     if (camOn) {
       vec3 reflCamera = sampleCameraReflection(screenUV, reflDir);
@@ -993,10 +997,12 @@ void main() {
     vec3 absorption = exp(-blendedAbsorption * pathLen);
     transmitted *= absorption;
 
-    // Specular
+    // Specular — 冷白 → 暖金（随 uMorphFactor 渐变）
     vec3 keyL = animateDir(vec3(0.8, 0.9, 0.5), 0.0);
     float spec = specularLobe(nFront, v, keyL, 0.000006) * GLASS_SPEC_BOOST;
-    vec3 specColor = vec3(1.0, 1.0, 0.98) * spec;
+    vec3 specTintCold = vec3(1.0, 1.0, 0.98);
+    vec3 specTintWarm = vec3(1.0, 0.88, 0.52); // 暖金高光
+    vec3 specColor = mix(specTintCold, specTintWarm, uMorphFactor) * spec;
 
     // Edge glow — 冷白 → 暖琥珀（随 uMorphFactor 渐变）
     vec3 edgeGlowColor = mix(GLASS_EDGE_GLOW, vec3(1.0, 0.78, 0.28), uMorphFactor);

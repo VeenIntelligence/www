@@ -106,6 +106,9 @@
   text-transform: uppercase;
   margin-bottom: 16px;
   color: hsl(var(--omega-fg));
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* 发光呼吸竖线 — 金琥珀色（区别于 About 的蓝色） */
@@ -242,6 +245,9 @@
   line-height: 1.0;
   letter-spacing: -0.02em;
   color: hsl(var(--omega-fg));
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-heading__light {
@@ -304,6 +310,9 @@
     0 0 48px rgba(60,  140, 255, 0.15);
   /* 最大宽度；默认标准值：576px（原 480px 增大 20%）。调大可减少换行。 */
   max-width: 500px;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- CTA 按钮区 ---------- */
@@ -534,6 +543,9 @@
   line-height: 1.7;
   color: hsl(var(--omega-fg) / 0.55);
   margin: 0 0 14px;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-manifesto__highlight {
@@ -546,6 +558,9 @@
   padding-left: 14px;
   /* 金琥珀分割线，区别于 About 的蓝色 */
   border-left: 2px solid rgba(255, 200, 80, 0.4);
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- 四大支柱 ---------- */
@@ -570,6 +585,9 @@
   text-transform: uppercase;
   color: hsl(var(--omega-fg) / 0.5);
   margin-bottom: 16px;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-pillars__grid {
@@ -638,6 +656,9 @@
   color: hsl(var(--omega-fg) / 0.92);
   margin: 0;
   letter-spacing: 0.01em;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .omega-pillar__desc {
@@ -646,6 +667,9 @@
   line-height: 1.6;
   color: hsl(var(--omega-fg) / 0.72);
   margin: 0;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- 模糊→清晰出场动画 ---------- */

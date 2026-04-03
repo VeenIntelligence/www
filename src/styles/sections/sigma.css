@@ -157,6 +157,9 @@
   text-transform: uppercase;
   margin-bottom: 16px;
   color: hsl(var(--about-fg));
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* 发光呼吸竖线 */
@@ -307,6 +310,9 @@
   line-height: 1.0;
   letter-spacing: -0.02em;
   color: hsl(var(--about-fg));
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .sigma-heading__light {
@@ -476,6 +482,9 @@
   line-height: 1.7;
   color: hsl(var(--about-fg) / 0.55);
   margin: 0 0 14px;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .sigma-manifesto__highlight {
@@ -487,6 +496,9 @@
   margin: 0;
   padding-left: 14px;
   border-left: 2px solid rgba(120, 180, 255, 0.4);
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- 四大支柱 ---------- */
@@ -511,6 +523,9 @@
   text-transform: uppercase;
   color: hsl(var(--about-fg) / 0.5);
   margin-bottom: 16px;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .sigma-pillars__grid {
@@ -576,6 +591,9 @@
   color: hsl(var(--about-fg) / 0.92);
   margin: 0;
   letter-spacing: 0.01em;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .sigma-pillar__desc {
@@ -585,6 +603,9 @@
   /* 底板变浅后从 0.48 提到 0.72，保证可读性；默认标准值：0.72 */
   color: hsl(var(--about-fg) / 0.72);
   margin: 0;
+  /* 防止移动端单词被截断，整词换行 */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ---------- 模糊→清晰出场动画（scroll 触发） ---------- */
