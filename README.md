@@ -10,34 +10,39 @@ Official website for Venn Intelligence Foundation, a Wyoming-based LLC specializ
 
 ## 🏢 Company Profile
 
-| | |
-|---|---|
-| **Full Name** | Venn Intelligence Foundation LLC |
-| **Chinese Name** | 文氏智能基金会有限责任公司 |
-| **Type** | LLC (Limited Liability Company) |
-| **State** | Wyoming (WY) |
-| **Founded** | February 25, 2026 |
-| **Registration ID** | 2026-001903366 |
-| **Address** | 30 N Gould St Ste N, Sheridan, WY 82801 |
-| **Founder & CEO** | Chengzhi Gao |
-| **Registered Agent** | Northwest Registered Agent Service Inc |
+|                      |                                         |
+| -------------------- | --------------------------------------- |
+| **Full Name**        | Venn Intelligence Foundation LLC        |
+| **Chinese Name**     | 文氏智能基金会有限责任公司              |
+| **Type**             | LLC (Limited Liability Company)         |
+| **State**            | Wyoming (WY)                            |
+| **Founded**          | February 25, 2026                       |
+| **Registration ID**  | 2026-001903366                          |
+| **Address**          | 30 N Gould St Ste N, Sheridan, WY 82801 |
+| **Founder & CEO**    | Chengzhi Gao                            |
+| **Registered Agent** | Northwest Registered Agent Service Inc  |
 
 ---
 
 ## 🎯 What We Do
 
 ### Project Σ (Sigma) — Collective Intelligence Infrastructure
+
 Building the next-generation infrastructure protocol for human collective intelligence. Four pillars: Proof of Humanity (ZK-based), Σ Engine (information-theoretic evaluation), Cognitive Topology (self-organizing knowledge fields), and Bazaar of Currencies (multi-tribe token economics).
 
 ### Project Ω (Omega) — AI Trading Development Documentation
+
 The first product to sell the complete evolutionary record of building an AI-agent-driven trading system — every architecture decision, every failed approach, every pivot, documented in real time. Featuring agent-native intelligence, trigger-driven execution, reflection dashboards, and human-agent co-governance via Telegram.
 
 ### Consulting Services
+
 Personal consulting from Taitan Pascal (co-founder), offered in two tiers:
+
 - **Casual Chat** — $100 / 30 min
 - **Formal Consulting** — $1000 / hour (with Google Meeting replay & legal documentation)
 
 ### Blog
+
 Markdown-based blog system with per-article routing (`/blog/:slug`), table of contents generation, and full i18n support.
 
 ---
@@ -175,28 +180,34 @@ Vennai/
 ## ✨ Key Features
 
 ### WebGL Rendering Pipeline
+
 The site features a **UnifiedStage** — a full-screen fixed-position WebGL compositor built with Three.js. It renders multiple shader "looks" that transition seamlessly as the user scrolls between sections:
 
-| Section | Shader Look | Description |
-|---------|-------------|-------------|
-| Hero | Droplet | Organic liquid droplet simulation |
-| Sigma | Frosted Wave | Cool-toned frosted glass wave |
-| Omega | Sequin | Warm gold sequin/hexagonal grid |
-| Consultants | Custom | Pendulum background animation |
+| Section     | Shader Look  | Description                       |
+| ----------- | ------------ | --------------------------------- |
+| Hero        | Droplet      | Organic liquid droplet simulation |
+| Sigma       | Frosted Wave | Cool-toned frosted glass wave     |
+| Omega       | Sequin       | Warm gold sequin/hexagonal grid   |
+| Consultants | Custom       | Pendulum background animation     |
 
 ### GPU Adaptive Quality
+
 The `useAdaptiveQuality` hook automatically monitors frame rate over a 30-frame sliding window and scales rendering resolution to maintain smooth performance across devices — from high-end desktops to mobile phones.
 
 ### Section Freeze System
+
 The `useSectionFreeze` hook uses IntersectionObserver + Page Visibility API to completely pause WebGL rendering loops for off-screen sections, dramatically reducing GPU usage on long-scroll pages.
 
 ### GPU Debug Panel
+
 In development mode (`npm run dev:gpu`), a floating GPU tuning panel allows real-time adjustment of shader parameters, quality tiers, and resolution scaling. Production builds completely tree-shake this panel — zero runtime overhead.
 
 ### Glassmorphism Compatibility
+
 Automatic detection of device glass effect support with graceful CSS fallbacks for Android and lower-end devices.
 
 ### Internationalization
+
 All UI text is centralized in `src/config/i18n.js` with full English and Chinese translations. Language toggle persists user preference.
 
 ---
@@ -232,24 +243,25 @@ npm run lint
 
 ### Cloudflare Workers (Production)
 
-| | |
-|---|---|
-| **Git Provider** | GitHub |
-| **Repository** | `VeenIntelligence/www` |
-| **Production Branch** | `main` |
-| **Auto Deploy** | On push to `main` |
+|                       |                        |
+| --------------------- | ---------------------- |
+| **Git Provider**      | GitHub                 |
+| **Repository**        | `VeenIntelligence/www` |
+| **Production Branch** | `main`                 |
+| **Auto Deploy**       | On push to `main`      |
 
 **Build Configuration:**
 
-| | |
-|---|---|
-| **Build Command** | `npm run build` |
-| **Output Directory** | `dist` |
-| **Root Directory** | `/` |
-| **Node.js Version** | `^20.19.0 \|\| >=22.12.0` (Vite 8 requirement) |
-| **Worker Entrypoint** | `worker.js` |
+|                       |                                                |
+| --------------------- | ---------------------------------------------- |
+| **Build Command**     | `npm run build`                                |
+| **Output Directory**  | `dist`                                         |
+| **Root Directory**    | `/`                                            |
+| **Node.js Version**   | `^20.19.0 \|\| >=22.12.0` (Vite 8 requirement) |
+| **Worker Entrypoint** | `worker.js`                                    |
 
 **Wrangler Config** (`wrangler.toml`):
+
 ```toml
 name = "www"
 main = "worker.js"
@@ -279,14 +291,14 @@ npm run cf:deploy
 
 ## 🧪 Development Tools
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Standard dev server on port 5273 |
-| `npm run dev:gpu` | Dev server with GPU debug panel enabled |
-| `npm run build` | Production build (also used for validation) |
-| `npm run audit` | Code quality & performance audit |
-| `npm run cf:dev` | Build + local Wrangler dev server |
-| `npm run cf:deploy` | Build + deploy to Cloudflare Workers |
+| Command             | Description                                 |
+| ------------------- | ------------------------------------------- |
+| `npm run dev`       | Standard dev server on port 5273            |
+| `npm run dev:gpu`   | Dev server with GPU debug panel enabled     |
+| `npm run build`     | Production build (also used for validation) |
+| `npm run audit`     | Code quality & performance audit            |
+| `npm run cf:dev`    | Build + local Wrangler dev server           |
+| `npm run cf:deploy` | Build + deploy to Cloudflare Workers        |
 
 ---
 

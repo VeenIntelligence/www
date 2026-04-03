@@ -146,6 +146,9 @@ export default function PendulumBackground({ containerRef }) {
 
     // 冲击波列表（点击 / 触摸）
     const impulses = [];
+
+    // 预分配摆球位置缓冲（避免每帧 new Array + new Object，减少 GC 压力）
+    const bobs = Array.from({ length: NUM_PENDULUMS }, () => ({ x: 0, y: 0, px: 0, dl: 0 }));
     const addImpulse = (x, y) => impulses.push({ x, y, age: 0, s: 0.15 });
     const onClickCb = (e) => addImpulse(e.clientX, e.clientY);
     const onTouchCb = (e) => {
@@ -188,8 +191,10 @@ export default function PendulumBackground({ containerRef }) {
       rafRef.current = requestAnimationFrame(draw);
       if (frameThrottle.skip()) return;
 
-      // 首次启动
-      if (startTime === null) startTime = ts;
+      // 首次启动：使用一个非零偏移量初始化，让摆球在首帧就处于
+      // 自然分散状态，而非所有摆球都在零位（正中间）。
+      // 18 秒 ≈ 30% 的完整周期，摆球已充分展开。
+      if (startTime === null) startTime = ts - 18000;
 
       // 解冻：时间补偿
       if (freezeTs !== null) {
@@ -234,8 +239,7 @@ export default function PendulumBackground({ containerRef }) {
         if (impulses[j].s < 0.001) impulses.splice(j, 1);
       }
 
-      // 计算摆球位置 & 更新拖尾
-      const bobs = new Array(NUM_PENDULUMS);
+      // 计算摆球位置 & 更新拖尾（bobs 预分配在 effect 闭包顶层，复用不 new）
       for (let i = 0; i < NUM_PENDULUMS; i++) {
         const p   = pends[i];
         const px  = margin + (usableW / (NUM_PENDULUMS - 1)) * i;
@@ -253,7 +257,10 @@ export default function PendulumBackground({ containerRef }) {
         }
 
         p.trail.push(bob.x, bob.y);
-        bobs[i] = { x: bob.x, y: bob.y, px, dl };
+        bobs[i].x = bob.x;
+        bobs[i].y = bob.y;
+        bobs[i].px = px;
+        bobs[i].dl = dl;
       }
 
       // 拖尾

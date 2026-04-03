@@ -1,14 +1,12 @@
 export const COPY = {
   nav: {
     en: {
-      hero: 'Home',
       sigma: 'Σ',
       omega: 'Ω',
       consultants: 'Consultants',
       blog: 'Blog',
     },
     zh: {
-      hero: '首页',
       sigma: 'Σ',
       omega: 'Ω',
       consultants: '咨询',

@@ -12,6 +12,21 @@ const meta = {
   /** 发布日期（ISO 格式） */
   date: '2026-03-26',
 
+  /** 分类标签（列表页 pill 展示） */
+  tags: ['Infrastructure', 'Protocol'],
+
+  /**
+   * 封面渐变定义 — 列表页卡片封面使用
+   * bg: 背景渐变色
+   * accent: 几何装饰线条颜色
+   * glow: 发光球/光源颜色
+   */
+  cover: {
+    bg: 'linear-gradient(135deg, #070d1a 0%, #0a1628 40%, #0d0d0d 100%)',
+    accent: 'rgba(100, 160, 255, 0.25)',
+    glow: 'rgba(100, 160, 255, 0.12)',
+  },
+
   /** 英文元数据 */
   en: {
     title: 'Project Σ: Building the Next-Gen Infrastructure Protocol for Human Collective Intelligence',

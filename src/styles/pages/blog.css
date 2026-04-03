@@ -1,5 +1,14 @@
 /* ============================================================
    Blog Page — 博客列表与文章详情
+   ============================================================
+   设计规范：
+   - 背景: #0a0a0a（避免纯黑 #000 显得廉价）
+   - 卡片: 细 border rgba(255,255,255,0.08) + 微弱背景色区分
+   - hover: border 发光 + 背景微亮 + 轻微上移
+   - 封面: 几何图形 + 渐变光效（避免照片）
+   - 字体: 大标题 700，正文 400，行高 1.6+
+   - 标签: pill 形状，低饱和度
+   - 布局: featured 大图 + 2列网格（桌面）/ 1列（移动）
    ============================================================ */
 
 /* ---------- 页面容器 ---------- */
@@ -7,16 +16,18 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* 纯黑背景 + 顶部极淡的蓝色光晕（Halo）*/
-  background-color: #000000;
-  background-image: radial-gradient(circle at 50% -10%, rgba(48, 120, 255, 0.08) 0%, transparent 60%);
+  /* 深灰黑背景，比 #000 更有质感 */
+  background-color: #0a0a0a;
+  /* 顶部极淡的蓝色光晕，增加空间感 */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -5%, rgba(48, 120, 255, 0.06) 0%, transparent 70%);
   color: rgba(255, 255, 255, 0.9);
   font-family: var(--font-sans);
 }
 
 .blog-page__inner {
   flex: 1; /* 撑满剩余空间，让 Footer 沉到底部 */
-  max-width: 860px;
+  max-width: 960px;
   margin: 0 auto;
   width: 100%;
   padding: 120px 40px 80px;
@@ -30,7 +41,7 @@
 
 /* ---------- 列表页头部 ---------- */
 .blog-page__header {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 .blog-page__title {
@@ -38,120 +49,198 @@
   font-weight: 700;
   letter-spacing: -0.03em;
   color: #ffffff;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 
 .blog-page__subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.12em;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   margin: 0;
 }
 
-/* ---------- 文章列表 ---------- */
-.blog-list {
-  display: flex;
-  flex-direction: column;
+/* ---------- 文章网格（非首篇）---------- */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- 卡片封面（几何 SVG 图形）---------- */
+.blog-card__cover {
+  position: relative;
+  overflow: hidden;
+  /* height 由 inline style 动态设置 */
+}
+
+.blog-card__cover-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  transition: opacity 0.4s ease, transform 0.6s ease;
+}
+
+.blog-card:hover .blog-card__cover-svg {
+  opacity: 1;
+  transform: scale(1.04);
 }
 
 /* ---------- 文章卡片 ---------- */
 .blog-card {
   display: block;
-  width: 100%;
   text-align: left;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  /* 微弱白色背景，与 #0a0a0a 页面形成层次 */
+  background: rgba(255, 255, 255, 0.03);
+  /* 细边框，低透明度白色 */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
   font-family: inherit;
   color: inherit;
   padding: 0;
 }
 
 .blog-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(120, 180, 255, 0.15);
-  transform: translateY(-2px);
+  /* hover: 背景微亮 */
+  background: rgba(255, 255, 255, 0.055);
+  /* hover: border 发光 — 蓝色辉光 */
+  border-color: rgba(120, 180, 255, 0.2);
+  /* hover: 轻微上移 */
+  transform: translateY(-4px);
+  /* hover: 外层微弱光晕 */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(120, 180, 255, 0.08);
 }
 
-/* 首篇 — featured hero 区域 */
-.blog-card__hero {
-  position: relative;
-  padding: 60px 32px 48px;
-  background-color: #000;
-  background-image: 
-    radial-gradient(circle at 70% 30%, rgba(60, 120, 220, 0.1), transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(30, 80, 180, 0.08), transparent 40%);
-  overflow: hidden;
+/* --- Featured 大卡片特有样式 --- */
+.blog-card--featured {
+  grid-column: 1 / -1; /* 占满整行 */
 }
 
-.blog-card__hero-gradient {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 80% 20%, rgba(100, 170, 255, 0.1), transparent 40%),
-    linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.95) 100%);
-  pointer-events: none;
+.blog-card--featured .blog-card__body {
+  padding: 28px 32px 32px;
 }
 
-.blog-card__hero-quote {
-  position: relative;
-  z-index: 1;
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-  font-weight: 300;
-  font-style: italic;
-  line-height: 1.6;
-  color: rgba(200, 225, 255, 0.75);
-  margin: 0;
-  max-width: 580px;
+.blog-card--featured .blog-card__title {
+  font-size: clamp(1.25rem, 2.8vw, 1.7rem);
 }
 
-/* 卡片正文区 */
+/* ---------- 卡片正文区 ---------- */
 .blog-card__body {
-  padding: 24px 28px 28px;
+  padding: 20px 24px 24px;
+}
+
+/* 日期 + 标签行 */
+.blog-card__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
 }
 
 .blog-card__date {
-  display: block;
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(180, 180, 180, 0.45);
-  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
 }
 
+/* --- Pill 标签 --- */
+.blog-card__tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.blog-card__tag {
+  display: inline-block;
+  padding: 2px 10px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* 低饱和度背景 + 略亮文字 */
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 100px; /* 完全圆角 pill */
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  line-height: 1.8;
+}
+
+/* --- 卡片标题 --- */
 .blog-card__title {
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
   font-weight: 600;
   color: #ffffff;
   margin: 0 0 10px;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
+/* --- 卡片摘要 --- */
 .blog-card__excerpt {
   font-size: 13.5px;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.55);
-  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 18px;
+  /* 非 featured 卡片限制行数 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
+.blog-card--featured .blog-card__excerpt {
+  -webkit-line-clamp: 4;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- CTA 链接 + 箭头 --- */
 .blog-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, gap 0.3s ease;
+}
+
+/* 箭头 SVG — 固定 14px，与文字匹配 */
+.blog-card__arrow {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
 }
 
 .blog-card:hover .blog-card__cta {
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.9);
+  gap: 10px;
+}
+
+.blog-card:hover .blog-card__arrow {
+  transform: translateX(2px);
 }
 
 /* ============================================================

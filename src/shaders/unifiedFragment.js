@@ -1017,10 +1017,18 @@ void main() {
     hitAlpha = 1.0;
   } else {
     if (inAboutPhase) {
-      vec3 goldBg  = liquidGoldBackground(screenUV);
-      vec3 seqBg   = frostedWaveBackground(screenUV);
-      /* uBgAlpha: 1=液态金, 0=亮片海。平滑过渡避免突变 */
-      color    = mix(seqBg, goldBg, uBgAlpha);
+      /* 按需计算背景 — 避免在 uBgAlpha 极端值时同时跑两套 FBM
+       * （每套 5 层嵌套 FBM，双倍运算是 Omega 过渡闪烁的主因）。
+       * uBgAlpha: 1=完全液态金, 0=完全磨砂暖金。 */
+      if (uBgAlpha > 0.99) {
+        color = liquidGoldBackground(screenUV);
+      } else if (uBgAlpha < 0.01) {
+        color = frostedWaveBackground(screenUV);
+      } else {
+        vec3 goldBg = liquidGoldBackground(screenUV);
+        vec3 seqBg  = frostedWaveBackground(screenUV);
+        color = mix(seqBg, goldBg, uBgAlpha);
+      }
       hitAlpha = 1.0;
     } else {
       color    = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
@@ -1031,10 +1039,15 @@ void main() {
   // 立方体/四面体淡出
   if (uCubeFade < 0.999) {
     if (inAboutPhase) {
-      // 用 uBgAlpha 平滑混合两种背景，与上面的渲染路径一致，避免硬切换闪烁
-      vec3 goldBgF  = liquidGoldBackground(screenUV);
-      vec3 seqBgF   = frostedWaveBackground(screenUV);
-      vec3 bgColor  = mix(seqBgF, goldBgF, uBgAlpha);
+      // 按需计算背景（同上面的分支优化）
+      vec3 bgColor;
+      if (uBgAlpha > 0.99) {
+        bgColor = liquidGoldBackground(screenUV);
+      } else if (uBgAlpha < 0.01) {
+        bgColor = frostedWaveBackground(screenUV);
+      } else {
+        bgColor = mix(frostedWaveBackground(screenUV), liquidGoldBackground(screenUV), uBgAlpha);
+      }
       color = mix(bgColor, color, uCubeFade);
       hitAlpha = 1.0;
     } else {
@@ -1053,10 +1066,16 @@ void main() {
     hitAlpha = 1.0;
   } else {
     if (inAboutPhase) {
-      vec3 goldBg  = liquidGoldBackground(screenUV);
-      vec3 seqBg   = frostedWaveBackground(screenUV);
-      /* uBgAlpha: 1=液态金, 0=亮片海。平滑过渡。*/
-      color    = mix(seqBg, goldBg, uBgAlpha);
+      /* 按需计算背景 — 与 glass 路径一致的优化 */
+      if (uBgAlpha > 0.99) {
+        color = liquidGoldBackground(screenUV);
+      } else if (uBgAlpha < 0.01) {
+        color = frostedWaveBackground(screenUV);
+      } else {
+        vec3 goldBg = liquidGoldBackground(screenUV);
+        vec3 seqBg  = frostedWaveBackground(screenUV);
+        color = mix(seqBg, goldBg, uBgAlpha);
+      }
       hitAlpha = 1.0;
     } else {
       color    = envMap(rd) * BG_ENV_BASE_MIX + backgroundGlow(rd);
@@ -1067,10 +1086,15 @@ void main() {
   // 立方体/四面体淡出（非玻璃路径）
   if (uCubeFade < 0.999) {
     if (inAboutPhase) {
-      // 用 uBgAlpha 平滑混合两种背景，与上面的渲染路径一致，避免硬切换闪烁
-      vec3 goldBgF  = liquidGoldBackground(screenUV);
-      vec3 seqBgF   = frostedWaveBackground(screenUV);
-      vec3 bgColor  = mix(seqBgF, goldBgF, uBgAlpha);
+      // 按需计算背景（同上面的分支优化）
+      vec3 bgColor;
+      if (uBgAlpha > 0.99) {
+        bgColor = liquidGoldBackground(screenUV);
+      } else if (uBgAlpha < 0.01) {
+        bgColor = frostedWaveBackground(screenUV);
+      } else {
+        bgColor = mix(frostedWaveBackground(screenUV), liquidGoldBackground(screenUV), uBgAlpha);
+      }
       color = mix(bgColor, color, uCubeFade);
       hitAlpha = 1.0;
     } else {

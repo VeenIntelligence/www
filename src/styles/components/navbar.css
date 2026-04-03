@@ -156,7 +156,9 @@
   text-transform: uppercase; /* Ensure all caps */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background: none;
+  border: none;
   border-radius: 0;
+  cursor: pointer;
 }
 
 /* 中文字体视觉补偿：中文字在同等 font-size 下视觉上比英文小，

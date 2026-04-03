@@ -78,13 +78,14 @@ export default function SigmaSection() {
   const headingRevealRef = useRef(null);
   const headingInView = useInView(headingRevealRef, { once: true, margin: '-80px' });
 
-  /* 逐字符磁吸交互 — 参数比 Hero 柔和，匹配较小字号 */
+  /* 逐字符磁吸交互 — 参数比 Hero 柔和，匹配较小字号。sectionRef 用于离屏冻结。 */
   const magnetMouseRef = useCharMagnet(headingH2Ref, {
     radius: 160,    /* 影响半径（px）；默认标准值：160。About 字号较小用更小半径。 */
     maxY: -10,      /* Y 位移（px）；默认标准值：-10。 */
     maxScale: 0.12, /* 缩放增益；默认标准值：0.12。 */
     maxRotate: 3,   /* 旋转角度（deg）；默认标准值：3。 */
     damping: 0.10,  /* 弹簧阻尼；默认标准值：0.10。 */
+    sectionRef: sectionRef,
   });
 
   const { scrollYProgress } = useScroll({

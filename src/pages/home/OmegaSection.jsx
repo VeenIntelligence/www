@@ -81,6 +81,7 @@ export default function OmegaSection() {
     maxScale: 0.12,
     maxRotate: 3,
     damping: 0.10,
+    sectionRef: sectionRef,
   });
 
   const { scrollYProgress } = useScroll({

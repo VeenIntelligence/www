@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+// ══════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════════════
 // 液滴 + 立方体渲染全局配置（Hero / Sigma / Omega 阶段共用）
@@ -85,8 +85,9 @@ export const SPIKE_RELEASE_MIN_SPEED = 0.5;
 
 // --- Sigma 阶段立方体 ---
 // Sigma 阶段立方体固定位置 (SDF 空间)。Desktop: 稍偏上居中。Mobile: 居上。
-export const ABOUT_CUBE_POS_DESKTOP = new THREE.Vector3(0, 0.35, 0);
-export const ABOUT_CUBE_POS_MOBILE = new THREE.Vector3(0, 0.55, 0);
+// 使用 {x,y,z} 纯对象，避免引入 Three.js 依赖（运行时由 unifiedPhysics 转为 Vector3）。
+export const ABOUT_CUBE_POS_DESKTOP = { x: 0, y: 0.35, z: 0 };
+export const ABOUT_CUBE_POS_MOBILE = { x: 0, y: 0.55, z: 0 };
 // Sigma 阶段立方体缩放倍数（相对 Hero 阶段）。默认 2.38（原 1.83 放大约30%）。让 Sigma 的方块更大。
 export const ABOUT_CUBE_SCALE = 2.18;
 // 手动被冻结到 Sigma 位置后整个方块变大时用的 GLSL 半边长。默认 0.55。
@@ -101,9 +102,9 @@ export const ABOUT_IDLE_SLERP = 0.06;
 // --- Omega 阶段正四面体 ---
 // Omega 阶段四面体固定位置 (SDF 空间)。与 Sigma 保持一致，Desktop 稍偏上居中。
 // 默认标准值：(0, 0.35, 0)，和 Sigma 立方体相同位置，视觉上连续感更强。
-export const OMEGA_CUBE_POS_DESKTOP = new THREE.Vector3(0, 0.35, 0);
+export const OMEGA_CUBE_POS_DESKTOP = { x: 0, y: 0.35, z: 0 };
 // Mobile 版四面体位置。默认标准值：(0, 0.55, 0)。
-export const OMEGA_CUBE_POS_MOBILE = new THREE.Vector3(0, 0.55, 0);
+export const OMEGA_CUBE_POS_MOBILE = { x: 0, y: 0.55, z: 0 };
 // Omega 阶段四面体缩放倍数（相对 Hero 阶段）。默认 2.18，与 Sigma 立方体保持一致。缩小 20% → 1.744。
 export const OMEGA_CUBE_SCALE = 1.744;
 

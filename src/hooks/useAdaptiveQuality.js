@@ -93,7 +93,11 @@ export default function useAdaptiveQuality(options = {}) {
       targetTier,
       targetScale,
       upgraded: targetTier === bootTier && Math.min(bootScale, targetScale) === targetScale,
-      frameTimes: new Float32Array(SAMPLE_SIZE),
+      frameTimes: (() => {
+        const buf = new Float32Array(SAMPLE_SIZE);
+        buf.fill(16.67); // 预填充 60FPS 基准值，避免被冷启动帧时间污染
+        return buf;
+      })(),
       fIdx: 0,
       lastFrameTime: performance.now(),
       timerId: null,

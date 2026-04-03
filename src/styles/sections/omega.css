@@ -252,12 +252,6 @@
 
 .omega-heading__light {
   font-weight: 300;
-  /* key 变更重挂载时触发此动画；默认标准值：320ms */
-  animation: omega-title-reveal 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.omega-heading__light + br + .omega-heading__light {
-  animation-delay: 50ms;
 }
 
 .omega-heading__light + br + .omega-heading__light + br + .omega-heading__display,
@@ -265,7 +259,6 @@
   font-weight: 600;
   /* 兜底色 */
   color: rgba(255, 230, 160, 0.96);
-  animation: omega-title-reveal 320ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both;
 }
 
 /* MagnetText 拆字后的渐变裁剪 — 金琥珀色 */
@@ -672,37 +665,27 @@
   overflow-wrap: normal;
 }
 
-/* ---------- 模糊→清晰出场动画 ---------- */
+/* ---------- 出场动画 ---------- */
 /*
- * 初始状态：模糊+透明。inView 后添加 .is-revealed 触发清晰化。
- * 持续时间；默认标准值：1.2s。模糊程度；默认标准值：16px。
+ * 初始状态：透明 + 微微下移。inView 后添加 .is-revealed 触发入场。
+ * ⚠️ 不使用 filter:blur — 与 WebGL 全屏背景同帧时 GPU 合成冲突，
+ *    会导致多帧闪烁。改用纯 opacity+transform 动画（GPU composited，
+ *    零 layout thrashing，与 WebGL 渲染和平共处）。
+ * 持续时间；默认标准值：0.9s。位移距离；默认标准值：18px。
  */
 .omega-blur-reveal {
-  filter: blur(16px);
   opacity: 0;
+  transform: translateY(18px);
   transition:
-    filter  1.2s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity   0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .omega-blur-reveal.is-revealed {
-  filter: blur(0px);
   opacity: 1;
+  transform: translateY(0);
 }
 
-/*
- * 语言切换标题行入场动画
- * 初始标准值：blur 8px，translateY 0.3em，持续 320ms。
- */
-@keyframes omega-title-reveal {
-  from {
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(0.3em);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
-}
+/* omega-title-reveal keyframe 已移除 —
+ * filter:blur 动画与 WebGL 背景同帧时引发 GPU 合成冲突导致闪烁。
+ * 入场效果由 .omega-blur-reveal transition 统一处理。 */

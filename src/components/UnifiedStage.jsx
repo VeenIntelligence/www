@@ -577,13 +577,27 @@ export default function UnifiedStage() {
     dragHandle.addEventListener('touchstart', onTouchStart, { passive: false });
 
     // ── 自适应分辨率 ──
+    // 预填充帧时间缓冲为 60FPS（16.67ms），避免首个采样窗口被 shader 编译的
+    // 超长帧时间污染，导致假性降级→升级的乒乓闪烁。
     const frameTimes = new Float32Array(30);
+    frameTimes.fill(16.67);
     let fIdx = 0, lastT = performance.now();
+    // 启动稳定期：跳过前 N 个 30 帧采样窗口不做画质调节。
+    // WebGL shader 首次编译 + GPU 管线预热会导致前几个窗口帧时间异常偏高，
+    // 如果立即响应会连续触发降级→升级，产生可见闪烁。
+    // 默认 3 个窗口（90 帧，约 1.5 秒），足够 GPU 管线完全进入稳态。
+    let stabilizeCount = 3;
+    // applyScale 调用后的冷却期（ms）。冷却期内不做下一次画质调节，
+    // 避免 setSize() 重建 buffer 导致的帧时间尖峰又触发连锁调节。
+    // 默认 800ms。
+    let lastScaleChangeAt = 0;
+    const SCALE_COOLDOWN_MS = 800;
 
     function applyScale() {
       renderer.setPixelRatio(baseDPR * scale);
       renderer.setSize(w(), h());
       uniforms.uResolution.value.set(w() * baseDPR * scale, h() * baseDPR * scale);
+      lastScaleChangeAt = performance.now();
     }
 
     function adaptQuality() {
@@ -594,6 +608,16 @@ export default function UnifiedStage() {
       lastT = now;
       fIdx = (fIdx + 1) % 30;
       if (fIdx !== 0) return;
+
+      // 启动稳定期：收集帧时间但不做画质调节，等 GPU 管线完全稳定
+      if (stabilizeCount > 0) {
+        stabilizeCount--;
+        return;
+      }
+
+      // applyScale 冷却期：上次调整后尚未冷却完毕，跳过
+      if (now - lastScaleChangeAt < SCALE_COOLDOWN_MS) return;
+
       let sum = 0;
       for (let i = 0; i < 30; i++) sum += frameTimes[i];
       const avg = sum / 30;
@@ -888,6 +912,19 @@ export default function UnifiedStage() {
       if (document.body.contains(video)) document.body.removeChild(video);
       if (videoTex) videoTex.dispose();
       placeholderTex.dispose();
+
+      // 场景清理 — 遍历所有子对象确保 GPU 资源完全释放
+      scene.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) {
+            obj.material.forEach((m) => m.dispose());
+          } else {
+            obj.material.dispose();
+          }
+        }
+      });
+      scene.clear();
 
       geo.dispose();
       material.dispose();

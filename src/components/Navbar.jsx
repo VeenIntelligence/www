@@ -10,8 +10,8 @@ import { glassClass } from '../utils/glassUtils';
 import '../styles/components/navbar.css';
 
 // 导航栏区块配置，已从硬编码文本变为仅用ID查找，配合多语言字典进行翻译使用
+// hero 已由 Logo 承担入口，不再作为独立菜单项
 const NAV_LINKS = [
-  { id: 'hero' },
   { id: 'sigma' },
   { id: 'omega' },
   { id: 'consultants' },
@@ -28,7 +28,8 @@ const NAVBAR_SECTION_OBSERVER = {
 };
 
 // 用于从多个同时可见的区块中选出当前「主角」——取 DOM 顺序最靠后且交叉比 ≥ 20% 的区块
-const SECTION_ORDER = NAV_LINKS.map(l => l.id);
+// hero 虽然不是菜单项，仍然参与可见性检测（滚到顶部时不应高亮任何菜单项）
+const SECTION_ORDER = ['hero', ...NAV_LINKS.filter(l => !l.route).map(l => l.id)];
 
 // 导航栏液态毛玻璃组件的基础物理渲染常量
 const NAVBAR_GLASS_BASE = {
@@ -57,7 +58,8 @@ const NAVBAR_GLASS_SCROLLED = {
 };
 
 export default function Navbar() {
-  const [activeSection, setActiveSection] = useState('hero');
+  // 默认 null：当用户在 hero 区域时不高亮任何菜单项
+  const [activeSection, setActiveSection] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [glassCompatibility, setGlassCompatibility] = useState(() => getGlassCompatibility());
@@ -78,48 +80,68 @@ export default function Navbar() {
   });
 
   useEffect(() => {
-    // 记录每个 section 的实时交叉比例
-    const ratioMap = new Map();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          ratioMap.set(entry.target.id, entry.intersectionRatio);
-        }
-        // 从 DOM 顺序最后（最靠近屏幕底部）的可见 section 中，选交叉比最大的
-        let bestId = null;
-        let bestScore = -1;
-        for (const id of SECTION_ORDER) {
-          const ratio = ratioMap.get(id) || 0;
-          if (ratio >= 0.15) {
-            // 靠后的 section 给予 bonus，优先级更高
-            const orderBonus = SECTION_ORDER.indexOf(id) * 0.01;
-            const score = ratio + orderBonus;
-            if (score > bestScore) {
-              bestScore = score;
-              bestId = id;
-            }
-          }
-        }
-        if (bestId) setActiveSection(bestId);
-      },
-      NAVBAR_SECTION_OBSERVER
-    );
-
-    NAV_LINKS.forEach(link => {
-      if (link.route) return; // blog 等外部路由不参与 IO 检测
-      const el = document.getElementById(link.id);
-      if (el) observer.observe(el);
-    });
-
     const onScroll = () => setScrolled(window.scrollY > NAVBAR_SCROLL_THRESHOLD);
     window.addEventListener('scroll', onScroll, { passive: true });
 
+    // 非首页不需要 section 观测
+    if (!isHome) {
+      setActiveSection(null);
+      return () => window.removeEventListener('scroll', onScroll);
+    }
+
+    // 记录每个 section 的实时交叉比例
+    const ratioMap = new Map();
+    let observer = null;
+    let rafId = null;
+
+    // HomePage 是 lazy() 加载的，section 元素可能还不在 DOM。
+    // 用 rAF 轮询等待至少一个 section 出现后再启动 IntersectionObserver。
+    const trySetupObserver = () => {
+      const sections = SECTION_ORDER
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+
+      if (sections.length === 0) {
+        // 下一帧继续尝试
+        rafId = requestAnimationFrame(trySetupObserver);
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            ratioMap.set(entry.target.id, entry.intersectionRatio);
+          }
+          // 从 DOM 顺序最后（最靠近屏幕底部）的可见 section 中，选交叉比最大的
+          let bestId = null;
+          let bestScore = -1;
+          for (const id of SECTION_ORDER) {
+            const ratio = ratioMap.get(id) || 0;
+            if (ratio >= 0.15) {
+              const orderBonus = SECTION_ORDER.indexOf(id) * 0.01;
+              const score = ratio + orderBonus;
+              if (score > bestScore) {
+                bestScore = score;
+                bestId = id;
+              }
+            }
+          }
+          if (bestId) setActiveSection(bestId);
+        },
+        NAVBAR_SECTION_OBSERVER
+      );
+
+      sections.forEach(el => observer.observe(el));
+    };
+
+    rafId = requestAnimationFrame(trySetupObserver);
+
     return () => {
-      observer.disconnect();
+      cancelAnimationFrame(rafId);
+      observer?.disconnect();
       window.removeEventListener('scroll', onScroll);
     };
-  }, []);
+  }, [isHome]);
 
   useEffect(() => {
     const onResize = () => {
@@ -161,6 +183,20 @@ export default function Navbar() {
     };
   }, [isMobile, menuOpen]);
 
+  // 点击菜单项时平滑滚动到对应区块（兼容 scroll-snap）
+  const scrollToSection = (id) => {
+    setMenuOpen(false);
+    if (!isHome) {
+      // 不在首页时，先导航回首页并携带 hash
+      window.location.href = `/#${id}`;
+      return;
+    }
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const renderLinks = () => (
     NAV_LINKS.map(link => {
       if (link.route) {
@@ -176,16 +212,15 @@ export default function Navbar() {
         );
       }
 
-      const href = isHome ? `#${link.id}` : `/#${link.id}`;
       return (
-        <a
+        <button
           key={link.id}
-          href={href}
+          type="button"
           className={`navbar__link ${isHome && activeSection === link.id ? 'navbar__link--active' : ''}`}
-          onClick={() => setMenuOpen(false)}
+          onClick={() => scrollToSection(link.id)}
         >
           {COPY.nav[lang][link.id]}
-        </a>
+        </button>
       );
     })
   );

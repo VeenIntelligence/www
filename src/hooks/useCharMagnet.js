@@ -8,6 +8,8 @@ import { useEffect, useRef } from 'react';
  * 参数：
  *   containerRef — 包含 .magnet-char 元素的容器 React ref
  *   options      — 可选调节参数（见下方 DEFAULT_OPTIONS）
+ *     options.sectionRef — 可选。如果提供，当该 section 滚出视口时自动冻结 RAF，
+ *                          避免对不可见字符执行 getBoundingClientRect()（layout thrashing）。
  *
  * 返回：
  *   mouseRef — mutable ref，消费方在 pointerMove/pointerLeave 中更新
@@ -15,7 +17,10 @@ import { useEffect, useRef } from 'react';
  *
  * 示例用法：
  *   const containerRef = useRef(null);
- *   const mouseRef = useCharMagnet(containerRef, { radius: 200 });
+ *   const mouseRef = useCharMagnet(containerRef, {
+ *     radius: 200,
+ *     sectionRef: sectionRef, // 可选：离屏冻结
+ *   });
  *
  *   const onPointerMove = (e) => {
  *     mouseRef.current.x = e.clientX;
@@ -28,6 +33,7 @@ import { useEffect, useRef } from 'react';
  *   弹簧插值 + 死区优化，空闲时跳过 DOM 写入。
  *   MutationObserver 监听容器子节点变化：语言切换后 DOM 重建时
  *   自动重新扫描 .magnet-char 并重启循环，磁吸效果不会丢失。
+ *   接入 IntersectionObserver 离屏冻结后，不在视口的 section 完全不跑 RAF。
  * ─────────────────────────────────────────── */
 
 const DEFAULT_OPTIONS = {
@@ -43,6 +49,8 @@ const DEFAULT_OPTIONS = {
   maxRotate: 4,
   /* 弹簧阻尼（0-1）；默认标准值：0.12。越小回弹越慢越柔和。 */
   damping: 0.12,
+  /* 离屏冻结 section ref；默认 null。提供后 RAF 仅在 section 可见时运行。 */
+  sectionRef: null,
 };
 
 export default function useCharMagnet(containerRef, options = {}) {
@@ -59,11 +67,14 @@ export default function useCharMagnet(containerRef, options = {}) {
     let animId = 0;
     let charEls = [];
     let springs = [];
+    /* 离屏冻结状态 — 默认可见（无 sectionRef 时始终运行） */
+    let sectionVisible = true;
+    let loopRunning = false;
 
     /* ── 初始化/重新初始化字符集 ── */
     const init = () => {
       /* 先停掉旧循环，重置旧元素 transform */
-      cancelAnimationFrame(animId);
+      stopLoop();
       charEls.forEach((el) => { el.style.transform = ''; });
 
       charEls = Array.from(container.querySelectorAll(optsRef.current.selector));
@@ -74,11 +85,27 @@ export default function useCharMagnet(containerRef, options = {}) {
         targetY: 0, targetScale: 0, targetRotate: 0,
       }));
 
-      animId = requestAnimationFrame(tick);
+      startLoop();
     };
+
+    /* ── RAF 循环控制 ── */
+    function startLoop() {
+      if (loopRunning || !charEls.length || !sectionVisible) return;
+      loopRunning = true;
+      animId = requestAnimationFrame(tick);
+    }
+
+    function stopLoop() {
+      if (!loopRunning) return;
+      loopRunning = false;
+      cancelAnimationFrame(animId);
+      animId = 0;
+    }
 
     /* ── 动画主循环 ── */
     const tick = () => {
+      if (!loopRunning) return;
+
       const o = optsRef.current;
       const mouse = mouseRef.current;
       const radiusSq = o.radius * o.radius;
@@ -149,12 +176,41 @@ export default function useCharMagnet(containerRef, options = {}) {
 
     mo.observe(container, { childList: true, subtree: true });
 
+    /* ── IntersectionObserver：离屏冻结 ──
+     * 当 sectionRef 提供时，仅在 section 可见时运行 RAF。
+     * 不可见时停止循环，避免 getBoundingClientRect() layout thrashing。
+     */
+    let io = null;
+    const sectionEl = optsRef.current.sectionRef?.current;
+    if (sectionEl) {
+      sectionVisible = false; // 初始假设不可见，等 IO 回调确认
+      io = new IntersectionObserver(
+        ([entry]) => {
+          sectionVisible = entry.isIntersecting;
+          if (sectionVisible) {
+            startLoop();
+          } else {
+            stopLoop();
+            // 冻结时清除所有字符 transform，避免残留偏移
+            charEls.forEach((el) => { el.style.transform = ''; });
+            springs.forEach((s) => {
+              s.y = 0; s.scale = 0; s.rotate = 0;
+              s.targetY = 0; s.targetScale = 0; s.targetRotate = 0;
+            });
+          }
+        },
+        { threshold: [0, 0.05] },
+      );
+      io.observe(sectionEl);
+    }
+
     /* 首次初始化 */
     init();
 
     return () => {
       mo.disconnect();
-      cancelAnimationFrame(animId);
+      if (io) io.disconnect();
+      stopLoop();
       charEls.forEach((el) => { el.style.transform = ''; });
     };
   /* containerRef 挂载后不会变，effect 只需运行一次 */

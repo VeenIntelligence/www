@@ -11,6 +11,21 @@ const meta = {
   /** 发布日期（ISO 格式） */
   date: '2026-04-02',
 
+  /** 分类标签（列表页 pill 展示） */
+  tags: ['Trading', 'AI Agent'],
+
+  /**
+   * 封面渐变定义 — 列表页卡片封面使用
+   * bg: 背景渐变色
+   * accent: 几何装饰线条颜色
+   * glow: 发光球/光源颜色
+   */
+  cover: {
+    bg: 'linear-gradient(135deg, #1a1207 0%, #2d1f0a 40%, #0d0d0d 100%)',
+    accent: 'rgba(212, 175, 55, 0.25)',
+    glow: 'rgba(212, 175, 55, 0.12)',
+  },
+
   /** 英文元数据 */
   en: {
     title: 'Project Ω: The Complete Evolutionary Record of a Real Trading System',

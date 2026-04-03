@@ -61,8 +61,8 @@ export default function HeroSection() {
   const pointerYSpring = useSpring(pointerY, { stiffness: 140, damping: 22, mass: 0.5 });
   const subtitleLines = copy.subtitleLines ?? (copy.subtitle ? [copy.subtitle] : []);
 
-  /* 逐字符磁吸交互 — 共享 hook */
-  const magnetMouseRef = useCharMagnet(titleAreaRef);
+  /* 逐字符磁吸交互 — 共享 hook，sectionRef 用于离屏冻结 */
+  const magnetMouseRef = useCharMagnet(titleAreaRef, { sectionRef: sectionRef });
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,

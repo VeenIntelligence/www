@@ -17,8 +17,8 @@ import {
   SPIKE_THROW_GAIN,
   SPIKE_RELEASE_MIN_SPEED,
   DROP_RADII,
-  ABOUT_CUBE_POS_DESKTOP,
-  ABOUT_CUBE_POS_MOBILE,
+  ABOUT_CUBE_POS_DESKTOP as _ABOUT_POS_D,
+  ABOUT_CUBE_POS_MOBILE as _ABOUT_POS_M,
   ABOUT_CUBE_SCALE,
   ABOUT_IDLE_SPIN,
   ABOUT_DRAG_SLERP,
@@ -32,8 +32,8 @@ import {
   VIDEO_FADE_END,
   CUBE_FADEOUT_START,
   CUBE_FADEOUT_END,
-  OMEGA_CUBE_POS_DESKTOP,
-  OMEGA_CUBE_POS_MOBILE,
+  OMEGA_CUBE_POS_DESKTOP as _OMEGA_POS_D,
+  OMEGA_CUBE_POS_MOBILE as _OMEGA_POS_M,
   OMEGA_CUBE_SCALE,
   OMEGA_MORPH_START,
   OMEGA_MORPH_END,
@@ -42,6 +42,13 @@ import {
   OMEGA_FADEOUT_START,
   OMEGA_FADEOUT_END,
 } from '../config/dropletLook';
+
+// dropletLook.js 导出的是纯 {x,y,z} 对象（避免全局引入 Three.js），
+// 在物理引擎中转为 THREE.Vector3 以便后续 .copy() / .lerpVectors() 等调用。
+const ABOUT_CUBE_POS_DESKTOP = new THREE.Vector3(_ABOUT_POS_D.x, _ABOUT_POS_D.y, _ABOUT_POS_D.z);
+const ABOUT_CUBE_POS_MOBILE  = new THREE.Vector3(_ABOUT_POS_M.x, _ABOUT_POS_M.y, _ABOUT_POS_M.z);
+const OMEGA_CUBE_POS_DESKTOP = new THREE.Vector3(_OMEGA_POS_D.x, _OMEGA_POS_D.y, _OMEGA_POS_D.z);
+const OMEGA_CUBE_POS_MOBILE  = new THREE.Vector3(_OMEGA_POS_M.x, _OMEGA_POS_M.y, _OMEGA_POS_M.z);
 
 // ══════════════════════════════════════════════════════════════
 // 统一物理引擎
