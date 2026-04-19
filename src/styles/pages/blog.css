@@ -76,6 +76,8 @@
 
 /* ---------- Card cover ---------- */
 .blog-card__cover {
+  grid-area: 1 / 1;
+  align-self: stretch;
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -102,12 +104,12 @@
 
 /* ---------- 文章卡片 ---------- */
 .blog-card {
-  display: block;
+  display: grid;
   text-align: left;
   text-decoration: none;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 22px;
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
   transition:
@@ -117,6 +119,10 @@
   font-family: inherit;
   color: inherit;
   padding: 0;
+  --blog-card-overlay-start: 136px;
+  --blog-card-body-pad-top: 18px;
+  --blog-card-body-pad-inline: 20px;
+  --blog-card-body-pad-bottom: 22px;
 }
 
 .blog-card:hover {
@@ -128,11 +134,14 @@
 /* --- Featured 大卡片特有样式 --- */
 .blog-card--featured {
   grid-column: 1 / -1; /* 占满整行 */
+  --blog-card-overlay-start: 184px;
+  --blog-card-body-pad-top: 22px;
+  --blog-card-body-pad-inline: 30px;
+  --blog-card-body-pad-bottom: 30px;
 }
 
 .blog-card--featured .blog-card__body {
-  margin: -32px 18px 18px;
-  padding: 28px 30px 30px;
+  padding-top: calc(var(--blog-card-overlay-start) + var(--blog-card-body-pad-top));
 }
 
 .blog-card--featured .blog-card__title {
@@ -141,18 +150,34 @@
 
 /* ---------- 卡片正文区 ---------- */
 .blog-card__body {
+  grid-area: 1 / 1;
+  align-self: end;
   position: relative;
   z-index: 2;
-  margin: -24px 14px 14px;
-  padding: 20px 20px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.66) 0%, rgba(9, 13, 23, 0.5) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 12px 30px rgba(0, 0, 0, 0.24);
+  padding:
+    calc(var(--blog-card-overlay-start) + var(--blog-card-body-pad-top))
+    var(--blog-card-body-pad-inline)
+    var(--blog-card-body-pad-bottom);
+}
+
+.blog-card__body::before {
+  content: '';
+  position: absolute;
+  top: var(--blog-card-overlay-start);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(18, 24, 38, 0.62) 0%, rgba(9, 13, 23, 0.52) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(18px) saturate(1.25);
   -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  pointer-events: none;
+}
+
+.blog-card__body > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* 日期 + 标签行 */
@@ -223,18 +248,18 @@
 }
 
 @media (max-width: 768px) {
-  .blog-card__cover {
-    height: 210px !important;
+  .blog-card {
+    --blog-card-overlay-start: 124px;
+    --blog-card-body-pad-top: 16px;
+    --blog-card-body-pad-inline: 18px;
+    --blog-card-body-pad-bottom: 20px;
   }
 
-  .blog-card__body {
-    margin: -22px 12px 12px;
-    padding: 18px 18px 20px;
-  }
-
-  .blog-card--featured .blog-card__body {
-    margin: -24px 12px 12px;
-    padding: 22px 22px 24px;
+  .blog-card--featured {
+    --blog-card-overlay-start: 152px;
+    --blog-card-body-pad-top: 18px;
+    --blog-card-body-pad-inline: 22px;
+    --blog-card-body-pad-bottom: 24px;
   }
 }
 

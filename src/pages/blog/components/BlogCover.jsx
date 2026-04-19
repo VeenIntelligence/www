@@ -514,7 +514,6 @@ export default function BlogCover({ cover, featured }) {
     <div
       ref={cardRef}
       className={`blog-card__cover blog-card__cover--silk${featured ? ' blog-card__cover--featured' : ''}`}
-      style={{ height: featured ? 320 : 220 }}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >
