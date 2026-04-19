@@ -16,21 +16,15 @@ const meta = {
   tags: ['Infrastructure', 'Protocol'],
 
   /**
-   * 封面配置 — 列表页卡片封面使用
-   * bg: 底层背景渐变
-   * palette: 抽象主体配色
-   * variant: 构图预设
-   * glassTint: 毛玻璃切片染色
+   * Cover shader colors for the blog card.
    */
   cover: {
-    bg: 'radial-gradient(circle at 50% 42%, rgba(126, 198, 255, 0.18) 0%, rgba(126, 198, 255, 0) 28%), linear-gradient(140deg, #07101e 0%, #0b1730 45%, #07161a 100%)',
-    palette: [
-      'rgba(124, 176, 255, 0.92)',
-      'rgba(127, 240, 214, 0.86)',
-      'rgba(221, 246, 255, 0.88)',
-    ],
-    variant: 'bloom',
-    glassTint: 'rgba(115, 193, 255, 0.18)',
+    bgInner: '#101726',
+    bgOuter: '#04070d',
+    glow: '#5e8fcf',
+    layers: ['#4fc1d4', '#86c8ff', '#d6f4ff'],
+    flowSpeed: 0.34,
+    sheenIntensity: 0.96,
   },
 
   /** 英文元数据 */

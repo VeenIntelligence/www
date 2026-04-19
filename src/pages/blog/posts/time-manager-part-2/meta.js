@@ -4,14 +4,12 @@ const meta = {
   date: '2026-04-11',
   tags: ['Architecture', 'Trading', 'Engineering'],
   cover: {
-    bg: 'radial-gradient(circle at 50% 48%, rgba(86, 170, 255, 0.16) 0%, rgba(86, 170, 255, 0) 22%), linear-gradient(135deg, #091126 0%, #10233d 42%, #081823 100%)',
-    palette: [
-      'rgba(86, 170, 255, 0.9)',
-      'rgba(88, 228, 255, 0.82)',
-      'rgba(177, 197, 255, 0.84)',
-    ],
-    variant: 'halo',
-    glassTint: 'rgba(110, 176, 255, 0.16)',
+    bgInner: '#131225',
+    bgOuter: '#04050c',
+    glow: '#5d71c3',
+    layers: ['#4c7fe8', '#6daeff', '#b7a7ff'],
+    flowSpeed: 0.36,
+    sheenIntensity: 0.94,
   },
   en: {
     title: 'How to Design a Quantitative Trading Time Manager? (Part 2)',

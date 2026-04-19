@@ -15,21 +15,15 @@ const meta = {
   tags: ['Trading', 'AI Agent'],
 
   /**
-   * 封面配置 — 列表页卡片封面使用
-   * bg: 底层背景渐变
-   * palette: 抽象主体配色
-   * variant: 构图预设
-   * glassTint: 毛玻璃切片染色
+   * Cover shader colors for the blog card.
    */
   cover: {
-    bg: 'radial-gradient(circle at 72% 34%, rgba(255, 193, 97, 0.16) 0%, rgba(255, 193, 97, 0) 24%), linear-gradient(145deg, #191107 0%, #2d1808 42%, #120d09 100%)',
-    palette: [
-      'rgba(255, 176, 78, 0.9)',
-      'rgba(255, 125, 89, 0.84)',
-      'rgba(255, 238, 192, 0.9)',
-    ],
-    variant: 'prism',
-    glassTint: 'rgba(255, 186, 112, 0.17)',
+    bgInner: '#21150d',
+    bgOuter: '#090503',
+    glow: '#b96c3d',
+    layers: ['#a86a2c', '#d98a63', '#f2d6ae'],
+    flowSpeed: 0.4,
+    sheenIntensity: 1.02,
   },
 
   /** 英文元数据 */

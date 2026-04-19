@@ -74,102 +74,30 @@
   }
 }
 
-/* ---------- 卡片封面（抽象主体 + 毛玻璃切片）---------- */
+/* ---------- Card cover ---------- */
 .blog-card__cover {
   position: relative;
   overflow: hidden;
-  /* height 由 inline style 动态设置 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   isolation: isolate;
 }
 
-.blog-cover-art,
-.blog-cover-art__scene,
-.blog-cover-art__glass-layer {
+.blog-card__cover-canvas,
+.blog-card__cover-vignette {
   position: absolute;
   inset: 0;
 }
 
-.blog-cover-art {
-  overflow: hidden;
+.blog-card__cover-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.blog-cover-art__ambient,
-.blog-cover-art__sheen,
-.blog-cover-art__grain {
-  position: absolute;
-  inset: 0;
+.blog-card__cover-vignette {
   pointer-events: none;
-}
-
-.blog-cover-art__ambient {
   background:
-    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.08) 0%, transparent 24%),
-    radial-gradient(circle at 82% 32%, rgba(255, 255, 255, 0.06) 0%, transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(5, 10, 20, 0.18) 100%);
-  opacity: 0.9;
-}
-
-.blog-cover-art__scene {
-  transform: scale(1);
-  transition: transform 0.7s ease;
-}
-
-.blog-cover-art__form {
-  position: absolute;
-  display: block;
-  border-radius: 999px;
-  mix-blend-mode: screen;
-  transform-origin: center;
-}
-
-.blog-cover-art__glass {
-  position: absolute;
-  display: block;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -20px 40px rgba(255, 255, 255, 0.04),
-    0 18px 50px rgba(2, 6, 18, 0.26);
-  backdrop-filter: blur(18px) saturate(1.35);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  transition: opacity 0.45s ease;
-}
-
-.blog-cover-art__sheen {
-  background:
-    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.08) 24%, transparent 46%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 34%, rgba(0, 0, 0, 0.16) 100%);
-  opacity: 0.8;
-  transition: opacity 0.45s ease;
-}
-
-.blog-cover-art__grain {
-  background-image:
-    radial-gradient(circle at 20% 24%, rgba(255, 255, 255, 0.12) 0 0.6px, transparent 0.9px),
-    radial-gradient(circle at 72% 68%, rgba(255, 255, 255, 0.08) 0 0.7px, transparent 1px),
-    radial-gradient(circle at 58% 34%, rgba(255, 255, 255, 0.06) 0 0.6px, transparent 0.9px);
-  background-size: 110px 110px, 140px 140px, 90px 90px;
-  opacity: 0.4;
-  mix-blend-mode: screen;
-}
-
-.blog-card__cover--featured .blog-cover-art__glass {
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-}
-
-.blog-card:hover .blog-cover-art__scene {
-  transform: scale(1.05);
-}
-
-.blog-card:hover .blog-cover-art__glass {
-  opacity: 0.92;
-}
-
-.blog-card:hover .blog-cover-art__sheen {
-  opacity: 1;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.0) 24%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.0) 50%, rgba(4, 6, 12, 0.4) 100%);
 }
 
 /* ---------- 文章卡片 ---------- */
@@ -177,15 +105,12 @@
   display: block;
   text-align: left;
   text-decoration: none;
-  /* 微弱白色背景，与 #0a0a0a 页面形成层次 */
-  background: rgba(255, 255, 255, 0.03);
-  /* 细边框，低透明度白色 */
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
   transition:
-    background 0.35s ease,
     border-color 0.35s ease,
     transform 0.35s ease,
     box-shadow 0.35s ease;
@@ -195,13 +120,8 @@
 }
 
 .blog-card:hover {
-  /* hover: 背景微亮 */
-  background: rgba(255, 255, 255, 0.055);
-  /* hover: border 发光 — 蓝色辉光 */
   border-color: rgba(120, 180, 255, 0.2);
-  /* hover: 轻微上移 */
   transform: translateY(-4px);
-  /* hover: 外层微弱光晕 */
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(120, 180, 255, 0.08);
 }
 
@@ -211,7 +131,8 @@
 }
 
 .blog-card--featured .blog-card__body {
-  padding: 28px 32px 32px;
+  margin: -32px 18px 18px;
+  padding: 28px 30px 30px;
 }
 
 .blog-card--featured .blog-card__title {
@@ -220,7 +141,18 @@
 
 /* ---------- 卡片正文区 ---------- */
 .blog-card__body {
-  padding: 20px 24px 24px;
+  position: relative;
+  z-index: 2;
+  margin: -24px 14px 14px;
+  padding: 20px 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(18, 24, 38, 0.66) 0%, rgba(9, 13, 23, 0.5) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 12px 30px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
 /* 日期 + 标签行 */
@@ -256,10 +188,10 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   /* 低饱和度背景 + 略亮文字 */
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.58);
   border-radius: 100px; /* 完全圆角 pill */
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   line-height: 1.8;
 }
 
@@ -276,7 +208,7 @@
 .blog-card__excerpt {
   font-size: 13.5px;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.54);
   margin: 0 0 18px;
   /* 非 featured 卡片限制行数 */
   display: -webkit-box;
@@ -287,7 +219,23 @@
 
 .blog-card--featured .blog-card__excerpt {
   -webkit-line-clamp: 4;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.58);
+}
+
+@media (max-width: 768px) {
+  .blog-card__cover {
+    height: 210px !important;
+  }
+
+  .blog-card__body {
+    margin: -22px 12px 12px;
+    padding: 18px 18px 20px;
+  }
+
+  .blog-card--featured .blog-card__body {
+    margin: -24px 12px 12px;
+    padding: 22px 22px 24px;
+  }
 }
 
 /* --- CTA 链接 + 箭头 --- */
