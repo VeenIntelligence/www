@@ -16,15 +16,21 @@ const meta = {
   tags: ['Infrastructure', 'Protocol'],
 
   /**
-   * 封面渐变定义 — 列表页卡片封面使用
-   * bg: 背景渐变色
-   * accent: 几何装饰线条颜色
-   * glow: 发光球/光源颜色
+   * 封面配置 — 列表页卡片封面使用
+   * bg: 底层背景渐变
+   * palette: 抽象主体配色
+   * variant: 构图预设
+   * glassTint: 毛玻璃切片染色
    */
   cover: {
-    bg: 'linear-gradient(135deg, #070d1a 0%, #0a1628 40%, #0d0d0d 100%)',
-    accent: 'rgba(100, 160, 255, 0.25)',
-    glow: 'rgba(100, 160, 255, 0.12)',
+    bg: 'radial-gradient(circle at 50% 42%, rgba(126, 198, 255, 0.18) 0%, rgba(126, 198, 255, 0) 28%), linear-gradient(140deg, #07101e 0%, #0b1730 45%, #07161a 100%)',
+    palette: [
+      'rgba(124, 176, 255, 0.92)',
+      'rgba(127, 240, 214, 0.86)',
+      'rgba(221, 246, 255, 0.88)',
+    ],
+    variant: 'bloom',
+    glassTint: 'rgba(115, 193, 255, 0.18)',
   },
 
   /** 英文元数据 */

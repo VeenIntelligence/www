@@ -4,9 +4,14 @@ const meta = {
   date: '2026-04-11',
   tags: ['Architecture', 'Trading', 'Engineering'],
   cover: {
-    bg: 'linear-gradient(135deg, #0a1128 0%, #1c3b5a 40%, #0d1b2a 100%)',
-    accent: 'rgba(56, 189, 248, 0.25)',
-    glow: 'rgba(56, 189, 248, 0.12)',
+    bg: 'radial-gradient(circle at 50% 48%, rgba(86, 170, 255, 0.16) 0%, rgba(86, 170, 255, 0) 22%), linear-gradient(135deg, #091126 0%, #10233d 42%, #081823 100%)',
+    palette: [
+      'rgba(86, 170, 255, 0.9)',
+      'rgba(88, 228, 255, 0.82)',
+      'rgba(177, 197, 255, 0.84)',
+    ],
+    variant: 'halo',
+    glassTint: 'rgba(110, 176, 255, 0.16)',
   },
   en: {
     title: 'How to Design a Quantitative Trading Time Manager? (Part 2)',

@@ -74,25 +74,102 @@
   }
 }
 
-/* ---------- 卡片封面（几何 SVG 图形）---------- */
+/* ---------- 卡片封面（抽象主体 + 毛玻璃切片）---------- */
 .blog-card__cover {
   position: relative;
   overflow: hidden;
   /* height 由 inline style 动态设置 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  isolation: isolate;
 }
 
-.blog-card__cover-svg {
+.blog-cover-art,
+.blog-cover-art__scene,
+.blog-cover-art__glass-layer {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.8;
-  transition: opacity 0.4s ease, transform 0.6s ease;
 }
 
-.blog-card:hover .blog-card__cover-svg {
+.blog-cover-art {
+  overflow: hidden;
+}
+
+.blog-cover-art__ambient,
+.blog-cover-art__sheen,
+.blog-cover-art__grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.blog-cover-art__ambient {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.08) 0%, transparent 24%),
+    radial-gradient(circle at 82% 32%, rgba(255, 255, 255, 0.06) 0%, transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(5, 10, 20, 0.18) 100%);
+  opacity: 0.9;
+}
+
+.blog-cover-art__scene {
+  transform: scale(1);
+  transition: transform 0.7s ease;
+}
+
+.blog-cover-art__form {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  mix-blend-mode: screen;
+  transform-origin: center;
+}
+
+.blog-cover-art__glass {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -20px 40px rgba(255, 255, 255, 0.04),
+    0 18px 50px rgba(2, 6, 18, 0.26);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  transition: opacity 0.45s ease;
+}
+
+.blog-cover-art__sheen {
+  background:
+    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.08) 24%, transparent 46%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 34%, rgba(0, 0, 0, 0.16) 100%);
+  opacity: 0.8;
+  transition: opacity 0.45s ease;
+}
+
+.blog-cover-art__grain {
+  background-image:
+    radial-gradient(circle at 20% 24%, rgba(255, 255, 255, 0.12) 0 0.6px, transparent 0.9px),
+    radial-gradient(circle at 72% 68%, rgba(255, 255, 255, 0.08) 0 0.7px, transparent 1px),
+    radial-gradient(circle at 58% 34%, rgba(255, 255, 255, 0.06) 0 0.6px, transparent 0.9px);
+  background-size: 110px 110px, 140px 140px, 90px 90px;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+}
+
+.blog-card__cover--featured .blog-cover-art__glass {
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+
+.blog-card:hover .blog-cover-art__scene {
+  transform: scale(1.05);
+}
+
+.blog-card:hover .blog-cover-art__glass {
+  opacity: 0.92;
+}
+
+.blog-card:hover .blog-cover-art__sheen {
   opacity: 1;
-  transform: scale(1.04);
 }
 
 /* ---------- 文章卡片 ---------- */
