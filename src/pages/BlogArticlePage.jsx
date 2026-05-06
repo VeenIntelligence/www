@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '../context/useLanguage';
 import { COPY } from '../config/i18n';
 import Footer from '../components/Footer';
+import ArticleSchema from '../components/seo/ArticleSchema';
 import { BLOG_POSTS } from './blog/registry';
 import NotFound from './NotFound';
 import '../styles/pages/blog.css';
@@ -32,6 +33,13 @@ export default function BlogArticlePage() {
     <main className="blog-page">
       <div className="blog-page__inner">
         <article className="blog-detail">
+          <ArticleSchema
+            slug={post.slug}
+            date={post.meta.date}
+            title={localMeta.title}
+            excerpt={localMeta.excerpt}
+            tags={post.meta.tags}
+          />
           <Link to="/blog" className="blog-detail__back">
             {copy.backToList}
           </Link>
@@ -51,3 +59,4 @@ export default function BlogArticlePage() {
     </main>
   );
 }
+

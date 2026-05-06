@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { COPY } from '../../config/i18n';
 import { useLanguage } from '../../context/useLanguage';
 import LiquidGoldBackground from '../../components/LiquidGoldBackground';
@@ -61,6 +61,32 @@ export default function ConsultantsSection({ children }) {
   const { lang } = useLanguage();
   const content = COPY.consultants[lang];
   const sectionRef = useRef(null);
+  const [activeCheckout, setActiveCheckout] = useState('');
+  const [checkoutError, setCheckoutError] = useState('');
+
+  const openCheckout = async (rate) => {
+    setCheckoutError('');
+    setActiveCheckout(rate);
+
+    try {
+      const response = await fetch('/api/checkout/formal-consulting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rate }),
+      });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error || 'checkout_failed');
+      }
+
+      window.location.assign(payload.url);
+    } catch (error) {
+      console.error(error);
+      setActiveCheckout('');
+      setCheckoutError(content.checkout.error);
+    }
+  };
 
   return (
     <section
@@ -110,12 +136,20 @@ export default function ConsultantsSection({ children }) {
             {/* Panel 2 & 3: Consulting tiers */}
             {content.tiers.map((tier, idx) => {
               const isPremium = idx === 1;
+              const rate = isPremium ? 'standard' : 'invite';
+              const note = checkoutError && activeCheckout === ''
+                ? content.checkout.error
+                : activeCheckout === rate
+                  ? (isPremium ? content.checkout.loadingStandard : content.checkout.loadingInvite)
+                  : tier.note;
+
               return (
                 <GlassPanel key={tier.name} variant={isPremium ? 'premium' : 'standard'}>
                   <div className={`consultants-panel__inner consultants-tier ${isPremium ? 'consultants-tier--premium' : ''}`}>
                     <div className="consultants-tier__head">
                       <span className="consultants-tier__index">{tier.label}</span>
                       <h3 className="consultants-tier__name">{tier.name}</h3>
+                      <p className="consultants-tier__summary">{tier.summary}</p>
                     </div>
 
                     <div className="consultants-tier__price-wrap">
@@ -135,10 +169,15 @@ export default function ConsultantsSection({ children }) {
                     <button
                       type="button"
                       className={`consultants-cta ${isPremium ? 'consultants-cta--premium' : ''}`}
+                      onClick={() => openCheckout(rate)}
+                      disabled={activeCheckout !== ''}
+                      aria-busy={activeCheckout === rate}
                     >
                       {tier.button}
                       <ArrowRight className="consultants-cta__arrow" />
                     </button>
+
+                    <p className="consultants-tier__note">{note}</p>
                   </div>
                 </GlassPanel>
               );

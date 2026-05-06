@@ -1,0 +1,33 @@
+# Venn Intelligence Foundation
+
+> Venn Intelligence Foundation is a research organization funding the first
+> infrastructure protocols for human collective intelligence. We operate two
+> core projects: Project Σ (decentralized collective intelligence protocol)
+> and Project Ω (AI-native trading system with full development transparency).
+> Founded by Taitan Pascal. Based at vennai.org.
+
+## About
+- [Homepage](https://vennai.org/): Landing page with full project overviews
+- [Blog](https://vennai.org/blog): Thoughts and announcements
+
+## Project Σ — Collective Intelligence Protocol
+- Proof of Humanity: Zero-knowledge proof of unique personhood — without revealing identity
+- The Σ Engine: Information-theoretic evaluation of every message's true contribution to collective intelligence
+- Cognitive Topology: Multi-dimensional cognitive space where content flows from high to low potential
+- Bazaar of Currencies: Fork your own tribe, issue your own token — wisdom priced by the free market
+
+## Project Ω — AI-Native Trading Infrastructure
+- Agent-Native Intelligence: LLM as primary decision maker, not a plugin
+- Trigger-Driven Precision: Agent-generated conditional hooks that fire on exact market signals
+- Reflection Dashboard: Transparent trade outcome and performance tracking
+- Human-Agent Co-governance: Real-time Telegram integration for manual orders, status queries, and danger alerts
+
+## Consulting
+- Taitan Pascal offers formal consulting sessions ($1000/hour standard, $100/hour by invite)
+- Topics: AI infrastructure, trading systems, life optimization
+- Contact: contact@vennai.org
+
+## Contact
+- Email: contact@vennai.org
+- Twitter: @venn_foundation
+- GitHub: VennIntelligence

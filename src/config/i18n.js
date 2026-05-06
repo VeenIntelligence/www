@@ -207,22 +207,31 @@ export const COPY = {
       bio2: 'Co-founder of Venn Intelligence.',
       tiers: [
         {
-          label: 'Tier One',
-          name: 'Casual Chat',
+          label: 'Invite Rate',
+          name: 'Private Invite Rate',
           price: '$100',
-          duration: '/ 30 min',
-          features: ['For mutuals and friends', 'Casual chat without recording', 'Half an hour to solve core confusions'],
-          button: 'Book Now',
+          duration: '/ hour',
+          summary: 'The same formal consulting session, unlocked by a private invite code.',
+          features: ['Same scope as the full consulting session', 'Private promotion code required at checkout', 'Limited distribution for friends and close referrals'],
+          note: 'If you do not have a code, book the standard rate.',
+          button: 'Use Invite Rate',
         },
         {
-          label: 'Tier Two',
+          label: 'Standard Rate',
           name: 'Formal Consulting',
           price: '$1000',
           duration: '/ hour',
+          summary: 'The default booking path for the full consulting engagement.',
           features: ['Full Google Meeting replay', 'Requires signing legal documents', 'Formal and comprehensive deep dive'],
-          button: 'Book Now',
+          note: 'Public checkout. No invite code required.',
+          button: 'Book Standard Rate',
         }
-      ]
+      ],
+      checkout: {
+        loadingInvite: 'Opening invite checkout...',
+        loadingStandard: 'Opening standard checkout...',
+        error: 'Checkout is temporarily unavailable. Please email contact@vennai.org.',
+      },
     },
     zh: {
       sectionTitle: '咨询服务',
@@ -232,22 +241,31 @@ export const COPY = {
       bio2: 'Venn Intelligence 联合创始人',
       tiers: [
         {
-          label: '层级一',
-          name: '熟人简单聊',
+          label: '邀请码价',
+          name: '私密邀请码价',
           price: '$100',
-          duration: '/ 半小时',
-          features: ['适合认识的朋友', '轻松交流不录像', '半小时解决核心困惑'],
-          button: '立即预约',
+          duration: '/ 小时',
+          summary: '和正式咨询是同一项服务，只是通过私密邀请码解锁折扣价格。',
+          features: ['服务范围与正式咨询一致', '结账时需要输入私密折扣码', '只面向朋友与近距离转介绍限量发放'],
+          note: '如果你没有邀请码，请直接走标准价预约。',
+          button: '使用邀请码价',
         },
         {
-          label: '层级二',
+          label: '标准价',
           name: '正规咨询',
           price: '$1000',
           duration: '/ 小时',
+          summary: '这是完整正式咨询的默认预约入口。',
           features: ['完整的 Google Meeting 回放', '要求签署相关法律文件', '正式且全方位的深度探讨'],
-          button: '立即预约',
+          note: '公开结账，无需邀请码。',
+          button: '预约标准价',
         }
-      ]
+      ],
+      checkout: {
+        loadingInvite: '正在打开邀请码结账...',
+        loadingStandard: '正在打开标准价结账...',
+        error: '暂时无法打开结账页面，请发送邮件到 contact@vennai.org。',
+      },
     },
   },
   blog: {

@@ -1,0 +1,6 @@
+STRIPE_SECRET_KEY=sk_test_xxxxx
+STRIPE_FORMAL_CONSULTING_PRICE_ID=price_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+SITE_URL=http://127.0.0.1:8787
+STRIPE_SUCCESS_URL=http://127.0.0.1:8787/?checkout=success#consultants
+STRIPE_CANCEL_URL=http://127.0.0.1:8787/?checkout=cancel#consultants

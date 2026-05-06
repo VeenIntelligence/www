@@ -1,0 +1,43 @@
+# ── Vennai.org robots.txt ──
+# 允许传统搜索引擎和 AI 搜索 Agent 抓取，屏蔽纯训练/爬取类
+
+# ── 默认：所有爬虫允许 ──
+User-agent: *
+Allow: /
+Sitemap: https://vennai.org/sitemap.xml
+
+# ── AI 搜索 Agent（明确允许） ──
+# OpenAI 搜索
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+# Google AI
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# ── 纯训练/批量爬取类（屏蔽） ──
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /

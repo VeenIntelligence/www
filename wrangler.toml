@@ -2,6 +2,12 @@ name = "www"
 main = "worker.js"
 compatibility_date = "2026-03-28"
 
+[vars]
+STRIPE_FORMAL_CONSULTING_PRICE_ID = "price_1TNwNj3XjhTjA4m7a66dA3lT"
+SITE_URL = "https://vennai.org"
+STRIPE_SUCCESS_URL = "https://vennai.org/?checkout=success#consultants"
+STRIPE_CANCEL_URL = "https://vennai.org/?checkout=cancel#consultants"
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"
